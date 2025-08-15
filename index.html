@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghostly Tools</title>
+<style>
+/* Body & background */
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    color: #fff;
+    background: url('https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg') no-repeat center center fixed;
+    background-size: cover;
+    filter: grayscale(20%) brightness(0.5);
+    position: relative;
+    overflow-x: hidden;
+    padding: 40px 0;
+}
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    z-index: 0;
+}
+
+/* Heading and slogan */
+h1 { font-size: 3em; color: #fff; text-shadow: 0 0 15px #fff,0 0 30px #ccc; margin-bottom:20px; z-index:10; animation: fadeInOut 15s ease-in-out infinite; }
+.ghost-emoji { display:inline-block; animation: floatPulse 2s ease-in-out infinite; }
+@keyframes floatPulse { 0%{transform:translateY(0) scale(1);}25%{transform:translateY(-12px) scale(1.1);}50%{transform:translateY(0) scale(1);}75%{transform:translateY(-6px) scale(1.05);}100%{transform:translateY(0) scale(1);} }
+@keyframes fadeInOut {0%{opacity:1;}50%{opacity:0;}100%{opacity:1;}}
+
+#slogan { font-size:1.5em; font-weight:bold; margin-bottom:25px; animation:pulse 2s infinite; }
+@keyframes pulse {0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
+
+/* Content box */
+#description { max-width:800px; margin:0 auto 40px; text-align:left; line-height:1.5em; font-size:1em; background-color: rgba(0,0,0,0.5); padding:20px; border-radius:10px; box-shadow:0 0 20px #000; position:relative; z-index:10; }
+
+/* Inputs & buttons */
+input, button { padding:12px 20px; font-size:16px; border-radius:8px; border:2px solid #fff; background-color: rgba(0,0,0,0.6); color:#f0f0f0; margin:5px; transition:0.3s; box-shadow:0 0 10px #fff; z-index:10; }
+input[type="text"], input[type="password"]{ width:260px; text-align:center; }
+button:hover { background:#fff; color:#000; transform:scale(1.1); box-shadow:0 0 20px #fff; }
+
+/* Downloads */
+#downloads a { display:block; margin:20px auto; padding:15px 30px; background: rgba(0,0,0,0.6); color:#f0f0f0; text-decoration:none; border:2px solid #fff; border-radius:10px; width:320px; font-weight:bold; text-transform:uppercase; text-shadow:0 0 5px #fff; box-shadow:0 0 10px #fff; transition:0.3s; }
+#downloads a:hover { background:#fff; color:#000; transform:scale(1.1); text-shadow:0 0 15px #000; box-shadow:0 0 20px #fff; }
+
+/* Smoke */
+.smoke-container { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; overflow:hidden; z-index:5; }
+.smoke { position:absolute; width:450px; height:450px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 80%); filter:blur(60px); opacity:0.2; animation: drift linear infinite; transition:0.5s; }
+@keyframes drift {0%{transform:translateY(100vh) translateX(0) rotate(0deg); opacity:0;}10%{opacity:0.1;}50%{opacity:0.25;}90%{opacity:0.1;}100%{transform:translateY(-200px) translateX(60px) rotate(360deg); opacity:0;}}
+</style>
+</head>
+<body>
+
+<h1>Ghostly Tools <span class="ghost-emoji">👻</span></h1>
+<p id="slogan">Invisible. Anonymous. Unstoppable</p>
+
+<div id="description">
+<p>Ghostly Tools is a hub for anyone who wants to operate online like a ghost – staying invisible while accessing powerful tools safely and privately. From exploring networks to testing IPs, managing connections, or using dark web utilities, this is the place for everything tech-savvy and discreet.</p>
+<p><strong>What You Can Do Here:</strong></p>
+<ul>
+<li><strong>Ghostly Tools Hub:</strong> Your central access point to all utilities and resources.</li>
+<li><strong>Savage Multi Tool:</strong> A dark web multi-tool that lets you access accessories, automate tasks, and analyze systems efficiently.</li>
+<li><strong>Pinger & Network Tools:</strong> Quickly check servers, networks, or IP addresses for speed, availability, and status.</li>
+<li><strong>IP Lookup & Privacy Utilities:</strong> Everything you need to monitor, analyze, or protect connections while remaining anonymous.</li>
+</ul>
+<p><strong>Important:</strong> Downloads are password-protected. Ghostly Tools is not for everyone — it’s designed for tech-savvy individuals who know what they’re doing and want to operate privately and efficiently online. Only those with the password can access the software.</p>
+</div>
+
+<!-- Auth -->
+<div id="auth">
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+<button onclick="signUp()">Sign Up</button>
+<button onclick="signIn()">Sign In</button>
+</div>
+
+<!-- Downloads -->
+<div id="downloads" style="display:none;">
+<a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Tools</a>
+<a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage Multi Tool</a>
+<a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pinger</a>
+</div>
+
+<div class="smoke-container">
+<div class="smoke" style="left:5%; animation-duration: 45s;"></div>
+<div class="smoke" style="left:25%; animation-duration: 55s;"></div>
+<div class="smoke" style="left:50%; animation-duration: 65s;"></div>
+<div class="smoke" style="left:70%; animation-duration: 60s;"></div>
+<div class="smoke" style="left:85%; animation-duration: 70s;"></div>
+</div>
+
+<audio id="bg-music" autoplay loop>
+<source src="ghostly_music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+
+let users = JSON.parse(localStorage.getItem("users")||"{}");
+let currentUser = null;
+const ADMIN_USER = "Ghostly";
+const ADMIN_PASS = "Dare2995!";
+
+function signUp(){
+const u = document.getElementById("username").value.trim();
+const p = document.getElementById("password").value.trim();
+if(!u||!p){ alert("Fill all fields."); return; }
+if(users[u]){ alert("Username exists."); return; }
+users[u]={password:p, verified:false};
+localStorage.setItem("users", JSON.stringify(users));
+currentUser = u;
+alert("Signed up! Wait for verification.");
+sendWebhook(u);
+}
+
+function signIn(){
+const u = document.getElementById("username").value.trim();
+const p = document.getElementById("password").value.trim();
+if(u===ADMIN_USER && p===ADMIN_PASS){
+window.location.href="admin.html";
+return;
+}
+if(!users[u] || users[u].password!==p){ alert("Wrong credentials."); return; }
+currentUser = u;
+if(users[u].verified){
+document.getElementById("downloads").style.display="block";
+alert("Access granted!");
+} else { alert("Wait for admin approval."); }
+}
+
+function sendWebhook(username){
+fetch(DISCORD_WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:`New sign-up: ${username}`})});
+}
+
+// Music
+const music=document.getElementById('bg-music'); music.volume=0.8; music.play().catch(()=>{});
+
+// Smoke fade on scroll
+window.addEventListener('scroll',()=>{ const scrollY=window.scrollY; document.querySelectorAll('.smoke').forEach(s=> s.style.opacity=Math.max(0.1,0.2-scrollY/1000)); });
+</script>
+</body>
+</html>
