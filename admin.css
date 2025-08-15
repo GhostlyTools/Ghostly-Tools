@@ -1,0 +1,88 @@
+/* Admin panel body */
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: 'Courier New', monospace;
+    background-color: #111;
+    color: #fff;
+}
+
+/* Heading */
+h1 {
+    text-align: center;
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    color: #fff;
+    text-shadow: 0 0 10px #fff;
+}
+
+/* Admin table */
+#user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 auto 30px;
+    max-width: 900px;
+}
+
+#user-table th, #user-table td {
+    border: 1px solid #444;
+    padding: 12px 15px;
+    text-align: center;
+}
+
+#user-table th {
+    background-color: #222;
+    color: #fff;
+}
+
+#user-table tr:nth-child(even) {
+    background-color: #1a1a1a;
+}
+
+/* Buttons */
+button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.approve-btn {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.approve-btn:hover {
+    background-color: #1e7e34;
+}
+
+.remove-btn {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.remove-btn:hover {
+    background-color: #a71d2a;
+}
+
+/* Notification area */
+#admin-notification {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #ff0;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    #user-table th, #user-table td {
+        padding: 8px;
+        font-size: 12px;
+    }
+    button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
