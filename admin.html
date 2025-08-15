@@ -3,32 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Tools Admin</title>
-<style>
-body { background:#111; color:#fff; font-family:'Courier New', monospace; padding:20px; }
-h1{ text-align:center; }
-.user-entry { display:flex; justify-content:space-between; margin-bottom:10px; background:#222; padding:5px 10px; border-radius:5px; }
-button { padding:5px 10px; margin-left:5px; }
-</style>
+<title>Ghostly Tools Admin Panel</title>
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<h1>Admin Panel</h1>
-<div id="user-list"></div>
-<script>
-let users=JSON.parse(localStorage.getItem("users")||"{}");
-function updateUserList(){
-const div=document.getElementById("user-list"); div.innerHTML="";
-for(let u in users){
-const e=document.createElement("div"); e.className="user-entry";
-let buttons='';
-if(!users[u].verified){ buttons=`<button onclick="approve('${u}')">Approve</button><button onclick="reject('${u}')">Reject</button>`; }
-else{ buttons=`<button onclick="kick('${u}')">Kick</button>`; }
-e.innerHTML=`<span>${u} ${users[u].verified?'✔️':'⏳'}</span><div>${buttons}</div>`; div.appendChild(e);
-}}
-function approve(u){ if(users[u]){ users[u].verified=true; localStorage.setItem("users",JSON.stringify(users)); updateUserList(); alert(u+" approved."); } }
-function reject(u){ if(users[u]){ delete users[u]; localStorage.setItem("users",JSON.stringify(users)); updateUserList(); alert(u+" rejected."); } }
-function kick(u){ if(users[u]){ delete users[u]; localStorage.setItem("users",JSON.stringify(users)); updateUserList(); alert(u+" removed."); } }
-updateUserList();
-</script>
+
+<h1>Ghostly Tools Admin Panel</h1>
+<p>Manage user access to downloads in real-time.</p>
+
+<table id="user-table">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Users will be populated here -->
+    </tbody>
+</table>
+
+<script src="admin.js"></script>
 </body>
 </html>

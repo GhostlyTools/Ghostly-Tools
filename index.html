@@ -8,7 +8,7 @@
 </head>
 <body>
 
-<h1 id="main-title">Ghostly Tools <span class="ghost-emoji">👻</span></h1>
+<h1 id="site-title">Ghostly Tools <span class="ghost-emoji">👻</span></h1>
 <p id="slogan">Invisible. Anonymous. Unstoppable</p>
 
 <div id="description">
@@ -22,31 +22,27 @@
     <li><strong>IP Lookup & Privacy Utilities:</strong> Everything you need to monitor, analyze, or protect connections while remaining anonymous.</li>
 </ul>
 
-<p><strong>Important:</strong> Downloads are password-protected. Ghostly Tools is not for everyone — it’s designed for tech-savvy individuals who know what they’re doing and want to operate privately and efficiently online. Only those with the password can access the software.</p>
+<p><strong>Important:</strong> Downloads are password-protected. Ghostly Tools is not for everyone — only tech-savvy users with verified access can unlock downloads.</p>
 </div>
 
-<!-- Sign Up / Sign In -->
 <div id="auth-container">
     <input type="text" id="username" placeholder="Username">
-    <input type="password" id="password" placeholder="Password">
-    <button id="signup-btn">Sign Up</button>
-    <button id="signin-btn">Sign In</button>
+    <input type="password" id="userpass" placeholder="Password">
+    <button id="sign-up-btn">Sign Up</button>
+    <button id="sign-in-btn">Sign In</button>
 </div>
 
-<!-- Pop-up notification -->
-<div id="popup" class="pop-up" style="display:none;">
-    <p id="popup-message"></p>
+<div id="popup-message" style="display:none;">
+    <p id="popup-text">Your account is pending admin approval. You cannot access downloads yet.</p>
     <button onclick="closePopup()">Close</button>
 </div>
 
-<!-- Downloads section -->
 <div id="downloads" style="display:none;">
-    <a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Tools</a>
-    <a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage Multi Tool</a>
-    <a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pinger</a>
+    <a href="ghostly_tools.zip" target="_blank">Ghostly Tools</a>
+    <a href="Savage_Multi_Tool.bat" target="_blank">Savage Multi Tool</a>
+    <a href="Pinger.zip" target="_blank">Pinger</a>
 </div>
 
-<!-- Smoke -->
 <div class="smoke-container">
     <div class="smoke" style="left:5%; animation-duration: 45s;"></div>
     <div class="smoke" style="left:25%; animation-duration: 55s;"></div>
@@ -59,6 +55,6 @@
   <source src="ghostly_music.mp3" type="audio/mpeg">
 </audio>
 
-<script src="main.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
