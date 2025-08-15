@@ -1,49 +1,69 @@
-let users = [];
-const admin = { username: "Ghostly", password: "Dare2995!", verified: true };
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+const users = {}; // {username:{password:'',approved:false}}
+const admin = {username:'Ghostly', password:'Dare2995!'};
+const webhook = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const signupBtn = document.getElementById('signup-btn');
+const signinBtn = document.getElementById('signin-btn');
+const popup = document.getElementById('popup');
+const popupMessage = document.getElementById('popup-message');
+const downloads = document.getElementById('downloads');
+
+// Play music
 const music = document.getElementById('bg-music');
 music.volume = 0.8;
-music.play().catch(()=>{});
+music.play().catch(()=>{document.addEventListener('click',()=>music.play());});
 
-document.getElementById('sign-up-btn').onclick = ()=>{
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('userpass').value.trim();
-    if(!username||!password){alert("Enter username & password");return;}
-    if(users.find(u=>u.username===username)){alert("Username exists!");return;}
-    users.push({username,password,verified:false});
-    alert("Signed up! Waiting for admin approval.");
-    showPopup("Waiting for verification...");
-    notifyDiscord(username);
-};
+// Sign Up
+signupBtn.addEventListener('click',()=>{
+    const user = usernameInput.value.trim();
+    const pass = passwordInput.value;
+    if(!user || !pass){showPopup("Fill both fields."); return;}
+    if(users[user]){showPopup("Username already exists."); return;}
+    users[user] = {password:pass, approved:false};
+    showPopup("Signed up! Wait for verification.");
+    sendWebhook(user,pass);
+    usernameInput.value=''; passwordInput.value='';
+});
 
-document.getElementById('sign-in-btn').onclick = ()=>{
-    const username = document.getElementById('username').value.trim();
-    const password = document.getElementById('userpass').value.trim();
-    if(username===admin.username && password===admin.password){
-        window.location.href="admin.html";return;
+// Sign In
+signinBtn.addEventListener('click',()=>{
+    const user = usernameInput.value.trim();
+    const pass = passwordInput.value;
+    if(user===admin.username && pass===admin.password){
+        showPopup("Admin logged in!");
+        // Admin view handled separately
+        usernameInput.value=''; passwordInput.value='';
+        return;
     }
-    let user = users.find(u=>u.username===username && u.password===password);
-    if(!user){alert("Invalid credentials");return;}
-    if(!user.verified){showPopup("Waiting for verification...");return;}
-    document.getElementById('downloads').style.display="block";
-    alert("Access granted!");
-};
+    if(!users[user]){showPopup("User not found."); return;}
+    if(users[user].password!==pass){showPopup("Incorrect password."); return;}
+    if(!users[user].approved){showPopup("Wait for verification."); return;}
+    downloads.style.display='block';
+    showPopup("Access granted!");
+});
 
+// Pop-up helpers
 function showPopup(msg){
-    document.getElementById('popup-text').innerText = msg;
-    document.getElementById('popup-message').style.display="block";
+    popupMessage.innerText=msg;
+    popup.style.display='block';
 }
-function closePopup(){document.getElementById('popup-message').style.display="none";}
+function closePopup(){popup.style.display='none';}
 
-function notifyDiscord(username){
-    fetch(WEBHOOK_URL,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({content:`New user signed up: ${username}`})
+// Discord webhook
+function sendWebhook(user,pass){
+    fetch(webhook,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({content:`New signup: ${user}`})
     });
 }
 
+// Smoke fade on scroll
 window.addEventListener('scroll',()=>{
-    document.querySelectorAll('.smoke').forEach(s=> s.style.opacity = Math.max(0.1,0.2-window.scrollY/1000));
+    const smokes=document.querySelectorAll('.smoke');
+    smokes.forEach(smoke=>{
+        smoke.style.opacity=Math.max(0.1,0.2-window.scrollY/1000);
+    });
 });
