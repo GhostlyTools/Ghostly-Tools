@@ -1,0 +1,32 @@
+body {
+    margin:0;
+    font-family:'Courier New',monospace;
+    text-align:center;
+    background:url('https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg') no-repeat center center fixed;
+    background-size:cover;
+    color:#fff;
+    position:relative;
+    overflow-x:hidden;
+    padding:40px 0;
+    filter:grayscale(20%) brightness(0.5);
+}
+body::before {
+    content:'';
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.4);
+    z-index:0;
+}
+h1 { font-size:3em;text-shadow:0 0 15px #fff,0 0 30px #ccc;margin-bottom:20px; z-index:10; animation: fadeInOut 10s ease-in-out infinite;}
+.ghost-emoji {animation:floatPulse 2s ease-in-out infinite;}
+@keyframes floatPulse {0%{transform:translateY(0) scale(1);}25%{transform:translateY(-12px) scale(1.1);}50%{transform:translateY(0) scale(1);}75%{transform:translateY(-6px) scale(1.05);}100%{transform:translateY(0) scale(1);}}
+@keyframes fadeInOut {0%{opacity:1;}50%{opacity:0;}100%{opacity:1;}}
+#slogan {font-size:1.5em;font-weight:bold;margin-bottom:25px; animation:pulse 2s infinite;}
+@keyframes pulse {0%{transform:scale(1);}50%{transform:scale(1.1);}100%{transform:scale(1);}}
+#description {max-width:800px;margin:0 auto 40px;text-align:left;line-height:1.5em;font-size:1em;background-color:rgba(0,0,0,0.5);padding:20px;border-radius:10px;box-shadow:0 0 20px #000;position:relative; z-index:10;}
+input,button {padding:12px 20px;font-size:16px;border-radius:8px;border:2px solid #fff;background-color:rgba(0,0,0,0.6);color:#f0f0f0;margin:5px;box-shadow:0 0 10px #fff;transition:all 0.3s ease;}
+button:hover {background-color:#fff;color:#000;transform:scale(1.1);box-shadow:0 0 20px #fff;}
+.smoke-container {position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden; z-index:5;}
+.smoke {position:absolute;width:450px;height:450px;background:radial-gradient(circle,rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 80%);filter:blur(60px);opacity:0.2;animation:drift linear infinite;transition:opacity 0.5s;}
+@keyframes drift {0%{transform:translateY(100vh) translateX(0) rotate(0deg);opacity:0;}10%{opacity:0.1;}50%{opacity:0.25;}90%{opacity:0.1;}100%{transform:translateY(-200px) translateX(60px) rotate(360deg);opacity:0;}}
