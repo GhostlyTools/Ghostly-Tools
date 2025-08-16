@@ -51,7 +51,60 @@ music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console
 window.addEventListener('load', ()=>{
     showPopup("Welcome to Ghostly Tools – The Ultimate Toolbox");
 });
-</script>
 
+// Toggle between Sign In / Sign Up forms
+document.getElementById('show-signup').addEventListener('click', ()=>{
+    document.getElementById('signin-form').style.display='none';
+    document.getElementById('signup-form').style.display='block';
+});
+document.getElementById('show-signin').addEventListener('click', ()=>{
+    document.getElementById('signup-form').style.display='none';
+    document.getElementById('signin-form').style.display='block';
+});
+
+// Sign Up logic
+document.getElementById('signup-btn').addEventListener('click', ()=>{
+    const username = document.getElementById('signup-username').value.trim();
+    const password = document.getElementById('signup-password').value.trim();
+    if(!username || !password){
+        showPopup("Please enter both fields.");
+        return;
+    }
+    let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+    if(users[username]){
+        showPopup("Username already exists.");
+        return;
+    }
+    users[username] = {password: password, approved: false};
+    localStorage.setItem('ghostlyUsers', JSON.stringify(users));
+    showPopup("Account created! Waiting for admin approval.");
+    document.getElementById('signup-form').style.display='none';
+    document.getElementById('signin-form').style.display='block';
+});
+
+// Sign In logic with redirects
+document.getElementById('signin-btn').addEventListener('click', ()=>{
+    const username = document.getElementById('signin-username').value.trim();
+    const password = document.getElementById('signin-password').value.trim();
+    let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+
+    if(users[username] && users[username].password===password){
+        sessionStorage.setItem('loggedInUser', username);
+
+        if(username === "Ghostly"){
+            // Admin goes to admin panel
+            window.location.href='admin.html';
+        } else if(!users[username].approved){
+            // Non-approved users go to index page, downloads locked
+            window.location.href='index.html';
+        } else {
+            // Approved users go to index page
+            window.location.href='index.html';
+        }
+    } else {
+        showPopup("Incorrect username or password.");
+    }
+});
+</script>
 </body>
 </html>
