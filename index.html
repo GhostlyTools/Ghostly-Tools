@@ -7,31 +7,36 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<script>
-const user = sessionStorage.getItem('loggedInUser');
-if(!user){ window.location.href='auth.html'; }
 
-const users = JSON.parse(localStorage.getItem('ghostlyUsers')) || {};
-const approved = (users[user] && users[user].approved);
+<script>
+  // Redirect to login if not signed in
+  const user = sessionStorage.getItem('loggedInUser');
+  if(!user){ window.location.href='auth.html'; }
+
+  const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+  const approved = users[user] && users[user].approved;
 </script>
 
+<!-- Haunted Background Logo -->
 <img id="logo" src="images/logo.png" alt="Ghostly Logo">
+
 <div class="content">
-<h1>Ghostly Tools 👻</h1>
-<p>Welcome, <span id="user-name"></span></p>
+  <h1>Ghostly Tools 👻</h1>
+  <p>Welcome, <span id="user-name"></span></p>
 </div>
 
+<!-- Downloads Section (only visible if approved) -->
 <div class="downloads" style="display:none;">
-<h2>Downloads</h2>
-<ul>
-<li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage MultiTool</a></li>
-<li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
-<li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pinger</a></li>
-</ul>
+  <h2>Downloads</h2>
+  <ul>
+    <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage MultiTool</a></li>
+    <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
+    <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pinger</a></li>
+  </ul>
 </div>
 
+<!-- Logout -->
 <a href="#" id="logout">Logout</a>
-<audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
 
 <!-- Pop-up -->
 <div id="popup" class="popup">
@@ -41,18 +46,28 @@ const approved = (users[user] && users[user].approved);
   </div>
 </div>
 
+<!-- Background Music -->
+<audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
+
+<!-- Scripts -->
 <script src="scripts.js"></script>
 <script>
 document.getElementById('user-name').innerText = user;
+
+// Show downloads only if approved
+if(approved) document.querySelector('.downloads').style.display='block';
+else showPopup("Waiting for admin approval. Downloads are locked.");
+
+// Logout functionality
 document.getElementById('logout').addEventListener('click', ()=>{
     sessionStorage.removeItem('loggedInUser');
     window.location.href='auth.html';
 });
-if(approved) document.querySelector('.downloads').style.display='block';
-else showPopup("Waiting for admin approval. Downloads are locked.");
 
+// Play background music
 const music = document.getElementById('bg-music');
 music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console.log(e));
 </script>
+
 </body>
 </html>
