@@ -11,10 +11,8 @@
 <script>
 const user = sessionStorage.getItem('loggedInUser');
 if(!user){ window.location.href='auth.html'; }
+let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
 
-const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-
-// Force logout if kicked
 if(localStorage.getItem('kick_' + user) === 'true'){
     localStorage.removeItem('kick_' + user);
     sessionStorage.removeItem('loggedInUser');
@@ -41,7 +39,6 @@ if(localStorage.getItem('kick_' + user) === 'true'){
 
 <a href="#" id="logout">Logout</a>
 
-<!-- Pop-up -->
 <div id="popup" class="popup">
   <div class="popup-content">
     <p id="popup-message">Welcome to Ghostly Tools – The Ultimate Toolbox</p>
@@ -50,34 +47,34 @@ if(localStorage.getItem('kick_' + user) === 'true'){
 </div>
 
 <div id="ghost-container"></div>
-<audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
+<audio id="bg-music" src="Ghostly_music.mp3" loop autoplay></audio>
 
 <script src="scripts.js"></script>
-<script src="auth.js"></script>
 <script>
 document.getElementById('user-name').innerText = user;
+users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
 
 const downloads = document.getElementById('downloads');
-const approved = users[user] && users[user].approved;
-
-if(!approved){
+if(!users[user] || !users[user].approved){
     downloads.style.display = 'none';
     showPopup("Waiting for admin approval. Downloads are locked.");
-} else {
-    downloads.style.display = 'block';
 }
 
-// Logout
 document.getElementById('logout').addEventListener('click', ()=>{
     sessionStorage.removeItem('loggedInUser');
     window.location.href='auth.html';
 });
 
-// Play background music
+// Music auto-play
 const music = document.getElementById('bg-music');
-music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console.log(e));
+music.volume = 0.2;
+window.addEventListener('load', () => {
+    music.play().catch(() => {
+        document.body.addEventListener('click', () => { music.play(); }, { once: true });
+    });
+});
 
-// Live check for kick while user is on page
+// Kick live check
 setInterval(()=>{
     if(localStorage.getItem('kick_' + user) === 'true'){
         localStorage.removeItem('kick_' + user);
@@ -87,7 +84,7 @@ setInterval(()=>{
     }
 }, 2000);
 
-// Show initial welcome pop-up
+// Initial welcome pop-up
 window.addEventListener('load', ()=>{
     showPopup("Welcome to Ghostly Tools – The Ultimate Toolbox");
 });

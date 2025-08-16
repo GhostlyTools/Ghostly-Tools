@@ -8,6 +8,8 @@
 </head>
 <body>
 
+<img id="logo" src="images/logo.png" alt="Ghostly Logo">
+
 <div class="admin-container">
     <h1>Ghostly Portal</h1>
 
@@ -30,7 +32,6 @@
     </div>
 </div>
 
-<!-- Pop-up -->
 <div id="popup" class="popup">
   <div class="popup-content">
     <p id="popup-message">Welcome to Ghostly Tools – The Ultimate Toolbox</p>
@@ -39,19 +40,25 @@
 </div>
 
 <div id="ghost-container"></div>
-<audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
+<audio id="bg-music" src="Ghostly_music.mp3" loop autoplay></audio>
 
 <script src="scripts.js"></script>
 <script>
+// Music auto-play
 const music = document.getElementById('bg-music');
-music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console.log(e));
+music.volume = 0.2;
+window.addEventListener('load', () => {
+    music.play().catch(() => {
+        document.body.addEventListener('click', () => { music.play(); }, { once: true });
+    });
+});
 
-// Show initial welcome pop-up
+// Pop-up welcome
 window.addEventListener('load', ()=>{
     showPopup("Welcome to Ghostly Tools – The Ultimate Toolbox");
 });
 
-// Toggle between Sign In / Sign Up forms
+// Toggle Sign In / Sign Up
 document.getElementById('show-signup').addEventListener('click', ()=>{
     document.getElementById('signin-form').style.display='none';
     document.getElementById('signup-form').style.display='block';
@@ -68,7 +75,7 @@ if(!users["Ghostly"]){
     localStorage.setItem('ghostlyUsers', JSON.stringify(users));
 }
 
-// Sign Up logic
+// Sign Up with Discord webhook
 document.getElementById('signup-btn').addEventListener('click', ()=>{
     const username = document.getElementById('signup-username').value.trim();
     const password = document.getElementById('signup-password').value.trim();
@@ -81,14 +88,23 @@ document.getElementById('signup-btn').addEventListener('click', ()=>{
         showPopup("Username already exists.");
         return;
     }
+
     users[username] = {password: password, approved: false};
     localStorage.setItem('ghostlyUsers', JSON.stringify(users));
+
     showPopup("Account created! Waiting for admin approval.");
     document.getElementById('signup-form').style.display='none';
     document.getElementById('signin-form').style.display='block';
+
+    const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+    fetch(webhookURL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: New Ghostly user signed up: **${username}** })
+    }).catch(e => console.log("Discord webhook failed", e));
 });
 
-// Sign In logic with redirects
+// Sign In
 document.getElementById('signin-btn').addEventListener('click', ()=>{
     const username = document.getElementById('signin-username').value.trim();
     const password = document.getElementById('signin-password').value.trim();
@@ -96,15 +112,9 @@ document.getElementById('signin-btn').addEventListener('click', ()=>{
 
     if(users[username] && users[username].password===password){
         sessionStorage.setItem('loggedInUser', username);
-
         if(username === "Ghostly"){
-            // Admin goes to admin panel
             window.location.href='admin.html';
-        } else if(!users[username].approved){
-            // Non-approved users go to index page, downloads locked
-            window.location.href='index.html';
         } else {
-            // Approved users go to index page
             window.location.href='index.html';
         }
     } else {
