@@ -9,15 +9,20 @@
 <body>
 
 <script>
-  // Redirect to login if not signed in
-  const user = sessionStorage.getItem('loggedInUser');
-  if(!user){ window.location.href='auth.html'; }
+const user = sessionStorage.getItem('loggedInUser');
+if(!user){ window.location.href='auth.html'; }
 
-  const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-  const approved = users[user] && users[user].approved;
+const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+
+// Force logout if kicked
+if(localStorage.getItem('kick_' + user) === 'true'){
+    localStorage.removeItem('kick_' + user);
+    sessionStorage.removeItem('loggedInUser');
+    alert("You have been kicked by the admin.");
+    window.location.href='auth.html';
+}
 </script>
 
-<!-- Haunted Background Logo -->
 <img id="logo" src="images/logo.png" alt="Ghostly Logo">
 
 <div class="content">
@@ -25,8 +30,7 @@
   <p>Welcome, <span id="user-name"></span></p>
 </div>
 
-<!-- Downloads Section (only visible if approved) -->
-<div class="downloads" style="display:none;">
+<div class="downloads" id="downloads">
   <h2>Downloads</h2>
   <ul>
     <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage MultiTool</a></li>
@@ -35,30 +39,35 @@
   </ul>
 </div>
 
-<!-- Logout -->
 <a href="#" id="logout">Logout</a>
 
 <!-- Pop-up -->
 <div id="popup" class="popup">
   <div class="popup-content">
-    <p id="popup-message">Message goes here</p>
+    <p id="popup-message">Welcome to Ghostly Tools – The Ultimate Toolbox</p>
     <button onclick="closePopup()">Close</button>
   </div>
 </div>
 
-<!-- Background Music -->
+<div id="ghost-container"></div>
 <audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
 
-<!-- Scripts -->
 <script src="scripts.js"></script>
+<script src="auth.js"></script>
 <script>
 document.getElementById('user-name').innerText = user;
 
-// Show downloads only if approved
-if(approved) document.querySelector('.downloads').style.display='block';
-else showPopup("Waiting for admin approval. Downloads are locked.");
+const downloads = document.getElementById('downloads');
+const approved = users[user] && users[user].approved;
 
-// Logout functionality
+if(!approved){
+    downloads.style.display = 'none';
+    showPopup("Waiting for admin approval. Downloads are locked.");
+} else {
+    downloads.style.display = 'block';
+}
+
+// Logout
 document.getElementById('logout').addEventListener('click', ()=>{
     sessionStorage.removeItem('loggedInUser');
     window.location.href='auth.html';
@@ -67,6 +76,16 @@ document.getElementById('logout').addEventListener('click', ()=>{
 // Play background music
 const music = document.getElementById('bg-music');
 music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console.log(e));
+
+// Live check for kick while user is on page
+setInterval(()=>{
+    if(localStorage.getItem('kick_' + user) === 'true'){
+        localStorage.removeItem('kick_' + user);
+        sessionStorage.removeItem('loggedInUser');
+        alert("You have been kicked by the admin.");
+        window.location.href='auth.html';
+    }
+}, 2000);
 </script>
 
 </body>

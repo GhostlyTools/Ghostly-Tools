@@ -3,25 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Control</title>
+<title>Ghostly Admin Panel</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="admin-container">
-    <h1>Admin Panel</h1>
-    <p>Username: <b>Ghostly</b></p>
-    <p>Password: <b>Dare2995!</b></p>
 
-    <input type="text" id="admin-username" placeholder="Admin Username">
-    <input type="password" id="admin-password" placeholder="Admin Password">
-    <button id="admin-login">Login</button>
-    <p id="admin-error" class="error"></p>
+<script>
+const adminUser = sessionStorage.getItem('loggedInUser');
+if(adminUser !== 'Ghostly'){
+    alert("Access denied. Admins only.");
+    window.location.href='auth.html';
+}
+</script>
 
-    <div id="user-list" style="display:none;">
-        <h2>Pending Approvals</h2>
-        <ul id="users-ul"></ul>
-    </div>
+<img id="logo" src="images/logo.png" alt="Ghostly Logo">
+
+<div class="content">
+  <h1>Ghostly Admin Panel 👻</h1>
 </div>
-<script src="admin.js"></script>
+
+<div class="downloads" style="width:600px;">
+    <h2>Registered Users</h2>
+    <table id="user-table" border="1" style="width:100%; color:white;">
+        <tr>
+            <th>Username</th>
+            <th>Approved</th>
+            <th>Actions</th>
+        </tr>
+    </table>
+</div>
+
+<!-- Pop-up -->
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <p id="popup-message"></p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<div id="ghost-container"></div>
+<audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
+
+<script src="scripts.js"></script>
+<script>
+// Play background music
+const music = document.getElementById('bg-music');
+music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console.log(e));
+
+// Load users
+function loadUsers(){
+    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+    const table = document.getElementById('user-table');
+    table.innerHTML = `
+    <tr>
+        <th>Username</th>
+        <th>Approved</th>
+        <th>Actions</th>
+    </tr>`;
+    for(const u in users){
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+        <td>${u}</td>
+        <td>${users[u].approved ? '✅':'❌'}</td>
+        <td>
+            <button onclick="approveUser('${u}')">Approve</button>
+            <button onclick="kickUser('${u}')">Kick</button>
+        </td>`;
+        table.appendChild(tr);
+    }
+}
+
+// Approve user
+function approveUser(username){
+    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+    if(users[username]){
+        users[username].approved = true;
+        localStorage.setItem('ghostlyUsers', JSON.stringify(users));
+        showPopup(User ${username} approved!);
+        loadUsers();
+    }
+}
+
+// Kick user (live)
+function kickUser(username){
+    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+    if(users[username]){
+        delete users[username];
+        localStorage.setItem('ghostlyUsers', JSON.stringify(users));
+        // Set live kick flag
+        localStorage.setItem('kick_' + username, 'true');
+        showPopup(User ${username} has been kicked.);
+        loadUsers();
+    }
+}
+
+// Pop-up
+function showPopup(msg){
+    const popup = document.getElementById('popup');
+    const message = document.getElementById('popup-message');
+    message.innerText = msg;
+    popup.style.display = 'flex';
+}
+function closePopup(){
+    document.getElementById('popup').style.display='none';
+}
+
+// Initial load
+loadUsers();
+</script>
+
 </body>
 </html>
