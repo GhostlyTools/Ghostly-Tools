@@ -9,12 +9,16 @@
 <body>
 
 <script>
-  // Redirect if not signed in
-  const user = sessionStorage.getItem('loggedInUser');
-  if(!user){ window.location.href='auth.html'; }
-
-  const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-  const approved = users[user] && users[user].approved;
+const user = sessionStorage.getItem('loggedInUser');
+if(!user) window.location.href='auth.html';
+const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+const approved = users[user] && users[user].approved;
+if(localStorage.getItem('kick_'+user)){
+    alert("You have been kicked by the admin.");
+    sessionStorage.removeItem('loggedInUser');
+    localStorage.removeItem('kick_'+user);
+    window.location.href='auth.html';
+}
 </script>
 
 <div class="content">
@@ -22,7 +26,6 @@
   <p>Welcome, <span id="user-name"></span></p>
 </div>
 
-<!-- Downloads Section -->
 <div class="downloads" style="display:none;">
   <h2>Downloads</h2>
   <ul>
@@ -36,7 +39,7 @@
 
 <div id="popup" class="popup">
   <div class="popup-content">
-    <p id="popup-message">Welcome to Ghostly Tools – The Ultimate Toolbox</p>
+    <p id="popup-message"></p>
     <button onclick="closePopup()">Close</button>
   </div>
 </div>
@@ -46,25 +49,16 @@
 <script src="scripts.js"></script>
 <script>
 document.getElementById('user-name').innerText = user;
-
-// Show downloads only if approved
-if(approved) document.querySelector('.downloads').style.display='block';
-else showPopup("Waiting for admin approval. Downloads are locked.");
-
-// Logout functionality
+if(approved){
+    document.querySelector('.downloads').style.display='block';
+    showPopup("Welcome to Ghostly Tools – The Ultimate Toolbox");
+} else {
+    showPopup("Waiting for admin approval. Downloads are locked.");
+}
 document.getElementById('logout').addEventListener('click', ()=>{
     sessionStorage.removeItem('loggedInUser');
     window.location.href='auth.html';
 });
-
-// Play background music on all browsers
-const music = document.getElementById('bg-music');
-music.volume = 0.2;
-music.play().catch(()=>{
-    document.body.addEventListener('click', ()=>music.play(), { once: true });
-    document.body.addEventListener('touchstart', ()=>music.play(), { once: true });
-});
 </script>
 </body>
 </html>
-

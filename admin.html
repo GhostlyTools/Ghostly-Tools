@@ -10,17 +10,7 @@
 
 <div class="content">
   <h1>Ghostly Admin Panel 👻</h1>
-
-  <!-- Admin Login -->
-  <div class="auth-form">
-    <h2>Admin Login</h2>
-    <input type="text" id="admin-username" placeholder="Username">
-    <input type="password" id="admin-password" placeholder="Password">
-    <button id="admin-login-btn">Login</button>
-  </div>
-
-  <!-- User Management -->
-  <div id="user-management" style="display:none;">
+  <div id="user-management">
     <h2>Pending Users</h2>
     <ul id="pending-users"></ul>
   </div>
@@ -37,67 +27,12 @@
 
 <script src="scripts.js"></script>
 <script>
-const ADMIN_USER = "Ghostly";
-const ADMIN_PASS = "Dare2995!";
-
-// Admin login
-document.getElementById('admin-login-btn').addEventListener('click', ()=>{
-    const username = document.getElementById('admin-username').value;
-    const password = document.getElementById('admin-password').value;
-
-    if(username === ADMIN_USER && password === ADMIN_PASS){
-        document.querySelector('.auth-form').style.display = 'none';
-        document.getElementById('user-management').style.display = 'block';
-        loadPendingUsers();
-    } else {
-        showPopup("Incorrect admin credentials.");
-    }
-});
-
-// Load pending users
-function loadPendingUsers(){
-    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-    const pending = Object.keys(users).filter(u => !users[u].approved);
-    const ul = document.getElementById('pending-users');
-    ul.innerHTML = "";
-
-    pending.forEach(u => {
-        const li = document.createElement('li');
-        li.innerHTML = `${u} 
-        <button onclick="approveUser('${u}')">Approve</button>
-        <button onclick="kickUser('${u}')">Kick</button>`;
-        ul.appendChild(li);
-    });
-}
-
-// Approve user
-function approveUser(username){
-    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-    if(users[username]){
-        users[username].approved = true;
-        localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-        loadPendingUsers();
-        showPopup(${username} has been approved.);
-    }
-}
-
-// Kick user
-function kickUser(username){
-    localStorage.setItem('kick_' + username, 'true');
-    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-    delete users[username];
-    localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-    loadPendingUsers();
-    showPopup(${username} has been kicked.);
-}
-
-// Play background music
-const music = document.getElementById('bg-music');
-music.volume = 0.2;
-music.play().catch(()=>{
-    document.body.addEventListener('click', ()=>music.play(), { once: true });
-    document.body.addEventListener('touchstart', ()=>music.play(), { once: true });
-});
+let users=JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+function loadPendingUsers(){const pending=Object.keys(users).filter(u=>!users[u].approved); const ul=document.getElementById('pending-users'); ul.innerHTML=""; pending.forEach(u=>{const li=document.createElement('li'); li.innerHTML=`${u} <button onclick="approveUser('${u}')">Approve</button> <button onclick="kickUser('${u}')">Kick</button>`; ul.appendChild(li);});}
+function approveUser(username){users[username].approved=true; localStorage.setItem('ghostlyUsers',JSON.stringify(users)); loadPendingUsers(); showPopup(${username} approved.);}
+function kickUser(username){localStorage.setItem('kick_'+username,'true'); delete users[username]; localStorage.setItem('ghostlyUsers',JSON.stringify(users)); loadPendingUsers(); showPopup(${username} kicked.);}
+loadPendingUsers();
+const music=document.getElementById('bg-music'); music.volume=0.2; music.play().catch(()=>{document.body.addEventListener('click',()=>music.play(),{once:true}); document.body.addEventListener('touchstart',()=>music.play(),{once:true});});
 </script>
 </body>
 </html>
