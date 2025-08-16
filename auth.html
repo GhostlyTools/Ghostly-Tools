@@ -11,7 +11,7 @@
 <div class="admin-container">
     <h1>Ghostly Portal</h1>
 
-    <!-- Sign In Form -->
+    <!-- Sign In -->
     <div id="signin-form">
         <h2>Sign In</h2>
         <input type="text" id="signin-username" placeholder="Username" required>
@@ -20,7 +20,7 @@
         <p>Don't have an account? <span id="show-signup" class="link">Sign Up</span></p>
     </div>
 
-    <!-- Sign Up Form -->
+    <!-- Sign Up -->
     <div id="signup-form" style="display:none;">
         <h2>Sign Up</h2>
         <input type="text" id="signup-username" placeholder="Username" required>
@@ -30,26 +30,27 @@
     </div>
 </div>
 
-<!-- Haunted Background -->
-<div id="ghost-container"></div>
-
 <!-- Pop-up -->
 <div id="popup" class="popup">
   <div class="popup-content">
-    <p id="popup-message">Message goes here</p>
+    <p id="popup-message">Welcome to Ghostly Tools – The Ultimate Toolbox</p>
     <button onclick="closePopup()">Close</button>
   </div>
 </div>
 
-<!-- Background Music -->
+<div id="ghost-container"></div>
 <audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
 
-<!-- Scripts -->
 <script src="scripts.js"></script>
 <script src="auth.js"></script>
 <script>
 const music = document.getElementById('bg-music');
 music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console.log(e));
+
+// Show initial welcome pop-up
+window.addEventListener('load', ()=>{
+    showPopup("Welcome to Ghostly Tools – The Ultimate Toolbox");
+});
 </script>
 
 </body>
