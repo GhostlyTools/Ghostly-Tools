@@ -3,28 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Tools Admin Panel</title>
-<link rel="stylesheet" href="admin.css">
+<title>Admin Control</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="admin-container">
+    <h1>Admin Panel</h1>
+    <p>Username: <b>Ghostly</b></p>
+    <p>Password: <b>Dare2995!</b></p>
 
-<h1>Ghostly Tools Admin Panel</h1>
-<p>Manage user access to downloads in real-time.</p>
+    <input type="text" id="admin-username" placeholder="Admin Username">
+    <input type="password" id="admin-password" placeholder="Admin Password">
+    <button id="admin-login">Login</button>
+    <p id="admin-error" class="error"></p>
 
-<table id="user-table">
-    <thead>
-        <tr>
-            <th>Username</th>
-            <th>Password</th>
-            <th>Status</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        <!-- Users will be populated here -->
-    </tbody>
-</table>
-
+    <div id="user-list" style="display:none;">
+        <h2>Pending Approvals</h2>
+        <ul id="users-ul"></ul>
+    </div>
+</div>
 <script src="admin.js"></script>
 </body>
 </html>

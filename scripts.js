@@ -1,84 +1,65 @@
-const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-const adminUser = "Ghostly";
-const adminPass = "Dare2995!";
-let users = {}; // store username, password, approved status
-
-const usernameInput = document.getElementById("username");
-const userpassInput = document.getElementById("userpass");
-const signUpBtn = document.getElementById("sign-up-btn");
-const signInBtn = document.getElementById("sign-in-btn");
-const popup = document.getElementById("popup-message");
-const popupText = document.getElementById("popup-text");
-const downloads = document.getElementById("downloads");
-
-// Sign Up
-signUpBtn.addEventListener("click", () => {
-    const u = usernameInput.value.trim();
-    const p = userpassInput.value;
-    if(!u || !p) return alert("Enter username and password");
-    if(users[u]) return alert("Username already exists");
-
-    users[u] = {pass:p, approved:false};
-    showPopup("Your account is pending admin approval. You cannot access downloads yet.");
-    sendDiscordNotification(u);
-});
-
-// Sign In
-signInBtn.addEventListener("click", () => {
-    const u = usernameInput.value.trim();
-    const p = userpassInput.value;
-
-    // Admin login
-    if(u === adminUser && p === adminPass){
-        window.location.href = "admin.html";
-        return;
-    }
-
-    if(!users[u]) return alert("User not found");
-    if(users[u].pass !== p) return alert("Wrong password");
-
-    if(users[u].approved){
-        downloads.style.display = "block";
-        alert("Access granted! Downloads unlocked.");
-    } else {
-        showPopup("Your account is pending admin approval. You cannot access downloads yet.");
-    }
-});
-
-// Pop-up
-function showPopup(msg){
-    popup.style.display = "block";
-    popupText.innerText = msg;
+// Haunted Effects
+const ghostCount=5, ghosts=[];
+for(let i=0;i<ghostCount;i++){
+    const g=document.createElement('div');
+    g.innerText='👻';
+    g.style.position='absolute';
+    g.style.fontSize=`${2+Math.random()*2}rem`;
+    g.style.top=Math.random()*window.innerHeight+'px';
+    g.style.left=Math.random()*window.innerWidth+'px';
+    g.style.opacity=Math.random()*0.7+0.3;
+    g.style.transition='all 1.5s linear';
+    document.body.appendChild(g); ghosts.push(g);
 }
+setInterval(()=>ghosts.forEach(g=>{ g.style.top=Math.random()*window.innerHeight+'px'; g.style.left=Math.random()*window.innerWidth+'px'; }),2000);
+
+const smokeCount=10, smokes=[];
+for(let i=0;i<smokeCount;i++){
+    const s=document.createElement('div');
+    s.innerText='💨';
+    s.style.position='absolute';
+    s.style.fontSize=`${1+Math.random()*2}rem`;
+    s.style.top=Math.random()*window.innerHeight+'px';
+    s.style.left=Math.random()*window.innerWidth+'px';
+    s.style.transition='all 1.5s linear';
+    document.body.appendChild(s); smokes.push(s);
+}
+setInterval(()=>smokes.forEach(s=>{ 
+    s.style.top=Math.random()*window.innerHeight+'px'; 
+    s.style.left=Math.random()*window.innerWidth+'px'; 
+    s.style.color=['red','green','yellow','white'][Math.floor(Math.random()*4)]; 
+}),1500);
+
+document.addEventListener('mousemove', e=>{
+    const spark=document.createElement('div');
+    spark.style.position='absolute';
+    spark.style.width='5px';
+    spark.style.height='5px';
+    spark.style.backgroundColor='white';
+    spark.style.borderRadius='50%';
+    spark.style.top=e.clientY+'px';
+    spark.style.left=e.clientX+'px';
+    spark.style.opacity=1;
+    spark.style.pointerEvents='none';
+    document.body.appendChild(spark);
+    setTimeout(()=>{ spark.style.transition='opacity 0.5s'; spark.style.opacity=0; setTimeout(()=>spark.remove(),500); },50);
+});
+
+(function flicker(){ document.body.style.opacity=Math.random()*0.5+0.5; setTimeout(flicker,Math.random()*1000+500); })();
+
+// Pop-ups
+function showPopup(message){
+    const popup = document.getElementById('popup');
+    const msg = document.getElementById('popup-message');
+    msg.innerText = message;
+    popup.style.display = 'block';
+}
+
 function closePopup(){
-    popup.style.display = "none";
+    document.getElementById('popup').style.display = 'none';
 }
 
-// Discord webhook
-function sendDiscordNotification(username){
-    fetch(webhookURL, {
-        method: "POST",
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({content:`New signup request: **${username}**`})
-    });
+window.onclick = function(event) {
+    const popup = document.getElementById('popup');
+    if (event.target == popup) closePopup();
 }
-
-// Play music (force autoplay)
-const music = document.getElementById('bg-music');
-music.volume = 0.8;
-music.play().catch(() => {
-    const resume = () => { music.play().finally(()=>{
-        window.removeEventListener('click', resume);
-        window.removeEventListener('keydown', resume);
-        window.removeEventListener('scroll', resume);
-    })};
-    window.addEventListener('click', resume);
-    window.addEventListener('keydown', resume);
-    window.addEventListener('scroll', resume);
-});
-
-// Smoke opacity on scroll
-window.addEventListener('scroll', () => {
-    const smokes = document.querySelectorAll('.smoke');
-    smokes.forEach(s => s.style.opacity = Math.max(0.1, 0.2 - window.scrollY/1000));
-});

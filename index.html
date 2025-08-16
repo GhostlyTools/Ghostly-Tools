@@ -7,54 +7,52 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<script>
+const user = sessionStorage.getItem('loggedInUser');
+if(!user){ window.location.href='auth.html'; }
 
-<h1 id="site-title">Ghostly Tools <span class="ghost-emoji">👻</span></h1>
-<p id="slogan">Invisible. Anonymous. Unstoppable</p>
+const users = JSON.parse(localStorage.getItem('ghostlyUsers')) || {};
+const approved = (users[user] && users[user].approved);
+</script>
 
-<div id="description">
-<p>Ghostly Tools is a hub for anyone who wants to operate online like a ghost – staying invisible while accessing powerful tools safely and privately. From exploring networks to testing IPs, managing connections, or using dark web utilities, this is the place for everything tech-savvy and discreet.</p>
+<img id="logo" src="images/logo.png" alt="Ghostly Logo">
+<div class="content">
+<h1>Ghostly Tools 👻</h1>
+<p>Welcome, <span id="user-name"></span></p>
+</div>
 
-<p><strong>What You Can Do Here:</strong></p>
+<div class="downloads" style="display:none;">
+<h2>Downloads</h2>
 <ul>
-    <li><strong>Ghostly Tools Hub:</strong> Your central access point to all utilities and resources.</li>
-    <li><strong>Savage Multi Tool:</strong> A dark web multi-tool that lets you access accessories, automate tasks, and analyze systems efficiently.</li>
-    <li><strong>Pinger & Network Tools:</strong> Quickly check servers, networks, or IP addresses for speed, availability, and status.</li>
-    <li><strong>IP Lookup & Privacy Utilities:</strong> Everything you need to monitor, analyze, or protect connections while remaining anonymous.</li>
+<li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage MultiTool</a></li>
+<li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
+<li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pinger</a></li>
 </ul>
-
-<p><strong>Important:</strong> Downloads are password-protected. Ghostly Tools is not for everyone — only tech-savvy users with verified access can unlock downloads.</p>
 </div>
 
-<div id="auth-container">
-    <input type="text" id="username" placeholder="Username">
-    <input type="password" id="userpass" placeholder="Password">
-    <button id="sign-up-btn">Sign Up</button>
-    <button id="sign-in-btn">Sign In</button>
-</div>
+<a href="#" id="logout">Logout</a>
+<audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
 
-<div id="popup-message" style="display:none;">
-    <p id="popup-text">Your account is pending admin approval. You cannot access downloads yet.</p>
+<!-- Pop-up -->
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <p id="popup-message">Message goes here</p>
     <button onclick="closePopup()">Close</button>
+  </div>
 </div>
 
-<div id="downloads" style="display:none;">
-    <a href="ghostly_tools.zip" target="_blank">Ghostly Tools</a>
-    <a href="Savage_Multi_Tool.bat" target="_blank">Savage Multi Tool</a>
-    <a href="Pinger.zip" target="_blank">Pinger</a>
-</div>
+<script src="scripts.js"></script>
+<script>
+document.getElementById('user-name').innerText = user;
+document.getElementById('logout').addEventListener('click', ()=>{
+    sessionStorage.removeItem('loggedInUser');
+    window.location.href='auth.html';
+});
+if(approved) document.querySelector('.downloads').style.display='block';
+else showPopup("Waiting for admin approval. Downloads are locked.");
 
-<div class="smoke-container">
-    <div class="smoke" style="left:5%; animation-duration: 45s;"></div>
-    <div class="smoke" style="left:25%; animation-duration: 55s;"></div>
-    <div class="smoke" style="left:50%; animation-duration: 65s;"></div>
-    <div class="smoke" style="left:70%; animation-duration: 60s;"></div>
-    <div class="smoke" style="left:85%; animation-duration: 70s;"></div>
-</div>
-
-<audio id="bg-music" autoplay loop>
-  <source src="ghostly_music.mp3" type="audio/mpeg">
-</audio>
-
-<script src="script.js"></script>
+const music = document.getElementById('bg-music');
+music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console.log(e));
+</script>
 </body>
 </html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghostly Portal</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="admin-container">
+    <h1>Ghostly Portal</h1>
+
+    <!-- Sign In -->
+    <div id="signin-form">
+        <h2>Sign In</h2>
+        <input type="text" id="signin-username" placeholder="Username" required>
+        <input type="password" id="signin-password" placeholder="Password" required>
+        <button id="signin-btn">Sign In</button>
+        <p>Don't have an account? <span id="show-signup" class="link">Sign Up</span></p>
+    </div>
+
+    <!-- Sign Up -->
+    <div id="signup-form" style="display:none;">
+        <h2>Sign Up</h2>
+        <input type="text" id="signup-username" placeholder="Username" required>
+        <input type="password" id="signup-password" placeholder="Password" required>
+        <button id="signup-btn">Sign Up</button>
+        <p>Already have an account? <span id="show-signin" class="link">Sign In</span></p>
+    </div>
+</div>
+
+<!-- Pop-up -->
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <p id="popup-message">Message goes here</p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<script src="scripts.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>
