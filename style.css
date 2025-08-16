@@ -1,5 +1,9 @@
-/* Basic reset */
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* ---------- Reset & Base Styles ---------- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
 body {
     font-family: Arial, sans-serif;
@@ -7,6 +11,7 @@ body {
     background: url('https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg') no-repeat center center fixed;
     background-size: cover;
     overflow-x: hidden;
+    position: relative;
 }
 
 /* Dark overlay for haunted effect */
@@ -19,7 +24,7 @@ body::before {
     pointer-events: none;
 }
 
-/* Floating logo */
+/* ---------- Floating Logo ---------- */
 #logo {
     position: fixed;
     top: 20px;
@@ -35,18 +40,48 @@ body::before {
     100% { transform: translateY(0); }
 }
 
-/* Pop-up, container, buttons */
-.admin-container, .content {
+/* ---------- Content ---------- */
+.content {
     position: relative;
     z-index: 10;
     max-width: 400px;
-    margin: 100px auto;
+    margin: 120px auto 20px auto;
     background: rgba(0,0,0,0.6);
     padding: 20px;
     border-radius: 10px;
     text-align: center;
 }
 
+/* ---------- Downloads ---------- */
+.downloads {
+    position: relative;
+    z-index: 10;
+    max-width: 400px;
+    margin: 20px auto;
+    background: rgba(0,0,0,0.6);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.downloads ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.downloads ul li {
+    margin: 10px 0;
+}
+
+.downloads ul li a {
+    color: #ff80bf;
+    text-decoration: none;
+}
+
+.downloads ul li a:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Buttons & Links ---------- */
 button {
     padding: 10px 20px;
     margin-top: 10px;
@@ -56,10 +91,24 @@ button {
     border-radius: 5px;
     cursor: pointer;
 }
-button:hover { background: #ff4db8; }
+button:hover {
+    background: #ff4db8;
+}
 
-.link { color: #ff80bf; cursor: pointer; text-decoration: underline; }
+a#logout {
+    display: block;
+    text-align: center;
+    margin: 20px auto;
+    color: #ff80bf;
+    text-decoration: none;
+    font-weight: bold;
+}
 
+a#logout:hover {
+    text-decoration: underline;
+}
+
+/* ---------- Pop-up ---------- */
 .popup {
     position: fixed;
     top: 0; left: 0;
@@ -76,6 +125,9 @@ button:hover { background: #ff4db8; }
     padding: 20px;
     border-radius: 10px;
     text-align: center;
+    max-width: 400px;
 }
 
-.popup-content p { margin-bottom: 15px; }
+.popup-content p {
+    margin-bottom: 15px;
+}

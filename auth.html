@@ -3,122 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Portal</title>
+<title>Ghostly Login</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+<!-- Haunted Background Logo -->
 <img id="logo" src="images/logo.png" alt="Ghostly Logo">
 
-<div class="admin-container">
-    <h1>Ghostly Portal</h1>
+<div class="content">
+  <h1>Ghostly Login 👻</h1>
 
-    <!-- Sign In -->
-    <div id="signin-form">
-        <h2>Sign In</h2>
-        <input type="text" id="signin-username" placeholder="Username" required>
-        <input type="password" id="signin-password" placeholder="Password" required>
-        <button id="signin-btn">Sign In</button>
-        <p>Don't have an account? <span id="show-signup" class="link">Sign Up</span></p>
-    </div>
+  <!-- Sign In -->
+  <div class="auth-form">
+    <h2>Sign In</h2>
+    <input type="text" id="signin-username" placeholder="Username">
+    <input type="password" id="signin-password" placeholder="Password">
+    <button id="signin-btn">Sign In</button>
+  </div>
 
-    <!-- Sign Up -->
-    <div id="signup-form" style="display:none;">
-        <h2>Sign Up</h2>
-        <input type="text" id="signup-username" placeholder="Username" required>
-        <input type="password" id="signup-password" placeholder="Password" required>
-        <button id="signup-btn">Sign Up</button>
-        <p>Already have an account? <span id="show-signin" class="link">Sign In</span></p>
-    </div>
+  <!-- Sign Up -->
+  <div class="auth-form">
+    <h2>Sign Up</h2>
+    <input type="text" id="signup-username" placeholder="Username">
+    <input type="password" id="signup-password" placeholder="Password">
+    <button id="signup-btn">Sign Up</button>
+  </div>
 </div>
 
+<!-- Pop-up -->
 <div id="popup" class="popup">
   <div class="popup-content">
-    <p id="popup-message">Welcome to Ghostly Tools – The Ultimate Toolbox</p>
+    <p id="popup-message"></p>
     <button onclick="closePopup()">Close</button>
   </div>
 </div>
 
-<audio id="bg-music" src="ghostly_music.mp3" loop autoplay></audio>
+<!-- Background Music -->
+<audio id="bg-music" src="ghostly_music.mp3" loop></audio>
 
+<!-- Scripts -->
 <script src="scripts.js"></script>
 <script>
-// Music auto-play
-const music = document.getElementById('bg-music');
-music.volume = 0.2;
-window.addEventListener('load', () => {
-    music.play().catch(() => {
-        document.body.addEventListener('click', () => { music.play(); }, { once: true });
-    });
-});
+const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-// Pop-up welcome
-window.addEventListener('load', ()=>{
-    showPopup("Welcome to Ghostly Tools – The Ultimate Toolbox");
-});
+// ---------- Sign In ----------
+document.getElementById('signin-btn').addEventListener('click', ()=>{
+    const username = document.getElementById('signin-username').value;
+    const password = document.getElementById('signin-password').value;
+    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
 
-// Toggle Sign In / Sign Up
-document.getElementById('show-signup').addEventListener('click', ()=>{
-    document.getElementById('signin-form').style.display='none';
-    document.getElementById('signup-form').style.display='block';
-});
-document.getElementById('show-signin').addEventListener('click', ()=>{
-    document.getElementById('signup-form').style.display='none';
-    document.getElementById('signin-form').style.display='block';
-});
-
-// Initialize users including admin
-let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-if(!users["Ghostly"]){
-    users["Ghostly"] = {password: "Dare2995!", approved: true};
-    localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-}
-
-// Sign Up with Discord webhook
-document.getElementById('signup-btn').addEventListener('click', ()=>{
-    const username = document.getElementById('signup-username').value.trim();
-    const password = document.getElementById('signup-password').value.trim();
-    if(!username || !password){
-        showPopup("Please enter both fields.");
-        return;
+    if(users[username] && users[username].password === password){
+        sessionStorage.setItem('loggedInUser', username);
+        window.location.href = 'index.html';
+    } else {
+        showPopup("Incorrect username or password.");
     }
-    users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+});
+
+// ---------- Sign Up ----------
+document.getElementById('signup-btn').addEventListener('click', ()=>{
+    const username = document.getElementById('signup-username').value;
+    const password = document.getElementById('signup-password').value;
+    let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+
     if(users[username]){
         showPopup("Username already exists.");
         return;
     }
 
-    users[username] = {password: password, approved: false};
+    // Save user as not approved
+    users[username] = { password: password, approved: false };
     localStorage.setItem('ghostlyUsers', JSON.stringify(users));
 
-    showPopup("Account created! Waiting for admin approval.");
-    document.getElementById('signup-form').style.display='none';
-    document.getElementById('signin-form').style.display='block';
-
-    const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+    // Send Discord webhook
     fetch(webhookURL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: New Ghostly user signed up: **${username}** })
-    }).catch(e => console.log("Discord webhook failed", e));
-});
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: New Ghostly user signup: **${username}** })
+    });
 
-// Sign In
-document.getElementById('signin-btn').addEventListener('click', ()=>{
-    const username = document.getElementById('signin-username').value.trim();
-    const password = document.getElementById('signin-password').value.trim();
-    users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-
-    if(users[username] && users[username].password===password){
-        sessionStorage.setItem('loggedInUser', username);
-        if(username === "Ghostly"){
-            window.location.href='admin.html';
-        } else {
-            window.location.href='index.html';
-        }
-    } else {
-        showPopup("Incorrect username or password.");
-    }
+    showPopup("Sign-up successful! Waiting for admin approval.");
 });
 </script>
 </body>

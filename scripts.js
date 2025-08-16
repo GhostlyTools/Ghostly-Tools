@@ -1,65 +1,81 @@
-// Haunted Effects
-const ghostCount=5, ghosts=[];
-for(let i=0;i<ghostCount;i++){
-    const g=document.createElement('div');
-    g.innerText='👻';
-    g.style.position='absolute';
-    g.style.fontSize=`${2+Math.random()*2}rem`;
-    g.style.top=Math.random()*window.innerHeight+'px';
-    g.style.left=Math.random()*window.innerWidth+'px';
-    g.style.opacity=Math.random()*0.7+0.3;
-    g.style.transition='all 1.5s linear';
-    document.body.appendChild(g); ghosts.push(g);
-}
-setInterval(()=>ghosts.forEach(g=>{ g.style.top=Math.random()*window.innerHeight+'px'; g.style.left=Math.random()*window.innerWidth+'px'; }),2000);
-
-const smokeCount=10, smokes=[];
-for(let i=0;i<smokeCount;i++){
-    const s=document.createElement('div');
-    s.innerText='💨';
-    s.style.position='absolute';
-    s.style.fontSize=`${1+Math.random()*2}rem`;
-    s.style.top=Math.random()*window.innerHeight+'px';
-    s.style.left=Math.random()*window.innerWidth+'px';
-    s.style.transition='all 1.5s linear';
-    document.body.appendChild(s); smokes.push(s);
-}
-setInterval(()=>smokes.forEach(s=>{ 
-    s.style.top=Math.random()*window.innerHeight+'px'; 
-    s.style.left=Math.random()*window.innerWidth+'px'; 
-    s.style.color=['red','green','yellow','white'][Math.floor(Math.random()*4)]; 
-}),1500);
-
-document.addEventListener('mousemove', e=>{
-    const spark=document.createElement('div');
-    spark.style.position='absolute';
-    spark.style.width='5px';
-    spark.style.height='5px';
-    spark.style.backgroundColor='white';
-    spark.style.borderRadius='50%';
-    spark.style.top=e.clientY+'px';
-    spark.style.left=e.clientX+'px';
-    spark.style.opacity=1;
-    spark.style.pointerEvents='none';
-    document.body.appendChild(spark);
-    setTimeout(()=>{ spark.style.transition='opacity 0.5s'; spark.style.opacity=0; setTimeout(()=>spark.remove(),500); },50);
-});
-
-(function flicker(){ document.body.style.opacity=Math.random()*0.5+0.5; setTimeout(flicker,Math.random()*1000+500); })();
-
-// Pop-ups
+// ---------- Popup Handling ----------
 function showPopup(message){
     const popup = document.getElementById('popup');
-    const msg = document.getElementById('popup-message');
-    msg.innerText = message;
-    popup.style.display = 'block';
+    const popupMessage = document.getElementById('popup-message');
+    popupMessage.innerText = message;
+    popup.style.display = 'flex';
 }
 
 function closePopup(){
-    document.getElementById('popup').style.display = 'none';
+    const popup = document.getElementById('popup');
+    popup.style.display = 'none';
 }
 
-window.onclick = function(event) {
-    const popup = document.getElementById('popup');
-    if (event.target == popup) closePopup();
+// ---------- Floating Logo Animation ----------
+const logo = document.getElementById('logo');
+let direction = 1;
+setInterval(() => {
+    if(logo){
+        let current = parseFloat(getComputedStyle(logo).top);
+        if(current <= 10) direction = 1;
+        if(current >= 30) direction = -1;
+        logo.style.top = (current + direction) + 'px';
+    }
+}, 100);
+
+// ---------- Music Auto-Play (All Browsers) ----------
+const music = document.getElementById('bg-music');
+music.volume = 0.2;
+
+function startMusic(){
+    music.play().catch(()=>{});
 }
+music.play().catch(() => {
+    document.body.addEventListener('click', startMusic, { once: true });
+    document.body.addEventListener('touchstart', startMusic, { once: true });
+});
+
+// ---------- Kick / Admin Control ----------
+const user = sessionStorage.getItem('loggedInUser');
+if(user){
+    setInterval(()=>{
+        if(localStorage.getItem('kick_' + user) === 'true'){
+            localStorage.removeItem('kick_' + user);
+            sessionStorage.removeItem('loggedInUser');
+            alert("You have been kicked by the admin.");
+            window.location.href='auth.html';
+        }
+    }, 2000);
+}
+
+// ---------- Downloads Locking ----------
+function checkDownloads(){
+    const downloads = document.querySelector('.downloads');
+    if(!downloads) return;
+
+    let users = JSON.parse(localStorage.getItem('ghostlyUsers') || '{}');
+    if(!users[user] || !users[user].approved){
+        downloads.style.display = 'none';
+        showPopup("Waiting for admin approval. Downloads are locked.");
+    } else {
+        downloads.style.display = 'block';
+    }
+}
+
+window.addEventListener('load', checkDownloads);
+
+// ---------- Logout Button ----------
+const logoutBtn = document.getElementById('logout');
+if(logoutBtn){
+    logoutBtn.addEventListener('click', ()=>{
+        sessionStorage.removeItem('loggedInUser');
+        window.location.href='auth.html';
+    });
+}
+
+// ---------- Welcome Popup ----------
+window.addEventListener('load', ()=>{
+    if(user){
+        showPopup(Welcome to Ghostly Tools – The Ultimate Toolbox, ${user});
+    }
+});

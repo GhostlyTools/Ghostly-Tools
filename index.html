@@ -9,18 +9,15 @@
 <body>
 
 <script>
-const user = sessionStorage.getItem('loggedInUser');
-if(!user){ window.location.href='auth.html'; }
-let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+  // Redirect to login if not signed in
+  const user = sessionStorage.getItem('loggedInUser');
+  if(!user){ window.location.href='auth.html'; }
 
-if(localStorage.getItem('kick_' + user) === 'true'){
-    localStorage.removeItem('kick_' + user);
-    sessionStorage.removeItem('loggedInUser');
-    alert("You have been kicked by the admin.");
-    window.location.href='auth.html';
-}
+  const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+  const approved = users[user] && users[user].approved;
 </script>
 
+<!-- Haunted Background Logo -->
 <img id="logo" src="images/logo.png" alt="Ghostly Logo">
 
 <div class="content">
@@ -28,17 +25,20 @@ if(localStorage.getItem('kick_' + user) === 'true'){
   <p>Welcome, <span id="user-name"></span></p>
 </div>
 
-<div class="downloads" id="downloads">
+<!-- Downloads Section -->
+<div class="downloads" style="display:none;">
   <h2>Downloads</h2>
   <ul>
-    <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage MultiTool</a></li>
+    <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_multi_tool_v2.bat/file" target="_blank">Savage MultiTool</a></li>
     <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
-    <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pinger</a></li>
+    <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/pinger" target="_blank">Pinger</a></li>
   </ul>
 </div>
 
+<!-- Logout -->
 <a href="#" id="logout">Logout</a>
 
+<!-- Pop-up -->
 <div id="popup" class="popup">
   <div class="popup-content">
     <p id="popup-message">Welcome to Ghostly Tools – The Ultimate Toolbox</p>
@@ -46,48 +46,23 @@ if(localStorage.getItem('kick_' + user) === 'true'){
   </div>
 </div>
 
-<audio id="bg-music" src="ghostly_music.mp3" loop autoplay></audio>
+<!-- Background Music -->
+<audio id="bg-music" src="ghostly_music.mp3" loop></audio>
 
+<!-- Scripts -->
 <script src="scripts.js"></script>
 <script>
 document.getElementById('user-name').innerText = user;
-users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
 
-const downloads = document.getElementById('downloads');
-if(!users[user] || !users[user].approved){
-    downloads.style.display = 'none';
-    showPopup("Waiting for admin approval. Downloads are locked.");
-}
+// Show downloads only if approved
+if(approved) document.querySelector('.downloads').style.display='block';
+else showPopup("Waiting for admin approval. Downloads are locked.");
 
+// Logout functionality
 document.getElementById('logout').addEventListener('click', ()=>{
     sessionStorage.removeItem('loggedInUser');
     window.location.href='auth.html';
 });
-
-// Music auto-play
-const music = document.getElementById('bg-music');
-music.volume = 0.2;
-window.addEventListener('load', () => {
-    music.play().catch(() => {
-        document.body.addEventListener('click', () => { music.play(); }, { once: true });
-    });
-});
-
-// Kick live check
-setInterval(()=>{
-    if(localStorage.getItem('kick_' + user) === 'true'){
-        localStorage.removeItem('kick_' + user);
-        sessionStorage.removeItem('loggedInUser');
-        alert("You have been kicked by the admin.");
-        window.location.href='auth.html';
-    }
-}, 2000);
-
-// Initial welcome pop-up
-window.addEventListener('load', ()=>{
-    showPopup("Welcome to Ghostly Tools – The Ultimate Toolbox");
-});
 </script>
 </body>
 </html>
-

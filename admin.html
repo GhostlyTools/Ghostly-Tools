@@ -8,29 +8,25 @@
 </head>
 <body>
 
-<script>
-const adminUser = sessionStorage.getItem('loggedInUser');
-if(adminUser !== 'Ghostly'){
-    alert("Access denied. Admins only.");
-    window.location.href='auth.html';
-}
-</script>
-
+<!-- Haunted Background Logo -->
 <img id="logo" src="images/logo.png" alt="Ghostly Logo">
 
 <div class="content">
   <h1>Ghostly Admin Panel 👻</h1>
-</div>
 
-<div class="downloads" style="width:600px;">
-    <h2>Registered Users</h2>
-    <table id="user-table" border="1" style="width:100%; color:white;">
-        <tr>
-            <th>Username</th>
-            <th>Approved</th>
-            <th>Actions</th>
-        </tr>
-    </table>
+  <!-- Admin Login -->
+  <div class="auth-form">
+    <h2>Admin Login</h2>
+    <input type="text" id="admin-username" placeholder="Username">
+    <input type="password" id="admin-password" placeholder="Password">
+    <button id="admin-login-btn">Login</button>
+  </div>
+
+  <!-- User Management -->
+  <div id="user-management" style="display:none;">
+    <h2>Pending Users</h2>
+    <ul id="pending-users"></ul>
+  </div>
 </div>
 
 <!-- Pop-up -->
@@ -41,76 +37,69 @@ if(adminUser !== 'Ghostly'){
   </div>
 </div>
 
-<div id="ghost-container"></div>
-<audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
+<!-- Background Music -->
+<audio id="bg-music" src="ghostly_music.mp3" loop></audio>
 
 <script src="scripts.js"></script>
 <script>
-// Play background music
-const music = document.getElementById('bg-music');
-music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console.log(e));
+// Admin credentials
+const ADMIN_USER = "Ghostly";
+const ADMIN_PASS = "Dare2995!";
 
-// Load users
-function loadUsers(){
-    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-    const table = document.getElementById('user-table');
-    table.innerHTML = `
-    <tr>
-        <th>Username</th>
-        <th>Approved</th>
-        <th>Actions</th>
-    </tr>`;
-    for(const u in users){
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-        <td>${u}</td>
-        <td>${users[u].approved ? '✅':'❌'}</td>
-        <td>
-            <button onclick="approveUser('${u}')">Approve</button>
-            <button onclick="kickUser('${u}')">Kick</button>
-        </td>`;
-        table.appendChild(tr);
+// ---------- Admin Login ----------
+document.getElementById('admin-login-btn').addEventListener('click', ()=>{
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+
+    if(username === ADMIN_USER && password === ADMIN_PASS){
+        document.querySelector('.auth-form').style.display = 'none';
+        document.getElementById('user-management').style.display = 'block';
+        loadPendingUsers();
+    } else {
+        showPopup("Incorrect admin credentials.");
     }
+});
+
+// ---------- Load Pending Users ----------
+function loadPendingUsers(){
+    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+    const pending = Object.keys(users).filter(u => !users[u].approved);
+    const ul = document.getElementById('pending-users');
+    ul.innerHTML = "";
+
+    pending.forEach(u => {
+        const li = document.createElement('li');
+        li.innerHTML = `${u} 
+        <button onclick="approveUser('${u}')">Approve</button>
+        <button onclick="kickUser('${u}')">Kick</button>`;
+        ul.appendChild(li);
+    });
 }
 
-// Approve user
+// ---------- Approve User ----------
 function approveUser(username){
     const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
     if(users[username]){
         users[username].approved = true;
         localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-        showPopup(User ${username} approved!);
-        loadUsers();
+        loadPendingUsers();
+        showPopup(${username} has been approved.);
     }
 }
 
-// Kick user (live)
+// ---------- Kick User ----------
 function kickUser(username){
+    // Mark user to be kicked on their session
+    localStorage.setItem('kick_' + username, 'true');
+
+    // Remove user from storage
     const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-    if(users[username]){
-        delete users[username];
-        localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-        // Set live kick flag
-        localStorage.setItem('kick_' + username, 'true');
-        showPopup(User ${username} has been kicked.);
-        loadUsers();
-    }
-}
+    delete users[username];
+    localStorage.setItem('ghostlyUsers', JSON.stringify(users));
 
-// Pop-up
-function showPopup(msg){
-    const popup = document.getElementById('popup');
-    const message = document.getElementById('popup-message');
-    message.innerText = msg;
-    popup.style.display = 'flex';
+    loadPendingUsers();
+    showPopup(${username} has been kicked.);
 }
-function closePopup(){
-    document.getElementById('popup').style.display='none';
-}
-
-// Initial load
-loadUsers();
 </script>
-
 </body>
 </html>
