@@ -9,16 +9,13 @@
 <body>
 
 <script>
-  // Redirect to login if not signed in
+  // Redirect if not signed in
   const user = sessionStorage.getItem('loggedInUser');
   if(!user){ window.location.href='auth.html'; }
 
   const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
   const approved = users[user] && users[user].approved;
 </script>
-
-<!-- Haunted Background Logo -->
-<img id="logo" src="images/logo.png" alt="Ghostly Logo">
 
 <div class="content">
   <h1>Ghostly Tools 👻</h1>
@@ -35,10 +32,8 @@
   </ul>
 </div>
 
-<!-- Logout -->
 <a href="#" id="logout">Logout</a>
 
-<!-- Pop-up -->
 <div id="popup" class="popup">
   <div class="popup-content">
     <p id="popup-message">Welcome to Ghostly Tools – The Ultimate Toolbox</p>
@@ -46,10 +41,8 @@
   </div>
 </div>
 
-<!-- Background Music -->
 <audio id="bg-music" src="ghostly_music.mp3" loop></audio>
 
-<!-- Scripts -->
 <script src="scripts.js"></script>
 <script>
 document.getElementById('user-name').innerText = user;
@@ -63,6 +56,15 @@ document.getElementById('logout').addEventListener('click', ()=>{
     sessionStorage.removeItem('loggedInUser');
     window.location.href='auth.html';
 });
+
+// Play background music on all browsers
+const music = document.getElementById('bg-music');
+music.volume = 0.2;
+music.play().catch(()=>{
+    document.body.addEventListener('click', ()=>music.play(), { once: true });
+    document.body.addEventListener('touchstart', ()=>music.play(), { once: true });
+});
 </script>
 </body>
 </html>
+

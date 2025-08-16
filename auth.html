@@ -8,9 +8,6 @@
 </head>
 <body>
 
-<!-- Haunted Background Logo -->
-<img id="logo" src="images/logo.png" alt="Ghostly Logo">
-
 <div class="content">
   <h1>Ghostly Login 👻</h1>
 
@@ -31,7 +28,6 @@
   </div>
 </div>
 
-<!-- Pop-up -->
 <div id="popup" class="popup">
   <div class="popup-content">
     <p id="popup-message"></p>
@@ -39,20 +35,26 @@
   </div>
 </div>
 
-<!-- Background Music -->
 <audio id="bg-music" src="ghostly_music.mp3" loop></audio>
 
-<!-- Scripts -->
 <script src="scripts.js"></script>
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
 // ---------- Sign In ----------
 document.getElementById('signin-btn').addEventListener('click', ()=>{
-    const username = document.getElementById('signin-username').value;
+    const username = document.getElementById('signin-username').value.trim();
     const password = document.getElementById('signin-password').value;
     const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
 
+    // Admin check
+    if(username === "Ghostly" && password === "Dare2995!"){
+        sessionStorage.setItem('loggedInUser', username);
+        window.location.href = 'admin.html';
+        return;
+    }
+
+    // Normal user sign-in
     if(users[username] && users[username].password === password){
         sessionStorage.setItem('loggedInUser', username);
         window.location.href = 'index.html';
@@ -63,7 +65,7 @@ document.getElementById('signin-btn').addEventListener('click', ()=>{
 
 // ---------- Sign Up ----------
 document.getElementById('signup-btn').addEventListener('click', ()=>{
-    const username = document.getElementById('signup-username').value;
+    const username = document.getElementById('signup-username').value.trim();
     const password = document.getElementById('signup-password').value;
     let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
 
@@ -84,6 +86,14 @@ document.getElementById('signup-btn').addEventListener('click', ()=>{
     });
 
     showPopup("Sign-up successful! Waiting for admin approval.");
+});
+
+// ---------- Background Music Auto-Play ----------
+const music = document.getElementById('bg-music');
+music.volume = 0.2;
+music.play().catch(()=>{
+    document.body.addEventListener('click', ()=>music.play(), { once: true });
+    document.body.addEventListener('touchstart', ()=>music.play(), { once: true });
 });
 </script>
 </body>

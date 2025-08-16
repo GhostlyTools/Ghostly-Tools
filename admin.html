@@ -8,9 +8,6 @@
 </head>
 <body>
 
-<!-- Haunted Background Logo -->
-<img id="logo" src="images/logo.png" alt="Ghostly Logo">
-
 <div class="content">
   <h1>Ghostly Admin Panel 👻</h1>
 
@@ -29,7 +26,6 @@
   </div>
 </div>
 
-<!-- Pop-up -->
 <div id="popup" class="popup">
   <div class="popup-content">
     <p id="popup-message"></p>
@@ -37,16 +33,14 @@
   </div>
 </div>
 
-<!-- Background Music -->
 <audio id="bg-music" src="ghostly_music.mp3" loop></audio>
 
 <script src="scripts.js"></script>
 <script>
-// Admin credentials
 const ADMIN_USER = "Ghostly";
 const ADMIN_PASS = "Dare2995!";
 
-// ---------- Admin Login ----------
+// Admin login
 document.getElementById('admin-login-btn').addEventListener('click', ()=>{
     const username = document.getElementById('admin-username').value;
     const password = document.getElementById('admin-password').value;
@@ -60,7 +54,7 @@ document.getElementById('admin-login-btn').addEventListener('click', ()=>{
     }
 });
 
-// ---------- Load Pending Users ----------
+// Load pending users
 function loadPendingUsers(){
     const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
     const pending = Object.keys(users).filter(u => !users[u].approved);
@@ -76,7 +70,7 @@ function loadPendingUsers(){
     });
 }
 
-// ---------- Approve User ----------
+// Approve user
 function approveUser(username){
     const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
     if(users[username]){
@@ -87,19 +81,23 @@ function approveUser(username){
     }
 }
 
-// ---------- Kick User ----------
+// Kick user
 function kickUser(username){
-    // Mark user to be kicked on their session
     localStorage.setItem('kick_' + username, 'true');
-
-    // Remove user from storage
     const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
     delete users[username];
     localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-
     loadPendingUsers();
     showPopup(${username} has been kicked.);
 }
+
+// Play background music
+const music = document.getElementById('bg-music');
+music.volume = 0.2;
+music.play().catch(()=>{
+    document.body.addEventListener('click', ()=>music.play(), { once: true });
+    document.body.addEventListener('touchstart', ()=>music.play(), { once: true });
+});
 </script>
 </body>
 </html>
