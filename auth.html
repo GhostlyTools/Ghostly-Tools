@@ -42,7 +42,6 @@
 <audio id="bg-music" src="Ghostly_music.mp3" loop muted></audio>
 
 <script src="scripts.js"></script>
-<script src="auth.js"></script>
 <script>
 const music = document.getElementById('bg-music');
 music.play().then(()=>{ music.muted=false; music.volume=0.2; }).catch(e=>console.log(e));
@@ -62,6 +61,13 @@ document.getElementById('show-signin').addEventListener('click', ()=>{
     document.getElementById('signin-form').style.display='block';
 });
 
+// Initialize users including admin
+let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+if(!users["Ghostly"]){
+    users["Ghostly"] = {password: "Dare2995!", approved: true};
+    localStorage.setItem('ghostlyUsers', JSON.stringify(users));
+}
+
 // Sign Up logic
 document.getElementById('signup-btn').addEventListener('click', ()=>{
     const username = document.getElementById('signup-username').value.trim();
@@ -70,7 +76,7 @@ document.getElementById('signup-btn').addEventListener('click', ()=>{
         showPopup("Please enter both fields.");
         return;
     }
-    let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+    users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
     if(users[username]){
         showPopup("Username already exists.");
         return;
@@ -86,7 +92,7 @@ document.getElementById('signup-btn').addEventListener('click', ()=>{
 document.getElementById('signin-btn').addEventListener('click', ()=>{
     const username = document.getElementById('signin-username').value.trim();
     const password = document.getElementById('signin-password').value.trim();
-    let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+    users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
 
     if(users[username] && users[username].password===password){
         sessionStorage.setItem('loggedInUser', username);
