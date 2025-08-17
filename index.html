@@ -10,15 +10,9 @@
 
 <script>
 const user = sessionStorage.getItem('loggedInUser');
-if(!user) window.location.href='auth.html';
+if(!user){ window.location.href='auth.html'; }
 const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
 const approved = users[user] && users[user].approved;
-if(localStorage.getItem('kick_'+user)){
-    alert("You have been kicked by the admin.");
-    sessionStorage.removeItem('loggedInUser');
-    localStorage.removeItem('kick_'+user);
-    window.location.href='auth.html';
-}
 </script>
 
 <div class="content">

@@ -1,17 +1,64 @@
-body {
-    margin:0; padding:0;
-    font-family: Arial, sans-serif;
-    background: url('https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg') no-repeat center center fixed;
-    background-size: cover;
-    color: #fff;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghostly Tools</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-.content {text-align:center; margin-top:50px;}
-.auth-form {margin:20px auto; text-align:center;}
-input {display:block; margin:10px auto; padding:10px; width:200px;}
-button {padding:10px 20px; cursor:pointer;}
-.downloads ul {list-style:none; padding:0;}
-.downloads li {margin:10px 0;}
-a {color:#0ff; text-decoration:none;}
-.popup {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center;}
-.popup-content {background:#111; padding:20px; border:2px solid #0ff; text-align:center;}
+<script>
+const user = sessionStorage.getItem('loggedInUser');
+if(!user) window.location.href='auth.html';
+const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+const approved = users[user] && users[user].approved;
+if(localStorage.getItem('kick_'+user)){
+    alert("You have been kicked by the admin.");
+    sessionStorage.removeItem('loggedInUser');
+    localStorage.removeItem('kick_'+user);
+    window.location.href='auth.html';
+}
+</script>
+
+<div class="content">
+  <h1>Ghostly Tools 👻</h1>
+  <p>Welcome, <span id="user-name"></span></p>
+</div>
+
+<div class="downloads" style="display:none;">
+  <h2>Downloads</h2>
+  <ul>
+    <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_multi_tool_v2.bat/file" target="_blank">Savage MultiTool</a></li>
+    <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
+    <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/pinger" target="_blank">Pinger</a></li>
+  </ul>
+</div>
+
+<a href="#" id="logout">Logout</a>
+
+<div id="popup" class="popup">
+  <div class="popup-content">
+    <p id="popup-message"></p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+</div>
+
+<audio id="bg-music" src="ghostly_music.mp3" loop></audio>
+
+<script src="scripts.js"></script>
+<script>
+document.getElementById('user-name').innerText = user;
+if(approved){
+    document.querySelector('.downloads').style.display='block';
+    showPopup("Welcome to Ghostly Tools – The Ultimate Toolbox");
+} else {
+    showPopup("Waiting for admin approval. Downloads are locked.");
+}
+document.getElementById('logout').addEventListener('click', ()=>{
+    sessionStorage.removeItem('loggedInUser');
+    window.location.href='auth.html';
+});
+</script>
+</body>
+</html>

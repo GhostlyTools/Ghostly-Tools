@@ -9,22 +9,22 @@
 <body>
 
 <div class="content">
-  <h1>Ghostly Login 👻</h1>
+  <h1>Ghostly Tools 👻</h1>
 
-  <!-- Sign In -->
-  <div class="auth-form">
+  <div class="auth-form" id="signin-form">
     <h2>Sign In</h2>
     <input type="text" id="signin-username" placeholder="Username">
     <input type="password" id="signin-password" placeholder="Password">
     <button id="signin-btn">Sign In</button>
+    <p>Don't have an account? <button id="show-signup">Sign Up</button></p>
   </div>
 
-  <!-- Sign Up -->
-  <div class="auth-form">
+  <div class="auth-form" id="signup-form" style="display:none;">
     <h2>Sign Up</h2>
     <input type="text" id="signup-username" placeholder="Username">
     <input type="password" id="signup-password" placeholder="Password">
-    <button id="signup-btn">Sign Up</button>
+    <button id="signup-btn">Create Account</button>
+    <p>Already have an account? <button id="show-signin">Sign In</button></p>
   </div>
 </div>
 
@@ -36,64 +36,54 @@
 </div>
 
 <audio id="bg-music" src="ghostly_music.mp3" loop></audio>
-
 <script src="scripts.js"></script>
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-// ---------- Sign In ----------
+// Toggle forms
+document.getElementById('show-signup').addEventListener('click', ()=>{
+    document.getElementById('signin-form').style.display='none';
+    document.getElementById('signup-form').style.display='block';
+});
+document.getElementById('show-signin').addEventListener('click', ()=>{
+    document.getElementById('signup-form').style.display='none';
+    document.getElementById('signin-form').style.display='block';
+});
+
+// Sign In
 document.getElementById('signin-btn').addEventListener('click', ()=>{
     const username = document.getElementById('signin-username').value.trim();
     const password = document.getElementById('signin-password').value;
+    if(!username||!password){showPopup("Please enter both username and password."); return;}
     const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-
-    // Admin check
-    if(username === "Ghostly" && password === "Dare2995!"){
+    if(username==="Ghostly" && password==="Dare2995!"){
         sessionStorage.setItem('loggedInUser', username);
-        window.location.href = 'admin.html';
+        window.location.href='admin.html';
         return;
     }
-
-    // Normal user sign-in
-    if(users[username] && users[username].password === password){
+    if(users[username] && users[username].password===password){
         sessionStorage.setItem('loggedInUser', username);
-        window.location.href = 'index.html';
-    } else {
-        showPopup("Incorrect username or password.");
-    }
+        setTimeout(()=>window.location.href='index.html',50);
+    } else showPopup("Incorrect username or password.");
 });
 
-// ---------- Sign Up ----------
+// Sign Up
 document.getElementById('signup-btn').addEventListener('click', ()=>{
     const username = document.getElementById('signup-username').value.trim();
     const password = document.getElementById('signup-password').value;
     let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-
-    if(users[username]){
-        showPopup("Username already exists.");
-        return;
-    }
-
-    // Save user as not approved
+    if(!username||!password){showPopup("Please enter both username and password."); return;}
+    if(users[username]){showPopup("Username already exists."); return;}
     users[username] = { password: password, approved: false };
     localStorage.setItem('ghostlyUsers', JSON.stringify(users));
 
-    // Send Discord webhook
     fetch(webhookURL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: New Ghostly user signup: **${username}** })
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({content:`New Ghostly user signup: **${username}**`})
     });
 
     showPopup("Sign-up successful! Waiting for admin approval.");
-});
-
-// ---------- Background Music Auto-Play ----------
-const music = document.getElementById('bg-music');
-music.volume = 0.2;
-music.play().catch(()=>{
-    document.body.addEventListener('click', ()=>music.play(), { once: true });
-    document.body.addEventListener('touchstart', ()=>music.play(), { once: true });
 });
 </script>
 </body>

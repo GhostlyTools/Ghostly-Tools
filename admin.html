@@ -3,19 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Admin Panel</title>
+<title>Ghostly Admin</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div class="content">
-  <h1>Ghostly Admin Panel 👻</h1>
-  <div id="user-management">
-    <h2>Pending Users</h2>
-    <ul id="pending-users"></ul>
-  </div>
+<h1>Ghostly Admin Panel 👻</h1>
+<p>Welcome, Admin</p>
+<h2>Pending Users</h2>
+<ul id="pending-users"></ul>
 </div>
 
+<a href="#" id="logout">Logout</a>
 <div id="popup" class="popup">
   <div class="popup-content">
     <p id="popup-message"></p>
@@ -24,15 +23,41 @@
 </div>
 
 <audio id="bg-music" src="ghostly_music.mp3" loop></audio>
-
 <script src="scripts.js"></script>
 <script>
-let users=JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-function loadPendingUsers(){const pending=Object.keys(users).filter(u=>!users[u].approved); const ul=document.getElementById('pending-users'); ul.innerHTML=""; pending.forEach(u=>{const li=document.createElement('li'); li.innerHTML=`${u} <button onclick="approveUser('${u}')">Approve</button> <button onclick="kickUser('${u}')">Kick</button>`; ul.appendChild(li);});}
-function approveUser(username){users[username].approved=true; localStorage.setItem('ghostlyUsers',JSON.stringify(users)); loadPendingUsers(); showPopup(${username} approved.);}
-function kickUser(username){localStorage.setItem('kick_'+username,'true'); delete users[username]; localStorage.setItem('ghostlyUsers',JSON.stringify(users)); loadPendingUsers(); showPopup(${username} kicked.);}
-loadPendingUsers();
-const music=document.getElementById('bg-music'); music.volume=0.2; music.play().catch(()=>{document.body.addEventListener('click',()=>music.play(),{once:true}); document.body.addEventListener('touchstart',()=>music.play(),{once:true});});
+const user = sessionStorage.getItem('loggedInUser');
+if(user!=="Ghostly"){window.location.href='auth.html';}
+
+// Show pending users
+function refreshPending(){
+    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+    const pending = Object.keys(users).filter(u=>!users[u].approved);
+    const ul = document.getElementById('pending-users');
+    ul.innerHTML='';
+    pending.forEach(u=>{
+        const li = document.createElement('li');
+        li.innerHTML=`${u} <button onclick="approve('${u}')">Approve</button> <button onclick="kick('${u}')">Kick</button>`;
+        ul.appendChild(li);
+    });
+}
+function approve(u){
+    let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+    users[u].approved=true;
+    localStorage.setItem('ghostlyUsers', JSON.stringify(users));
+    showPopup(${u} approved!);
+    refreshPending();
+}
+function kick(u){
+    localStorage.setItem('kick_'+u, 'true');
+    showPopup(${u} has been kicked!);
+    refreshPending();
+}
+document.getElementById('logout').addEventListener('click', ()=>{
+    sessionStorage.removeItem('loggedInUser');
+    window.location.href='auth.html';
+});
+
+refreshPending();
 </script>
 </body>
 </html>
