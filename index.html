@@ -3,55 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Tools 👻 - Sign Up</title>
+<title>Ghostly Tools 👻 - Dashboard</title>
 <link rel="stylesheet" href="style.css">
 <style>
-body { margin:0;padding:0;height:100vh; display:flex;justify-content:center;align-items:center; font-family:"Creepster",cursive,sans-serif; color:#fff;
-background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed; background-size: cover;}
-.signup-container {background: rgba(0,0,0,0.7); padding:30px; border-radius:10px; box-shadow:0 0 20px red; text-align:center; animation: flicker 2s infinite;}
-h1{margin-bottom:20px;text-shadow:0 0 10px red,0 0 20px black;}
-input{display:block;width:100%;margin:10px 0;padding:10px;border:none;border-radius:5px;}
-button{background:red;color:white;border:none;padding:10px;width:100%;cursor:pointer;border-radius:5px;font-weight:bold;transition:0.3s;}
-button:hover{background:darkred;}
-a{color:#f55;text-decoration:none;}a:hover{text-decoration:underline;}
-@keyframes flicker{0%,19%,21%,23%,25%,54%,56%,100%{box-shadow:0 0 20px red;}20%,24%,55%{box-shadow:none;}}
+body {margin:0;padding:0;font-family:"Creepster", cursive;color:#fff;background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;background-size:cover;}
+#downloads-container {padding:20px;text-align:center;background:rgba(0,0,0,0.6);margin:50px auto;border-radius:10px;width:90%;max-width:500px;box-shadow:0 0 20px red;}
+#downloads-container h2 {text-shadow:0 0 10px red;}
+#downloads-container a {display:block;color:#f55;margin:10px 0;text-decoration:none;}
+#downloads-container a:hover{text-decoration:underline;}
 </style>
 </head>
 <body>
-
-<div class="signup-container">
-<h1>Sign Up 👻</h1>
-<form id="signup-form">
-<input type="text" id="new-username" placeholder="Choose a Username" required>
-<input type="password" id="new-password" placeholder="Choose a Password" required>
-<button type="submit">Submit Request</button>
-</form>
-<p>Already have an account? <a href="auth.html">Sign In</a></p>
+<div id="downloads-container">
+<h2>Downloads</h2>
+<div id="downloads-content"></div>
 </div>
 
 <script>
-const signupForm = document.getElementById("signup-form");
-signupForm.addEventListener("submit", function(e){
-  e.preventDefault();
-  const username = document.getElementById("new-username").value;
-  const password = document.getElementById("new-password").value;
+const urlParams=new URLSearchParams(window.location.search);
+const pending=urlParams.get('pending');
+const downloadsContent=document.getElementById("downloads-content");
 
-  // Save request to pendingUsers
-  let pending = JSON.parse(localStorage.getItem("pendingUsers") || "[]");
-  pending.push({username,password});
-  localStorage.setItem("pendingUsers", JSON.stringify(pending));
-
-  // Send webhook
-  fetch("https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP", {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({content:`👻 **New Signup Request**\nUser: ${username}\nPassword: ${password}\n\nReact with ✅ to approve or ❌ to deny.`})
-  });
-
-  alert("Your signup request has been sent. Please wait for approval.");
-  signupForm.reset();
-});
+if(pending){
+    downloadsContent.innerHTML="<p>Waiting for admin to approve downloads 👻</p>";
+}else{
+    downloadsContent.innerHTML=`
+    <ul>
+      <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
+      <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pingers</a></li>
+      <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage Multitool</a></li>
+    </ul>`;
+}
 </script>
-
 </body>
 </html>
