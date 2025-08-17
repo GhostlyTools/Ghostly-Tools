@@ -1,153 +1,120 @@
-// ---------------------------
-// Users storage
-// ---------------------------
-let users = JSON.parse(localStorage.getItem("ghostlyUsers") || "{}");
+const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+const userDropdownsContainer = document.getElementById("user-dropdowns");
 
-// ---------------------------
-// Background music autoplay
-// ---------------------------
-const music = document.getElementById("bg-music");
-if (music) {
-  music.volume = 1.0;
-  music.play().catch(() => {
-    document.addEventListener("click", () => music.play());
+const music=document.getElementById("bg-music");
+music.volume=1.0;
+function playMusic(){music.play().catch(()=>{});}
+playMusic();
+['click','keydown','touchstart'].forEach(e=>document.addEventListener(e, playMusic, {once:true}));
+
+function filterUsersDropdown() {
+  const filter = document.getElementById("search").value.toLowerCase();
+  const dropdowns = document.querySelectorAll(".user-dropdown");
+  dropdowns.forEach(drop => {
+    const username = drop.dataset.username.toLowerCase();
+    const ip = drop.dataset.ip;
+    drop.style.display = (username.includes(filter) || ip.includes(filter)) ? "block" : "none";
   });
 }
 
-// ---------------------------
-// Jumpscare
-// ---------------------------
-const jumpscare = document.getElementById("jumpscare");
-if (jumpscare) {
-  setTimeout(() => {
-    if (Math.random() < 0.5) {
-      jumpscare.style.display = "block";
-      setTimeout(() => jumpscare.style.display = "none", 2000);
+function updateOnlineCount() {
+  const online = document.querySelectorAll(".user-dropdown .status.online").length;
+  document.getElementById("online-count").innerText = online;
+}
+
+function loadUsers() {
+  const users = JSON.parse(localStorage.getItem("ghostlyUsers")||"{}");
+  userDropdownsContainer.innerHTML = "";
+
+  for(const [username, data] of Object.entries(users)){
+    const drop = document.createElement("div");
+    drop.className = "user-dropdown";
+    drop.dataset.username = username;
+    drop.dataset.ip = data.ip;
+
+    let pendingLabel = null;
+    if(!data.approved){
+        drop.classList.add("pending");
+        pendingLabel = document.createElement("span");
+        pendingLabel.innerText = "PENDING";
+        pendingLabel.className = "pending-label";
     }
-  }, 5000);
-}
 
-// ---------------------------
-// Pop-ups
-// ---------------------------
-function showPopup(msg) {
-  const popup = document.getElementById("popup");
-  const popupMsg = document.getElementById("popup-message");
-  if (popup && popupMsg) {
-    popupMsg.innerText = msg;
-    popup.style.display = "block";
+    const h3 = document.createElement("h3");
+    h3.innerText = username;
+    if(pendingLabel) h3.appendChild(pendingLabel);
+
+    const content = document.createElement("div");
+    content.className = "user-dropdown-content";
+
+    const pIP = document.createElement("p");
+    pIP.innerText = IP: ${data.ip || "N/A"};
+
+    const pStatus = document.createElement("p");
+    pStatus.innerText = "Online";
+    pStatus.className = "status online";
+
+    const kickBtn = document.createElement("button");
+    kickBtn.innerText = "Kick";
+    kickBtn.className = "kick";
+    kickBtn.onclick = ()=>{
+      pStatus.innerText = "Offline";
+      pStatus.className = "status offline";
+      updateOnlineCount();
+    };
+
+    const approveBtn = document.createElement("button");
+    approveBtn.innerText = "Approve";
+    approveBtn.onclick = ()=>{
+      users[username].approved = true;
+      localStorage.setItem("ghostlyUsers", JSON.stringify(users));
+      drop.classList.remove("pending");
+      if(pendingLabel) pendingLabel.remove();
+      const liveCount = Object.values(users).filter(u=>u.approved).length;
+      fetch(webhookURL, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({content:`✅ User approved!\nUsername: ${username}\nIP: ${data.ip}\nLive Users: ${liveCount}`})
+      });
+      alert(${username} approved!);
+      updateOnlineCount();
+    };
+
+    const denyBtn = document.createElement("button");
+    denyBtn.innerText = "Deny";
+    denyBtn.onclick = ()=>{
+      delete users[username];
+      localStorage.setItem("ghostlyUsers", JSON.stringify(users));
+      drop.remove();
+      const liveCount = Object.values(users).filter(u=>u.approved).length;
+      fetch(webhookURL, {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({content:`❌ User denied!\nUsername: ${username}\nIP: ${data.ip}\nLive Users: ${liveCount}`})
+      });
+      alert(${username} denied access.);
+      updateOnlineCount();
+    };
+
+    content.appendChild(pIP);
+    content.appendChild(pStatus);
+    content.appendChild(kickBtn);
+    content.appendChild(approveBtn);
+    content.appendChild(denyBtn);
+
+    drop.appendChild(h3);
+    drop.appendChild(content);
+
+    h3.onclick = () => {
+      const isOpen = content.classList.contains("open");
+      if (isOpen) content.classList.remove("open");
+      else content.classList.add("open");
+      content.style.animation = "hauntedFlicker 1.5s infinite";
+    }
+
+    userDropdownsContainer.appendChild(drop);
   }
-}
-function closePopup() {
-  const popup = document.getElementById("popup");
-  if (popup) popup.style.display = "none";
+  updateOnlineCount();
 }
 
-// ---------------------------
-// Sign-up
-// ---------------------------
-const signupForm = document.getElementById("signup-form");
-if (signupForm) {
-  signupForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const username = document.getElementById("signup-username").value;
-    const password = document.getElementById("signup-password").value;
-
-    if (users[username]) return alert("Username exists!");
-
-    users[username] = { password, approved: false, isAdmin: false };
-    localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-
-    // Discord webhook notification
-    fetch("https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: New signup: ${username} })
-    });
-
-    alert("Signup successful! Waiting for admin approval.");
-    window.location.href = "auth.html";
-  });
-}
-
-// ---------------------------
-// Sign-in
-// ---------------------------
-const loginForm = document.getElementById("login-form");
-if (loginForm) {
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
-    if (!users[username] || users[username].password !== password)
-      return alert("Invalid username or password!");
-
-    sessionStorage.setItem("loggedInUser", username);
-
-    if (username === "Ghostly" && password === "Dare2995!") window.location.href = "admin.html";
-    else window.location.href = "dashboard.html";
-  });
-}
-
-// ---------------------------
-// Dashboard
-// ---------------------------
-const currentUser = sessionStorage.getItem("loggedInUser");
-if (currentUser) {
-  const userSpan = document.getElementById("user-name");
-  if (userSpan) userSpan.innerText = currentUser;
-
-  const downloadsDiv = document.querySelector(".downloads");
-  if (downloadsDiv) {
-    if (users[currentUser] && users[currentUser].approved) downloadsDiv.style.display = "block";
-    else showPopup("Waiting for admin approval. Downloads are locked.");
-  }
-}
-
-// ---------------------------
-// Logout
-// ---------------------------
-const logoutBtn = document.getElementById("logout");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
-    sessionStorage.removeItem("loggedInUser");
-    window.location.href = "auth.html";
-  });
-}
-
-// ---------------------------
-// Admin functions
-// ---------------------------
-function approveUser(username) {
-  if (users[username]) {
-    users[username].approved = true;
-    localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-    alert(${username} approved!);
-    renderUserList();
-  }
-}
-function kickUser(username) {
-  if (users[username]) {
-    delete users[username];
-    localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-    alert(${username} kicked!);
-    renderUserList();
-  }
-}
-function renderUserList() {
-  const ul = document.getElementById("user-list");
-  if (!ul) return;
-  ul.innerHTML = "";
-  Object.keys(users).forEach(u => {
-    if (u === "Ghostly") return;
-    const li = document.createElement("li");
-    li.innerHTML = `<span>${u} - ${users[u].approved ? "Approved" : "Pending"}</span>
-      <div>
-        <button onclick="approveUser('${u}')">Approve</button>
-        <button onclick="kickUser('${u}')">Kick</button>
-      </div>`;
-    ul.appendChild(li);
-  });
-}
-if (document.getElementById("user-list")) renderUserList();
+loadUsers();
