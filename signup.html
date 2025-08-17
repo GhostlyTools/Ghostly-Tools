@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghostly Tools 👻 - Sign Up</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      font-family: "Creepster", cursive, sans-serif;
+      color: #fff;
+      background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .signup-container {
+      background: rgba(0,0,0,0.7);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px red;
+      text-align: center;
+      animation: flicker 2s infinite;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px red, 0 0 20px black;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+    }
+
+    button {
+      background: red;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: darkred;
+    }
+
+    a {
+      color: #f55;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { box-shadow: 0 0 20px red; }
+      20%, 24%, 55% { box-shadow: none; }
+    }
+
+    #jumpscare {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black url("https://i.imgur.com/zY8hVY2.png") center center no-repeat;
+      background-size: cover;
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="jumpscare"></div>
+
+  <div class="signup-container">
+    <h1>Ghostly Tools 👻</h1>
+    <form id="signup-form">
+      <input type="text" id="signup-username" placeholder="Username" required>
+      <input type="password" id="signup-password" placeholder="Password" required>
+      <button type="submit">Sign Up</button>
+    </form>
+    <p>Already have an account? <a href="auth.html">Sign In</a></p>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bg-music" src="Ghostly_music.mp3" loop autoplay></audio>
+
+  <script src="scripts.js"></script>
+  <script>
+    // Ensure music plays at 100%
+    const music = document.getElementById("bg-music");
+    music.volume = 1.0;
+    music.play().catch(() => { document.addEventListener("click", () => music.play()); });
+
+    // Random jumpscare
+    setTimeout(() => {
+      if (Math.random() < 0.5) {
+        document.getElementById("jumpscare").style.display = "block";
+        setTimeout(() => { document.getElementById("jumpscare").style.display = "none"; }, 2000);
+      }
+    }, 5000);
+  </script>
+
+</body>
+</html>
