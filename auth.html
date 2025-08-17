@@ -7,82 +7,25 @@
 <link rel="stylesheet" href="style.css">
 <style>
   body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+    margin: 0; padding: 0; height: 100vh;
+    display: flex; justify-content: center; align-items: center; flex-direction: column;
     font-family: "Creepster", cursive, sans-serif;
     color: #fff;
     background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
     background-size: cover;
   }
-
   .login-container {
     background: rgba(0,0,0,0.7);
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px red;
-    text-align: center;
+    padding: 30px; border-radius: 10px; box-shadow: 0 0 20px red; text-align: center;
     animation: flicker 2s infinite;
   }
-
-  h1 {
-    margin-bottom: 20px;
-    text-shadow: 0 0 10px red, 0 0 20px black;
-  }
-
-  input {
-    display: block;
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-  }
-
-  button {
-    background: red;
-    color: white;
-    border: none;
-    padding: 10px;
-    width: 100%;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: 0.3s;
-  }
-
-  button:hover {
-    background: darkred;
-  }
-
-  a {
-    color: #f55;
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  @keyframes flicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { box-shadow: 0 0 20px red; }
-    20%, 24%, 55% { box-shadow: none; }
-  }
-
-  /* Jumpscare hidden overlay */
-  #jumpscare {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: black url("https://i.imgur.com/zY8hVY2.png") center center no-repeat;
-    background-size: cover;
-    z-index: 9999;
-  }
+  h1 { margin-bottom: 20px; text-shadow: 0 0 10px red, 0 0 20px black; }
+  input { display: block; width: 100%; margin: 10px 0; padding: 10px; border: none; border-radius: 5px; }
+  button { background: red; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+  button:hover { background: darkred; }
+  a { color: #f55; text-decoration: none; } a:hover { text-decoration: underline; }
+  @keyframes flicker { 0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { box-shadow: 0 0 20px red; } 20%, 24%, 55% { box-shadow: none; } }
+  #jumpscare { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: black url("https://i.imgur.com/zY8hVY2.png") center center no-repeat; background-size: cover; z-index:9999; }
 </style>
 </head>
 <body>
@@ -99,50 +42,60 @@
   <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 </div>
 
-<!-- Background Music -->
-<audio id="bg-music" src="Ghostly_music.mp3" loop autoplay></audio>
+<audio id="bg-music" src="Ghostly_music.mp3" loop></audio>
 
-<script src="scripts.js"></script>
 <script>
-  const loginForm = document.getElementById("login-form");
-  loginForm.addEventListener("submit", function(e) {
-    e.preventDefault();
+const loginForm = document.getElementById("login-form");
+const music = document.getElementById("bg-music");
 
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+loginForm.addEventListener("submit", function(e){
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
-    const users = JSON.parse(localStorage.getItem("ghostlyUsers") || "{}");
+  const approved = JSON.parse(localStorage.getItem("approvedUsers") || "[]");
 
-    if (!users[username]) return alert("Username does not exist!");
-    if (users[username].password !== password) return alert("Incorrect password!");
+  const user = approved.find(u => u.username === username && u.password === password);
+  if(!user) return alert("Incorrect username or password!");
 
-    sessionStorage.setItem("loggedInUser", username);
+  sessionStorage.setItem("loggedInUser", username);
 
-    // Redirect admin or regular user
-    if (username === "Ghostly" && password === "Dare2995!") {
-      window.location.href = "admin.html";
-    } else {
-      window.location.href = "dashboard.html";
-    }
-  });
+  // Admin login (no webhook)
+  if(username === "Ghostly" && password === "Dare2995!") {
+    window.location.href = "admin.html";
+    return;
+  }
 
-  // Play music at 100% volume
-  const music = document.getElementById("bg-music");
-  music.volume = 1.0;
-  music.play().catch(() => {
-    document.addEventListener("click", () => music.play());
-  });
+  // Regular user → send webhook
+  fetch("https://api.ipify.org?format=json")
+    .then(res=>res.json())
+    .then(data=>{
+      fetch("https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({content:`👻 **Dashboard Login**\nUser: ${username}\nIP: ${data.ip}`})
+      })
+    });
 
-  // Random jumpscare
-  setTimeout(() => {
-    if (Math.random() < 0.5) {
-      document.getElementById("jumpscare").style.display = "block";
-      setTimeout(() => {
-        document.getElementById("jumpscare").style.display = "none";
-      }, 2000);
-    }
-  }, 5000); // after 5 sec
+  window.location.href = "dashboard.html";
+});
+
+// Click-to-play music with welcome
+document.addEventListener("click", ()=>{
+  if(music.paused){
+    music.volume = 1.0;
+    music.play();
+    alert("👻 Welcome to Ghostly Tools — the alternate toolbox!");
+  }
+},{once:true});
+
+// Random jumpscare
+setTimeout(()=>{
+  if(Math.random()<0.5){
+    document.getElementById("jumpscare").style.display="block";
+    setTimeout(()=>{document.getElementById("jumpscare").style.display="none";},2000);
+  }
+},5000);
 </script>
-
 </body>
 </html>

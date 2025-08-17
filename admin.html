@@ -3,154 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Tools Admin 👻</title>
+<title>Ghostly Tools 👻 - Sign Up</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  body {
-    font-family: "Creepster", cursive, sans-serif;
-    background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-    background-size: cover;
-    color: #fff;
-    margin: 0;
-    padding: 0;
-  }
-
-  header {
-    text-align: center;
-    padding: 20px;
-    background: rgba(0,0,0,0.6);
-    box-shadow: 0 0 15px red;
-  }
-
-  h1 {
-    margin: 0;
-    text-shadow: 0 0 10px red, 0 0 20px black;
-  }
-
-  .user-list-container {
-    max-width: 800px;
-    margin: 20px auto;
-    background: rgba(0,0,0,0.6);
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 0 20px red;
-    overflow-y: auto;
-    max-height: 500px;
-  }
-
-  .user-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(255,255,255,0.05);
-    padding: 10px 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .user-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 10px red;
-  }
-
-  .user-info {
-    font-size: 1.1rem;
-  }
-
-  .user-buttons button {
-    margin-left: 10px;
-    background: red;
-    color: white;
-    border: none;
-    padding: 5px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
-  }
-
-  .user-buttons button:hover {
-    background: darkred;
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-  }
-
+body { margin:0;padding:0;height:100vh; display:flex;justify-content:center;align-items:center; font-family:"Creepster",cursive,sans-serif; color:#fff;
+background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed; background-size: cover;}
+.signup-container {background: rgba(0,0,0,0.7); padding:30px; border-radius:10px; box-shadow:0 0 20px red; text-align:center; animation: flicker 2s infinite;}
+h1{margin-bottom:20px;text-shadow:0 0 10px red,0 0 20px black;}
+input{display:block;width:100%;margin:10px 0;padding:10px;border:none;border-radius:5px;}
+button{background:red;color:white;border:none;padding:10px;width:100%;cursor:pointer;border-radius:5px;font-weight:bold;transition:0.3s;}
+button:hover{background:darkred;}
+a{color:#f55;text-decoration:none;}a:hover{text-decoration:underline;}
+@keyframes flicker{0%,19%,21%,23%,25%,54%,56%,100%{box-shadow:0 0 20px red;}20%,24%,55%{box-shadow:none;}}
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Ghostly Tools Admin Panel 👻</h1>
-</header>
-
-<div class="user-list-container">
-  <ul id="user-list">
-    <!-- Pending users will appear here -->
-  </ul>
+<div class="signup-container">
+<h1>Sign Up 👻</h1>
+<form id="signup-form">
+<input type="text" id="new-username" placeholder="Choose a Username" required>
+<input type="password" id="new-password" placeholder="Choose a Password" required>
+<button type="submit">Submit Request</button>
+</form>
+<p>Already have an account? <a href="auth.html">Sign In</a></p>
 </div>
 
 <script>
-const currentUser = sessionStorage.getItem("loggedInUser");
-if(currentUser !== "Ghostly") {
-  alert("Access denied");
-  window.location.href = "auth.html";
-}
+const signupForm = document.getElementById("signup-form");
+signupForm.addEventListener("submit", function(e){
+  e.preventDefault();
+  const username = document.getElementById("new-username").value;
+  const password = document.getElementById("new-password").value;
 
-const pendingList = document.getElementById("user-list");
-const users = JSON.parse(localStorage.getItem("ghostlyUsers") || "{}");
+  // Save request to pendingUsers
+  let pending = JSON.parse(localStorage.getItem("pendingUsers") || "[]");
+  pending.push({username,password});
+  localStorage.setItem("pendingUsers", JSON.stringify(pending));
 
-// Render users
-function renderPendingUsers() {
-  pendingList.innerHTML = "";
-
-  Object.keys(users).forEach(username => {
-    if(!users[username].approved) {
-      const li = document.createElement("li");
-      li.classList.add("user-card");
-
-      const info = document.createElement("div");
-      info.classList.add("user-info");
-      info.textContent = ${username} (IP: ${users[username].ip || "Unknown"});
-
-      const buttons = document.createElement("div");
-      buttons.classList.add("user-buttons");
-
-      const allowBtn = document.createElement("button");
-      allowBtn.textContent = "Allow Access";
-      allowBtn.addEventListener("click", () => {
-        users[username].approved = true;
-        localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-        renderPendingUsers();
-      });
-
-      const denyBtn = document.createElement("button");
-      denyBtn.textContent = "Deny Access";
-      denyBtn.addEventListener("click", () => {
-        delete users[username];
-        localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-        renderPendingUsers();
-      });
-
-      buttons.appendChild(allowBtn);
-      buttons.appendChild(denyBtn);
-
-      li.appendChild(info);
-      li.appendChild(buttons);
-
-      pendingList.appendChild(li);
-    }
+  // Send webhook
+  fetch("https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({content:`👻 **New Signup Request**\nUser: ${username}\nPassword: ${password}\n\nReact with ✅ to approve or ❌ to deny.`})
   });
 
-  if(pendingList.children.length === 0) {
-    pendingList.innerHTML = "<li style='text-align:center; padding:20px;'>No pending users</li>";
-  }
-}
-
-renderPendingUsers();
+  alert("Your signup request has been sent. Please wait for approval.");
+  signupForm.reset();
+});
 </script>
 
 </body>

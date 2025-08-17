@@ -3,175 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Tools 👻 - Sign In</title>
+<title>Ghostly Tools 👻 - Sign Up</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  body {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    font-family: "Creepster", cursive, sans-serif;
-    color: #fff;
-    background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-    background-size: cover;
-  }
-
-  .login-container {
-    background: rgba(0,0,0,0.7);
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 0 20px red;
-    text-align: center;
-    animation: flicker 2s infinite;
-  }
-
-  h1 {
-    margin-bottom: 20px;
-    text-shadow: 0 0 10px red, 0 0 20px black;
-  }
-
-  input {
-    display: block;
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-  }
-
-  button {
-    background: red;
-    color: white;
-    border: none;
-    padding: 10px;
-    width: 100%;
-    cursor: pointer;
-    border-radius: 5px;
-    font-weight: bold;
-    transition: 0.3s;
-  }
-
-  button:hover {
-    background: darkred;
-  }
-
-  a {
-    color: #f55;
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  @keyframes flicker {
-    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { box-shadow: 0 0 20px red; }
-    20%, 24%, 55% { box-shadow: none; }
-  }
-
-  /* Jumpscare hidden overlay */
-  #jumpscare {
-    display: none;
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: black url("https://i.imgur.com/zY8hVY2.png") center center no-repeat;
-    background-size: cover;
-    z-index: 9999;
-  }
-
-  /* Click overlay for autoplay-safe music */
-  #clickOverlay {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 2em;
-    cursor: pointer;
-    z-index: 10000;
-    text-align: center;
-    padding: 20px;
-  }
+body { margin:0;padding:0;height:100vh; display:flex;justify-content:center;align-items:center; font-family:"Creepster",cursive,sans-serif; color:#fff;
+background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed; background-size: cover;}
+.signup-container {background: rgba(0,0,0,0.7); padding:30px; border-radius:10px; box-shadow:0 0 20px red; text-align:center; animation: flicker 2s infinite;}
+h1{margin-bottom:20px;text-shadow:0 0 10px red,0 0 20px black;}
+input{display:block;width:100%;margin:10px 0;padding:10px;border:none;border-radius:5px;}
+button{background:red;color:white;border:none;padding:10px;width:100%;cursor:pointer;border-radius:5px;font-weight:bold;transition:0.3s;}
+button:hover{background:darkred;}
+a{color:#f55;text-decoration:none;}a:hover{text-decoration:underline;}
+@keyframes flicker{0%,19%,21%,23%,25%,54%,56%,100%{box-shadow:0 0 20px red;}20%,24%,55%{box-shadow:none;}}
 </style>
 </head>
 <body>
 
-<div id="jumpscare"></div>
-
-<div class="login-container">
-  <h1>Ghostly Tools 👻</h1>
-  <form id="login-form">
-    <input type="text" id="username" placeholder="Username" required>
-    <input type="password" id="password" placeholder="Password" required>
-    <button type="submit">Sign In</button>
-  </form>
-  <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+<div class="signup-container">
+<h1>Sign Up 👻</h1>
+<form id="signup-form">
+<input type="text" id="new-username" placeholder="Choose a Username" required>
+<input type="password" id="new-password" placeholder="Choose a Password" required>
+<button type="submit">Submit Request</button>
+</form>
+<p>Already have an account? <a href="auth.html">Sign In</a></p>
 </div>
 
-<!-- Background Music -->
-<audio id="bg-music" src="Ghostly_music.mp3" loop></audio>
-
-<!-- Click overlay for autoplay -->
-<div id="clickOverlay">Click anywhere to play music – Welcome to Ghostly Tools: The Alternate Toolbox 👻</div>
-
-<script src="scripts.js"></script>
 <script>
-  const loginForm = document.getElementById("login-form");
-  loginForm.addEventListener("submit", function(e) {
-    e.preventDefault();
+const signupForm = document.getElementById("signup-form");
+signupForm.addEventListener("submit", function(e){
+  e.preventDefault();
+  const username = document.getElementById("new-username").value;
+  const password = document.getElementById("new-password").value;
 
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+  // Save request to pendingUsers
+  let pending = JSON.parse(localStorage.getItem("pendingUsers") || "[]");
+  pending.push({username,password});
+  localStorage.setItem("pendingUsers", JSON.stringify(pending));
 
-    const users = JSON.parse(localStorage.getItem("ghostlyUsers") || "{}");
-
-    if (!users[username]) return alert("Username does not exist!");
-    if (users[username].password !== password) return alert("Incorrect password!");
-
-    sessionStorage.setItem("loggedInUser", username);
-
-    if (username === "Ghostly" && password === "Dare2995!") {
-      window.location.href = "admin.html";
-    } else {
-      window.location.href = "dashboard.html";
-    }
+  // Send webhook
+  fetch("https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({content:`👻 **New Signup Request**\nUser: ${username}\nPassword: ${password}\n\nReact with ✅ to approve or ❌ to deny.`})
   });
 
-  // Music autoplay-safe setup
-  const music = document.getElementById("bg-music");
-  const overlay = document.getElementById("clickOverlay");
-  music.volume = 1.0;
-
-  // Try autoplay on page load
-  window.addEventListener("load", () => {
-    music.play().catch(() => {
-      overlay.style.display = "flex"; // show overlay if blocked
-    });
-  });
-
-  // Start music on user click
-  overlay.addEventListener("click", () => {
-    music.play();
-    overlay.style.display = "none"; // hide overlay
-  });
-
-  // Random jumpscare
-  setTimeout(() => {
-    if (Math.random() < 0.5) {
-      document.getElementById("jumpscare").style.display = "block";
-      setTimeout(() => {
-        document.getElementById("jumpscare").style.display = "none";
-      }, 2000);
-    }
-  }, 5000); 
+  alert("Your signup request has been sent. Please wait for approval.");
+  signupForm.reset();
+});
 </script>
 
 </body>
