@@ -1,60 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ghostly Tools 👻 - Admin Panel</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="login-container">
-    <h1>Ghostly Tools 👻 - Admin Panel</h1>
-    <h2>Users Online: <span id="online-count">0</span></h2>
-    <div id="user-list"></div>
-  </div>
-  <audio id="bg-music" src="Ghostly_music.mp3" loop autoplay></audio>
+const express = require('express');
+const fetch = require('node-fetch');
+const cors = require('cors');
 
-  <script>
-    const music = document.getElementById("bg-music");
-    music.volume = 1.0;
+const app = express();
+const PORT = 3000;
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-    function updateUserList() {
-      const container = document.getElementById("user-list");
-      container.innerHTML = "";
-      const users = JSON.parse(localStorage.getItem("ghostlyUsers") || "{}");
-      let count = 0;
+app.use(cors());
+app.use(express.json());
 
-      for (const username in users) {
-        const userData = users[username];
-        count++;
+// Signup event
+app.post('/signup-webhook', async (req, res) => {
+    const { username, ip } = req.body;
+    try {
+        await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: 👻 New signup request:\nUsername: ${username}\nIP: ${ip}\nStatus: Pending approval
+            })
+        });
+        res.sendStatus(200);
+    } catch(err){
+        res.status(500).json({ error: err.message });
+    }
+});
 
-        const drop = document.createElement("div");
-        drop.className = "dropdown";
-        if (!userData.approved) drop.classList.add("pending");
+// Status update (approve/deny)
+app.post('/status-webhook', async (req,res)=>{
+    const { username, ip, status } = req.body;
+    try{
+        await fetch(WEBHOOK_URL,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                content: 👻 User status update:\nUsername: ${username}\nIP: ${ip}\nStatus: ${status}
+            })
+        });
+        res.sendStatus(200);
+    } catch(err){
+        res.status(500).json({ error: err.message });
+    }
+});
 
-        const title = document.createElement("div");
-        title.innerHTML = username + (!userData.approved ? '<span class="pending-label">Pending</span>' : '');
-        drop.appendChild(title);
-
-        const content = document.createElement("div");
-        content.className = "dropdown-content";
-        content.innerHTML = `
-          <p><strong>IP:</strong> ${userData.ip}</p>
-          <button class="approve-btn">Approve</button>
-          <button class="deny-btn">Deny</button>
-        `;
-        drop.appendChild(content);
-
-        container.appendChild(drop);
-
-        content.querySelector(".approve-btn").onclick = () => {
-          userData.approved = true;
-          users[username] = userData;
-          localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-          drop.classList.remove("pending");
-          content.querySelector(".pending-label")?.remove();
-
-          fetch("http://localhost:3000/status-webhook", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body
+app.listen(PORT, ()=>console.log(Ghostly server running on http://localhost:${PORT}));
