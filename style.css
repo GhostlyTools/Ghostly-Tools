@@ -3,7 +3,7 @@ html, body {
     padding: 0;
     height: 100%;
     font-family: 'Arial', sans-serif;
-    background: url('https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg') no-repeat center center fixed;
+    background: url('images/background.jpg') no-repeat center center fixed;
     background-size: cover;
     color: #fff;
 }

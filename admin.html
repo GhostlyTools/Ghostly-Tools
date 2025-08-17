@@ -3,18 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Admin</title>
+<title>Ghostly Admin Panel</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<script>
+const user = sessionStorage.getItem('loggedInUser');
+if(user!=="Ghostly"){ window.location.href='auth.html'; }
+</script>
+
 <div class="content">
-<h1>Ghostly Admin Panel 👻</h1>
-<p>Welcome, Admin</p>
-<h2>Pending Users</h2>
-<ul id="pending-users"></ul>
+  <h1>Ghostly Admin Panel 👻</h1>
+  <p>Welcome, <span id="user-name"></span></p>
+</div>
+
+<div class="downloads">
+  <h2>Approve Users</h2>
+  <ul id="user-list"></ul>
 </div>
 
 <a href="#" id="logout">Logout</a>
+
 <div id="popup" class="popup">
   <div class="popup-content">
     <p id="popup-message"></p>
@@ -25,39 +35,43 @@
 <audio id="bg-music" src="ghostly_music.mp3" loop></audio>
 <script src="scripts.js"></script>
 <script>
-const user = sessionStorage.getItem('loggedInUser');
-if(user!=="Ghostly"){window.location.href='auth.html';}
+document.getElementById('user-name').innerText = user;
 
-// Show pending users
-function refreshPending(){
-    const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-    const pending = Object.keys(users).filter(u=>!users[u].approved);
-    const ul = document.getElementById('pending-users');
-    ul.innerHTML='';
-    pending.forEach(u=>{
-        const li = document.createElement('li');
-        li.innerHTML=`${u} <button onclick="approve('${u}')">Approve</button> <button onclick="kick('${u}')">Kick</button>`;
-        ul.appendChild(li);
-    });
+const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+const list = document.getElementById('user-list');
+for(const u in users){
+    if(u==="Ghostly") continue;
+    const li = document.createElement('li');
+    li.innerHTML = `${u} - Approved: ${users[u].approved} 
+        <button onclick="approveUser('${u}')">Approve</button>
+        <button onclick="kickUser('${u}')">Kick</button>`;
+    list.appendChild(li);
 }
-function approve(u){
-    let users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-    users[u].approved=true;
+
+function approveUser(u){
+    users[u].approved = true;
     localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-    showPopup(${u} approved!);
-    refreshPending();
+    showPopup(${u} has been approved!);
+    location.reload();
 }
-function kick(u){
-    localStorage.setItem('kick_'+u, 'true');
+
+function kickUser(u){
+    localStorage.setItem('kick_'+u, true);
     showPopup(${u} has been kicked!);
-    refreshPending();
+    location.reload();
 }
+
 document.getElementById('logout').addEventListener('click', ()=>{
     sessionStorage.removeItem('loggedInUser');
     window.location.href='auth.html';
 });
 
-refreshPending();
+const music = document.getElementById('bg-music');
+music.volume = 1.0;
+music.play().catch(()=>{
+    document.body.addEventListener('click', ()=>music.play(), {once:true});
+    document.body.addEventListener('touchstart', ()=>music.play(), {once:true});
+});
 </script>
 </body>
 </html>

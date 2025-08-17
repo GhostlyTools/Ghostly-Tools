@@ -9,10 +9,10 @@
 <body>
 
 <script>
-const user = sessionStorage.getItem('loggedInUser');
-if(!user){ window.location.href='auth.html'; }
-const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-const approved = users[user] && users[user].approved;
+  const user = sessionStorage.getItem('loggedInUser');
+  if(!user){ window.location.href='auth.html'; }
+  const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+  const approved = users[user] && users[user].approved;
 </script>
 
 <div class="content">
@@ -23,9 +23,9 @@ const approved = users[user] && users[user].approved;
 <div class="downloads" style="display:none;">
   <h2>Downloads</h2>
   <ul>
-    <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_multi_tool_v2.bat/file" target="_blank">Savage MultiTool</a></li>
+    <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage MultiTool</a></li>
     <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
-    <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/pinger" target="_blank">Pinger</a></li>
+    <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pinger</a></li>
   </ul>
 </div>
 
@@ -33,26 +33,31 @@ const approved = users[user] && users[user].approved;
 
 <div id="popup" class="popup">
   <div class="popup-content">
-    <p id="popup-message"></p>
+    <p id="popup-message">Welcome to Ghostly Tools, the ultimate toolbox!</p>
     <button onclick="closePopup()">Close</button>
   </div>
 </div>
 
 <audio id="bg-music" src="ghostly_music.mp3" loop></audio>
-
 <script src="scripts.js"></script>
 <script>
 document.getElementById('user-name').innerText = user;
-if(approved){
-    document.querySelector('.downloads').style.display='block';
-    showPopup("Welcome to Ghostly Tools – The Ultimate Toolbox");
-} else {
-    showPopup("Waiting for admin approval. Downloads are locked.");
-}
+
+if(approved) document.querySelector('.downloads').style.display='block';
+else showPopup("Waiting for admin approval. Downloads are locked.");
+
 document.getElementById('logout').addEventListener('click', ()=>{
     sessionStorage.removeItem('loggedInUser');
     window.location.href='auth.html';
 });
+
+const music = document.getElementById('bg-music');
+music.volume = 1.0;
+music.play().catch(()=>{
+    document.body.addEventListener('click', ()=>music.play(), {once:true});
+    document.body.addEventListener('touchstart', ()=>music.play(), {once:true});
+});
 </script>
 </body>
 </html>
+
