@@ -2,155 +2,155 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Ghostly Tools — Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghostly Tools Admin 👻</title>
 <link rel="stylesheet" href="style.css">
 <style>
-body {
-  margin: 0; padding: 0;
-  font-family: "Creepster", cursive, sans-serif;
-  background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-  background-size: cover;
-  color: #fff;
-}
+  body {
+    font-family: "Creepster", cursive, sans-serif;
+    background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
+    background-size: cover;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+  }
 
-main {
-  max-width: 800px;
-  margin: 50px auto;
-  background: rgba(0,0,0,0.8);
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 0 20px red;
-}
+  header {
+    text-align: center;
+    padding: 20px;
+    background: rgba(0,0,0,0.6);
+    box-shadow: 0 0 15px red;
+  }
 
-h1 {
-  text-align: center;
-  font-size: 2.5rem;
-  margin-bottom: 30px;
-  text-shadow: 0 0 10px red, 0 0 20px black;
-}
+  h1 {
+    margin: 0;
+    text-shadow: 0 0 10px red, 0 0 20px black;
+  }
 
-#user-list {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 30px;
-}
+  .user-list-container {
+    max-width: 800px;
+    margin: 20px auto;
+    background: rgba(0,0,0,0.6);
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 20px red;
+    overflow-y: auto;
+    max-height: 500px;
+  }
 
-#user-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255,255,255,0.05);
-  padding: 12px 15px;
-  margin: 8px 0;
-  border-radius: 6px;
-  transition: background 0.3s;
-}
+  .user-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
 
-#user-list li:hover {
-  background: rgba(255,255,255,0.1);
-}
+  .user-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px red;
+  }
 
-button {
-  padding: 8px 12px;
-  margin-left: 5px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
-}
+  .user-info {
+    font-size: 1.1rem;
+  }
 
-button.primary { background: red; color: white; }
-button.primary:hover { background: darkred; }
+  .user-buttons button {
+    margin-left: 10px;
+    background: red;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+  }
 
-button.secondary { background: #555; color: white; }
-button.secondary:hover { background: #777; }
+  .user-buttons button:hover {
+    background: darkred;
+  }
 
-#approve-all { display: block; margin: 0 auto 20px auto; }
-#logout { display: block; margin: 20px auto 0 auto; background: #333; color: #fff; }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
 </style>
-<script>
-if(sessionStorage.getItem('loggedInUser')!=='Ghostly') location.replace('auth.html');
-</script>
 </head>
 <body>
 
-<main>
-  <h1>Admin Panel 👑</h1>
-  <button id="approve-all" class="primary">Approve All Users</button>
-  <ul id="user-list"></ul>
-  <button id="logout">Log Out</button>
-</main>
+<header>
+  <h1>Ghostly Tools Admin Panel 👻</h1>
+</header>
 
-<!-- Background Music -->
-<audio id="bg-music" src="Ghostly_music.mp3" loop></audio>
+<div class="user-list-container">
+  <ul id="user-list">
+    <!-- Pending users will appear here -->
+  </ul>
+</div>
 
-<script src="scripts.js"></script>
 <script>
-function renderUserList(){
-  const list=document.getElementById('user-list');
-  const users=JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-  list.innerHTML='';
-  Object.keys(users).forEach(u=>{
-    if(u==='Ghostly') return;
-    const li=document.createElement('li');
-    li.textContent=`${u} — ${users[u].approved?'✅ Approved':'❌ Not approved'}`;
-    
-    const approveBtn=document.createElement('button'); 
-    approveBtn.textContent='Approve'; 
-    approveBtn.className='primary';
-    approveBtn.onclick=()=>{
-      users[u].approved=true;
-      localStorage.setItem('ghostlyUsers',JSON.stringify(users));
-      renderUserList();
-    };
-
-    const kickBtn=document.createElement('button'); 
-    kickBtn.textContent='Kick'; 
-    kickBtn.className='secondary';
-    kickBtn.onclick=()=>{
-      users[u].kicked=true;
-      localStorage.setItem('ghostlyUsers',JSON.stringify(users));
-      renderUserList();
-    };
-
-    const btnContainer=document.createElement('span');
-    btnContainer.appendChild(approveBtn);
-    btnContainer.appendChild(kickBtn);
-
-    li.appendChild(btnContainer);
-    list.appendChild(li);
-  });
+const currentUser = sessionStorage.getItem("loggedInUser");
+if(currentUser !== "Ghostly") {
+  alert("Access denied");
+  window.location.href = "auth.html";
 }
 
-renderUserList();
+const pendingList = document.getElementById("user-list");
+const users = JSON.parse(localStorage.getItem("ghostlyUsers") || "{}");
 
-document.getElementById('approve-all').onclick=()=>{
-  const users=JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
-  Object.keys(users).forEach(u=>{if(u!=='Ghostly') users[u].approved=true;});
-  localStorage.setItem('ghostlyUsers',JSON.stringify(users));
-  renderUserList();
-};
+// Render users
+function renderPendingUsers() {
+  pendingList.innerHTML = "";
 
-document.getElementById('logout').onclick=()=>{
-  sessionStorage.removeItem('loggedInUser');
-  location.replace('auth.html');
-};
+  Object.keys(users).forEach(username => {
+    if(!users[username].approved) {
+      const li = document.createElement("li");
+      li.classList.add("user-card");
 
-// Background music at max volume
-const music=document.getElementById("bg-music");
-music.volume=1.0;
-music.play().catch(()=>{
-  const playMusic=()=>{
-    music.volume=1.0;
-    music.play().catch(()=>{});
-    window.removeEventListener('pointerdown',playMusic);
-    window.removeEventListener('keydown',playMusic);
-  };
-  window.addEventListener('pointerdown',playMusic);
-  window.addEventListener('keydown',playMusic);
-});
+      const info = document.createElement("div");
+      info.classList.add("user-info");
+      info.textContent = ${username} (IP: ${users[username].ip || "Unknown"});
+
+      const buttons = document.createElement("div");
+      buttons.classList.add("user-buttons");
+
+      const allowBtn = document.createElement("button");
+      allowBtn.textContent = "Allow Access";
+      allowBtn.addEventListener("click", () => {
+        users[username].approved = true;
+        localStorage.setItem("ghostlyUsers", JSON.stringify(users));
+        renderPendingUsers();
+      });
+
+      const denyBtn = document.createElement("button");
+      denyBtn.textContent = "Deny Access";
+      denyBtn.addEventListener("click", () => {
+        delete users[username];
+        localStorage.setItem("ghostlyUsers", JSON.stringify(users));
+        renderPendingUsers();
+      });
+
+      buttons.appendChild(allowBtn);
+      buttons.appendChild(denyBtn);
+
+      li.appendChild(info);
+      li.appendChild(buttons);
+
+      pendingList.appendChild(li);
+    }
+  });
+
+  if(pendingList.children.length === 0) {
+    pendingList.innerHTML = "<li style='text-align:center; padding:20px;'>No pending users</li>";
+  }
+}
+
+renderPendingUsers();
 </script>
 
 </body>
