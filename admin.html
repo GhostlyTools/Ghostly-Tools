@@ -2,86 +2,53 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Admin Panel</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghostly Tools — Dashboard</title>
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="bg-haunt">
 
 <script>
 const user = sessionStorage.getItem('loggedInUser');
-if(user!=="Ghostly"){ window.location.href='auth.html'; }
-
-const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+if(!user) location.replace('auth.html');
 </script>
 
-<div class="content">
-  <h1>Admin Panel 👻</h1>
-  <p>Welcome, Ghostly</p>
-</div>
+<div class="overlay"></div>
 
-<h2>Pending Approvals</h2>
-<div id="pending-list"></div>
+<main class="card">
+  <h1 class="title">Ghostly Tools 👻</h1>
+  <p class="subtitle">Welcome, <span id="user-name"></span></p>
 
-<a href="#" id="logout">Logout</a>
+  <section id="downloads" hidden>
+    <h2>Downloads</h2>
+    <ul>
+      <li><a target="_blank" href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file">Savage MultiTool</a></li>
+      <li><a target="_blank" href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit">Ghostly Toolkit</a></li>
+      <li><a target="_blank" href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger">Pinger</a></li>
+    </ul>
+  </section>
 
-<div id="popup" class="popup">
-  <div class="popup-content">
-    <p id="popup-message"></p>
-    <button onclick="closePopup()">Close</button>
+  <div id="awaiting" class="notice" hidden>
+    Waiting for admin approval. Downloads are locked.
   </div>
-</div>
 
-<audio id="bg-music" src="ghostly_music.mp3" loop></audio>
+  <button id="logout" class="btn">Log Out</button>
+</main>
+
+<!-- Popup & jumpscare -->
+<div id="popup" class="popup" hidden></div>
+<div id="jump-scare" class="jump-scare" hidden></div>
+<audio id="bg-music" src="Ghostly_music.mp3" loop></audio>
 <script src="scripts.js"></script>
 <script>
-const pendingList = document.getElementById('pending-list');
-function renderPending(){
-    pendingList.innerHTML='';
-    for(const u in users){
-        if(u==="Ghostly") continue;
-        if(!users[u].approved){
-            const div = document.createElement('div');
-            div.innerHTML = `
-                ${u} 
-                <button onclick="approveUser('${u}')">Approve</button>
-                <button onclick="kickUser('${u}')">Kick</button>
-            `;
-            pendingList.appendChild(div);
-        }
-    }
+document.getElementById('user-name').textContent = user;
+
+const users = JSON.parse(localStorage.getItem('ghostlyUsers')||'{}');
+if(users[user] && users[user].approved){
+  document.getElementById('downloads').hidden = false;
+} else {
+  document.getElementById('awaiting').hidden = false;
 }
-
-function approveUser(username){
-    users[username].approved = true;
-    localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-    showPopup(${username} approved!);
-    renderPending();
-}
-
-function kickUser(username){
-    localStorage.setItem('kick_'+username,true);
-    delete users[username];
-    localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-    showPopup(${username} has been kicked!);
-    renderPending();
-}
-
-renderPending();
-
-document.getElementById('logout').addEventListener('click', ()=>{
-    sessionStorage.removeItem('loggedInUser');
-    window.location.href='auth.html';
-});
-
-// Autoplay music
-const music = document.getElementById('bg-music');
-music.volume = 1.0;
-music.play().catch(()=>{
-    document.body.addEventListener('click', ()=>music.play(), { once:true });
-    document.body.addEventListener('touchstart', ()=>music.play(), { once:true });
-});
 </script>
-
 </body>
 </html>
