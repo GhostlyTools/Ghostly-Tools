@@ -7,7 +7,7 @@ body {
   background-size: cover;
 }
 
-.admin-container, .login-container {
+.login-container, .admin-container {
   background: rgba(0,0,0,0.7);
   padding: 20px;
   border-radius: 10px;
@@ -34,18 +34,14 @@ button {
   transition: 0.3s;
 }
 
-button:hover {
-  background: darkred;
-}
+button:hover { background: darkred; }
 
 a {
   color: #f55;
   text-decoration: none;
 }
 
-a:hover {
-  text-decoration: underline;
-}
+a:hover { text-decoration: underline; }
 
 .user-dropdown {
   background: rgba(0,0,0,0.8);
@@ -58,10 +54,7 @@ a:hover {
   transition: all 0.3s;
 }
 
-.user-dropdown.pending {
-  border: 2px dashed red;
-  animation: pendingFlicker 1.5s infinite;
-}
+.user-dropdown.pending { border: 2px dashed red; animation: pendingFlicker 1.5s infinite; }
 
 .user-dropdown h3 {
   margin: 10px;
@@ -80,61 +73,16 @@ a:hover {
   transition: max-height 0.5s ease, padding 0.5s ease;
 }
 
-.user-dropdown-content.open {
-  display: block;
-  max-height: 200px;
-  padding: 10px;
-}
+.user-dropdown-content.open { display: block; max-height: 200px; padding: 10px; }
 
-.user-dropdown-content p {
-  margin: 5px 0;
-  font-size: 0.9em;
-}
+.user-dropdown-content p { margin: 5px 0; font-size: 0.9em; }
 
-.user-dropdown-content button {
-  margin: 5px 3px;
-  width: 80px;
-  background: red;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
-}
+.user-dropdown-content button { margin: 5px 3px; width: 80px; font-weight: bold; }
 
-.user-dropdown-content button:hover { background: darkred; }
-.user-dropdown-content button.kick { background: darkred; }
-.user-dropdown-content button.kick:hover { background: #ff1a1a; }
+.pending-label { color: red; font-weight: bold; margin-left: 10px; animation: pulseRed 1.2s infinite; }
 
-.status.online, .status.offline {
-  font-weight: bold;
-  animation: statusFlicker 1.5s infinite;
-}
+@keyframes hauntedFlicker { 0%,19%,21%,23%,25%,54%,56%,100% { box-shadow: 0 0 15px red; } 20%,24%,55% { box-shadow: 0 0 5px darkred; } }
 
-.pending-label {
-  color: red;
-  font-weight: bold;
-  margin-left: 10px;
-  animation: pulseRed 1.2s infinite;
-}
+@keyframes pendingFlicker { 0%,50%,100% { box-shadow: 0 0 10px red; } 25%,75% { box-shadow: 0 0 20px darkred; } }
 
-@keyframes hauntedFlicker {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { box-shadow: 0 0 15px red; }
-  20%, 24%, 55% { box-shadow: 0 0 5px darkred; }
-}
-
-@keyframes pendingFlicker {
-  0%, 50%, 100% { box-shadow: 0 0 10px red; }
-  25%, 75% { box-shadow: 0 0 20px darkred; }
-}
-
-@keyframes pulseRed {
-  0%, 100% { opacity: 1; text-shadow: 0 0 5px red; }
-  50% { opacity: 0.6; text-shadow: 0 0 20px darkred; }
-}
-
-@keyframes statusFlicker {
-  0%, 20%, 50%, 80%, 100% { text-shadow: 0 0 5px red; }
-  10%, 30%, 60%, 90% { text-shadow: 0 0 15px darkred; }
-}
+@keyframes pulseRed { 0%,100% { opacity: 1; text-shadow:0 0 5px red;} 50% { opacity:0.6; text-shadow:0 0 20px darkred;} }

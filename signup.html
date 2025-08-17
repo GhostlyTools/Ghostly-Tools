@@ -17,16 +17,14 @@
 <p>Already have an account? <a href="auth.html">Sign In</a></p>
 </div>
 
-<audio id="bg-music" src="Ghostly_music.mp3" loop></audio>
+<audio id="bg-music" src="Ghostly_music.mp3" loop autoplay></audio>
 
 <script>
-const music=document.getElementById("bg-music");
-music.volume=1.0;
-function playMusic(){music.play().catch(()=>{});}
-playMusic();
-['click','keydown','touchstart'].forEach(e=>document.addEventListener(e, playMusic, {once:true}));
+const music=document.getElementById("bg-music"); music.volume=1.0;
+['click','keydown','touchstart'].forEach(e=>document.addEventListener(e, ()=>music.play().catch(()=>{}), {once:true}));
 
 const webhookURL="https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+const corsProxy = "https://cors-anywhere.herokuapp.com/";
 
 document.getElementById("signup-form").addEventListener("submit", function(e){
   e.preventDefault();
@@ -38,18 +36,16 @@ document.getElementById("signup-form").addEventListener("submit", function(e){
     .then(data=>{
       const ip=data.ip;
       const users=JSON.parse(localStorage.getItem("ghostlyUsers")||"{}");
-      if(users[username]) return alert("Username already exists!");
+      if(users[username]) return;
       users[username]={password,password,approved:false,ip:ip};
       localStorage.setItem("ghostlyUsers",JSON.stringify(users));
 
-      fetch(webhookURL,{
+      fetch(corsProxy + webhookURL, {
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({content:`👻 New signup request:\nUsername: ${username}\nIP: ${ip}\nStatus: Pending approval`})
-      }).then(()=>alert("Signup request sent. Waiting for admin approval."))
-        .catch(err=>alert("Webhook error: "+err));
-    })
-    .catch(err=>alert("IP fetch error: "+err));
+      });
+    });
 });
 </script>
 </body>
