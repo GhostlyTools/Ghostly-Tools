@@ -2,88 +2,58 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Tools 👻 - Admin Panel</title>
+<title>Ghostly Tools 👻 - Admin</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="login-container">
-<h1>Ghostly Tools 👻 - Admin Panel</h1>
-<h2>Users Online: <span id="online-count">0</span></h2>
-<div id="user-list"></div>
-</div>
-
-<audio id="bg-music" src="Ghostly_music.mp3" loop autoplay></audio>
+<h1>👻 Ghostly Admin Panel</h1>
+<div id="users"></div>
 
 <script>
-const music = document.getElementById("bg-music");
-music.volume = 1.0;
+async function loadUsers(){
+  const res = await fetch("/users");
+  const users = await res.json();
+  const container = document.getElementById("users");
+  container.innerHTML = "";
 
-async function sendStatus(username, ip, status){
-    await fetch("http://localhost:3000/status-webhook", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, ip, status })
-    });
-}
-
-function updateUserList(){
-    const container = document.getElementById("user-list");
-    container.innerHTML = "";
-    const users = JSON.parse(localStorage.getItem("ghostlyUsers") || "{}");
-    let count = 0;
-
-    for(const username in users){
-        const userData = users[username];
-        count++;
-
-        const drop = document.createElement("div");
-        drop.className = "dropdown";
-        if(!userData.approved) drop.classList.add("pending");
-
-        const title = document.createElement("div");
-        title.innerHTML = username + (!userData.approved ? '<span class="pending-label">Pending</span>' : '');
-        drop.appendChild(title);
-
-        const content = document.createElement("div");
-        content.className = "dropdown-content";
-        content.innerHTML = `
-            <p><strong>IP:</strong> ${userData.ip}</p>
-            <button class="approve-btn">Approve</button>
-            <button class="deny-btn">Deny</button>
-        `;
-        drop.appendChild(content);
-        container.appendChild(drop);
-
-        content.querySelector(".approve-btn").onclick = async ()=>{
-            userData.approved = true;
-            users[username] = userData;
-            localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-            drop.classList.remove("pending");
-            content.querySelector(".pending-label")?.remove();
-            await sendStatus(username, userData.ip, "Approved");
-            updateOnlineCount();
-        };
-
-        content.querySelector(".deny-btn").onclick = async ()=>{
-            delete users[username];
-            localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-            drop.remove();
-            await sendStatus(username, userData.ip, "Denied");
-            updateOnlineCount();
-        };
+  users.forEach(user=>{
+    const dropdown = document.createElement("div");
+    dropdown.className="dropdown";
+    const header = document.createElement("div");
+    header.className="dropdown-header";
+    header.textContent=user.username;
+    if(user.status==="pending"){
+      const label = document.createElement("span");
+      label.textContent=" (Pending)";
+      label.className="pending-label";
+      header.appendChild(label);
     }
-    updateOnlineCount();
+    header.onclick=()=>dropdown.classList.toggle("active");
+
+    const content=document.createElement("div");
+    content.className="dropdown-content";
+    content.innerHTML=`<p>Status: ${user.status}</p><p>IP: ${user.ip}</p>
+      <button onclick="approveUser('${user.username}')">✅ Approve</button>
+      <button onclick="denyUser('${user.username}')">❌ Deny</button>`;
+
+    dropdown.appendChild(header);
+    dropdown.appendChild(content);
+    container.appendChild(dropdown);
+  });
 }
 
-function updateOnlineCount(){
-    const users = JSON.parse(localStorage.getItem("ghostlyUsers") || "{}");
-    document.getElementById("online-count").textContent = Object.keys(users).length;
+async function approveUser(username){
+  await fetch("/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})});
+  loadUsers();
 }
 
-// Initial load + auto-refresh every 5s
-updateUserList();
-setInterval(updateUserList, 5000);
+async function denyUser(username){
+  await fetch("/deny",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})});
+  loadUsers();
+}
+
+loadUsers();
+setInterval(loadUsers,5000);
 </script>
 </body>
 </html>
