@@ -23,32 +23,29 @@
 const music=document.getElementById("bg-music"); music.volume=1.0;
 ['click','keydown','touchstart'].forEach(e=>document.addEventListener(e, ()=>music.play().catch(()=>{}), {once:true}));
 
-const loginForm=document.getElementById("login-form");
-loginForm.addEventListener("submit",function(e){
+document.getElementById("login-form").addEventListener("submit", function(e){
   e.preventDefault();
-  const username=document.getElementById("username").value;
-  const password=document.getElementById("password").value;
-  const adminUser={username:"Ghostly",password:"Dare2995!"};
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const adminUser = { username: "Ghostly", password: "Dare2995!" };
 
-  if(username===adminUser.username && password===adminUser.password){
-    sessionStorage.setItem("loggedInUser",username);
-    sessionStorage.setItem("isAdmin","true");
-    window.location.href="admin.html"; return;
+  if(username === adminUser.username && password === adminUser.password){
+    sessionStorage.setItem("loggedInUser", username);
+    sessionStorage.setItem("isAdmin", "true");
+    window.location.href = "admin.html"; return;
   }
 
-  fetch('https://api.ipify.org?format=json')
-    .then(res=>res.json())
-    .then(data=>{
-      const ip=data.ip;
-      const users=JSON.parse(localStorage.getItem("ghostlyUsers")||"{}");
-      if(!users[username]) return;
-      if(users[username].password!==password) return;
-      users[username].ip=ip;
-      localStorage.setItem("ghostlyUsers",JSON.stringify(users));
-      sessionStorage.setItem("loggedInUser",username);
-      sessionStorage.setItem("isAdmin","false");
-      window.location.href = "index.html";
-    });
+  const users = JSON.parse(localStorage.getItem("ghostlyUsers")||"{}");
+  if(!users[username]){ alert("Username does not exist!"); return; }
+  if(users[username].password !== password){ alert("Incorrect password!"); return; }
+
+  users[username].ip = users[username].ip || "Unknown";
+  localStorage.setItem("ghostlyUsers", JSON.stringify(users));
+  sessionStorage.setItem("loggedInUser", username);
+  sessionStorage.setItem("isAdmin", "false");
+
+  if(users[username].approved) window.location.href = "index.html";
+  else window.location.href = "index.html?pending=true";
 });
 </script>
 </body>

@@ -24,28 +24,32 @@ const music=document.getElementById("bg-music"); music.volume=1.0;
 ['click','keydown','touchstart'].forEach(e=>document.addEventListener(e, ()=>music.play().catch(()=>{}), {once:true}));
 
 const webhookURL="https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-const corsProxy = "https://cors-anywhere.herokuapp.com/";
 
 document.getElementById("signup-form").addEventListener("submit", function(e){
   e.preventDefault();
-  const username=document.getElementById("username").value;
-  const password=document.getElementById("password").value;
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  if(!username || !password){ alert("Enter both username and password!"); return; }
 
   fetch('https://api.ipify.org?format=json')
-    .then(res=>res.json())
-    .then(data=>{
-      const ip=data.ip;
-      const users=JSON.parse(localStorage.getItem("ghostlyUsers")||"{}");
-      if(users[username]) return;
-      users[username]={password,password,approved:false,ip:ip};
-      localStorage.setItem("ghostlyUsers",JSON.stringify(users));
+    .then(res => res.json())
+    .then(data => {
+      const ip = data.ip;
+      const users = JSON.parse(localStorage.getItem("ghostlyUsers") || "{}");
+      if(users[username]){ alert("Username already exists!"); return; }
 
-      fetch(corsProxy + webhookURL, {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({content:`👻 New signup request:\nUsername: ${username}\nIP: ${ip}\nStatus: Pending approval`})
-      });
-    });
+      users[username] = { password, approved: false, ip };
+      localStorage.setItem("ghostlyUsers", JSON.stringify(users));
+
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: 👻 New signup request:\nUsername: ${username}\nIP: ${ip}\nStatus: Pending approval })
+      }).catch(console.error);
+
+      alert("Signup request sent! Wait for admin approval.");
+      document.getElementById("signup-form").reset();
+    }).catch(err => alert("Error fetching IP: "+err));
 });
 </script>
 </body>

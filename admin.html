@@ -16,6 +16,87 @@
 </div>
 
 <audio id="bg-music" src="Ghostly_music.mp3" loop autoplay></audio>
-<script src="script.js"></script>
+<script>
+// script.js content here (the full working dropdown + approve/deny + webhook)
+const music=document.getElementById("bg-music"); music.volume=1.0;
+['click','keydown','touchstart'].forEach(e=>document.addEventListener(e, ()=>music.play().catch(()=>{}), {once:true}));
+
+const webhookURL="https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+
+const userDropdowns=document.getElementById("user-dropdowns");
+const onlineCount=document.getElementById("online-count");
+
+function updateOnlineCount(){
+    const users=JSON.parse(localStorage.getItem("ghostlyUsers")||"{}");
+    onlineCount.innerText=Object.keys(users).length;
+}
+
+function createUserDropdown(username,userData){
+    const drop=document.createElement("div");
+    drop.className="user-dropdown";
+    if(!userData.approved) drop.classList.add("pending");
+
+    const title=document.createElement("h3");
+    title.innerText=username;
+    if(!userData.approved){
+        const pendingLabel=document.createElement("span");
+        pendingLabel.className="pending-label";
+        pendingLabel.innerText="Pending";
+        title.appendChild(pendingLabel);
+    }
+    drop.appendChild(title);
+
+    const content=document.createElement("div");
+    content.className="user-dropdown-content";
+    content.innerHTML=`<p>IP: ${userData.ip||"Unknown"}</p>`;
+
+    const approveBtn=document.createElement("button");
+    approveBtn.innerText="Approve";
+    approveBtn.onclick=()=>{
+        userData.approved=true;
+        localStorage.setItem("ghostlyUsers", JSON.stringify(JSON.parse(localStorage.getItem("ghostlyUsers")||"{}")));
+        drop.classList.remove("pending");
+        content.querySelector(".pending-label")?.remove();
+        fetch(webhookURL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:`✅ User Approved!\nUsername: ${username}\nIP: ${userData.ip}\nStatus: Approved`})});
+        updateOnlineCount();
+    };
+
+    const denyBtn=document.createElement("button");
+    denyBtn.innerText="Deny";
+    denyBtn.onclick=()=>{
+        const users=JSON.parse(localStorage.getItem("ghostlyUsers")||"{}");
+        delete users[username];
+        localStorage.setItem("ghostlyUsers",JSON.stringify(users));
+        drop.remove();
+        fetch(webhookURL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:`❌ User Denied!\nUsername: ${username}\nIP: ${userData.ip}\nStatus: Denied`})});
+        updateOnlineCount();
+    };
+
+    content.appendChild(approveBtn);
+    content.appendChild(denyBtn);
+    drop.appendChild(content);
+
+    title.onclick=()=>{ content.classList.toggle("open"); };
+    userDropdowns.appendChild(drop);
+}
+
+function loadUsers(){
+    userDropdowns.innerHTML="";
+    const users=JSON.parse(localStorage.getItem("ghostlyUsers")||"{}");
+    for(const [username,userData] of Object.entries(users)) createUserDropdown(username,userData);
+    updateOnlineCount();
+}
+
+function filterUsersDropdown(){
+    const query=document.getElementById("search").value.toLowerCase();
+    document.querySelectorAll(".user-dropdown").forEach(drop=>{
+        const username=drop.querySelector("h3").innerText.toLowerCase();
+        const ip=drop.querySelector(".user-dropdown-content p")?.innerText.toLowerCase()||"";
+        drop.style.display=(username.includes(query)||ip.includes(query))?"":"none";
+    });
+}
+
+loadUsers();
+</script>
 </body>
 </html>
