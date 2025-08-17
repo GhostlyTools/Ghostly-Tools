@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ghostly Tools 👻 - Pending Approval</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Creepster", cursive, sans-serif;
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
+  background-size: cover;
+  overflow: hidden;
+}
+
+.pending-box {
+  background: rgba(0,0,0,0.7);
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 0 20px red;
+  animation: flicker 2s infinite;
+  z-index: 10;
+  position: relative;
+}
+
+a {
+  color: #f55;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+@keyframes flicker {
+  0%,19%,21%,23%,25%,54%,56%,100% { opacity:1; }
+  20%,22%,24%,55% { opacity:0.3; }
+}
+
+/* Floating elements */
+.floating {
+  position: absolute;
+  font-size: 2rem;
+  color: rgba(255, 0, 0, 0.7);
+  animation: float 12s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity:0; }
+  10% { opacity:1; }
+  50% { transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.7; }
+  100% { transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0; }
+}
+
+/* Floating Waiting text */
+.waiting {
+  position: absolute;
+  font-size: 2.5rem;
+  color: rgba(255,0,0,0.8);
+  font-weight: bold;
+  animation: float 15s linear infinite;
+}
+</style>
+</head>
+<body>
+
+<div class="pending-box">
+<h1>⏳ Pending Approval</h1>
+<p>Your account is awaiting admin approval.<br>Please check back later!</p>
+<a href="auth.html">Return to Sign In</a>
+</div>
+
+<!-- Floating ghosts -->
+<div class="floating" style="left:10%; animation-delay:0s;">👻</div>
+<div class="floating" style="left:30%; animation-delay:2s;">👻</div>
+<div class="floating" style="left:50%; animation-delay:4s;">👻</div>
+<div class="floating" style="left:70%; animation-delay:1s;">👻</div>
+<div class="floating" style="left:90%; animation-delay:3s;">👻</div>
+
+<!-- Floating "Waiting..." text -->
+<div class="waiting" style="left:15%; animation-delay:1s;">Waiting…</div>
+<div class="waiting" style="left:40%; animation-delay:3s;">Waiting…</div>
+<div class="waiting" style="left:65%; animation-delay:2s;">Waiting…</div>
+<div class="waiting" style="left:85%; animation-delay:4s;">Waiting…</div>
+
+</body>
+</html>
