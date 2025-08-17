@@ -13,8 +13,8 @@ const music = document.getElementById('bg-music');
 if(music){
     music.volume = 1.0; 
     music.play().catch(()=>{
-        document.body.addEventListener('click', ()=>music.play(), { once: true });
-        document.body.addEventListener('touchstart', ()=>music.play(), { once: true });
+        document.body.addEventListener('click', ()=>music.play(), { once:true });
+        document.body.addEventListener('touchstart', ()=>music.play(), { once:true });
     });
 }
 
