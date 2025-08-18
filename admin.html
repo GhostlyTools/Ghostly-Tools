@@ -46,9 +46,9 @@ h1 { text-shadow:0 0 15px red; }
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-let users = []; // All users
 let websiteDisabled = false;
 
+// Send message to Discord webhook
 function sendWebhook(message) {
   fetch(webhookURL, {
     method:"POST",
@@ -57,17 +57,21 @@ function sendWebhook(message) {
   });
 }
 
-// Add a new user (call this on real sign-in)
-function addUser(username, status, ip, area){
-  users.push({username,status,ip,area});
-  sendWebhook(`👤 ${username} signed in from ${ip} (${area})`);
-  renderUsersSlow();
+// Get users from localStorage
+function getUsers() {
+  return JSON.parse(localStorage.getItem("ghostlyUsers") || "[]");
 }
 
-// Render all users slowly
-function renderUsersSlow(){
+// Save users to localStorage
+function saveUsers(users) {
+  localStorage.setItem("ghostlyUsers", JSON.stringify(users));
+}
+
+// Slow-render all users into dropdowns
+function renderUsersSlow() {
   const container = document.getElementById("users");
   container.innerHTML="";
+  const users = getUsers();
   let delay = 0;
   users.forEach(u=>{
     setTimeout(()=>{
@@ -76,11 +80,11 @@ function renderUsersSlow(){
       if(u.status==="pending") dropdown.classList.add("pending");
 
       const h3 = document.createElement("h3");
-      h3.textContent = u.username;
+      h3.textContent=u.username;
       if(u.status==="pending"){
         const label = document.createElement("span");
-        label.textContent = " (Pending)";
-        label.className = "pending-label";
+        label.textContent=" (Pending)";
+        label.className="pending-label";
         h3.appendChild(label);
       }
 
@@ -95,31 +99,46 @@ function renderUsersSlow(){
         <button onclick="kickUser('${u.username}')">💀 Kick</button>
       `;
       h3.onclick = ()=>content.classList.toggle("open");
-
       dropdown.appendChild(h3);
       dropdown.appendChild(content);
       container.appendChild(dropdown);
     }, delay);
-    delay += 150; // slow each user in sequence
+    delay += 150;
   });
 }
 
-// Admin actions
+// Approve, deny, kick functions
 function approveUser(username){
+  const users = getUsers();
   const user = users.find(u=>u.username===username);
-  if(user){ user.status="approved"; renderUsersSlow(); sendWebhook(`✅ ${username} approved by admin`);}
+  if(user){ 
+    user.status="approved"; 
+    saveUsers(users); 
+    renderUsersSlow(); 
+    sendWebhook(`✅ ${username} approved by admin`);
+  }
 }
+
 function denyUser(username){
+  const users = getUsers();
   const user = users.find(u=>u.username===username);
-  if(user){ user.status="denied"; renderUsersSlow(); sendWebhook(`❌ ${username} denied by admin`);}
+  if(user){ 
+    user.status="denied"; 
+    saveUsers(users); 
+    renderUsersSlow(); 
+    sendWebhook(`❌ ${username} denied by admin`);
+  }
 }
+
 function kickUser(username){
+  let users = getUsers();
   users = users.filter(u=>u.username!==username);
+  saveUsers(users);
   renderUsersSlow();
   sendWebhook(`💀 ${username} kicked by admin`);
 }
 
-// Toggle website
+// Disable website toggle
 document.getElementById("disableToggle").onclick = ()=>{
   websiteDisabled = !websiteDisabled;
   if(websiteDisabled){
@@ -131,9 +150,11 @@ document.getElementById("disableToggle").onclick = ()=>{
   }
 }
 
-// Auto-update every 2 seconds to catch new users
-setInterval(renderUsersSlow, 2000);
+// Auto-update users every 5 seconds to show new signups
+setInterval(renderUsersSlow, 5000);
 
+// Initial render
+renderUsersSlow();
 </script>
 </body>
 </html>
