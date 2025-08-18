@@ -7,23 +7,20 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
 <div id="downloads-container">
 <h2>Downloads</h2>
 <div id="downloads-content"></div>
 </div>
 
 <script>
+const downloadsContent=document.getElementById("downloads-content");
 async function loadDownloads(){
-  const res=await fetch("/downloads");
-  const data=await res.json();
-  const container=document.getElementById("downloads-content");
-
+  const res = await fetch("/downloads");
+  const data = await res.json();
   if(data.status==="pending"){
-    container.innerHTML="<p>Waiting for admin to approve downloads 👻</p>";
+    downloadsContent.innerHTML="<p>Waiting for admin to approve downloads 👻</p>";
   } else {
-    container.innerHTML=`
-    <ul>
+    downloadsContent.innerHTML=`<ul>
       <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
       <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pingers</a></li>
       <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage Multitool</a></li>
@@ -32,7 +29,6 @@ async function loadDownloads(){
     </ul>`;
   }
 }
-
 loadDownloads();
 setInterval(loadDownloads,5000);
 </script>
