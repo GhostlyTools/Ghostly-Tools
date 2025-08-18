@@ -1,43 +1,71 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ghostly Tools 👻 - Sign In</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<div class="login-container">
-<h1>Ghostly Tools 👻</h1>
-<form id="signin-form">
-<input type="text" id="username" placeholder="Username" required>
-<input type="password" id="password" placeholder="Password" required>
-<button type="submit">Sign In</button>
-</form>
-<p>Don't have an account? <a href="signup.html">Sign Up</a></p>
-</div>
+// ---- auth.js ----
+const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-<script>
-document.getElementById("signin-form").addEventListener("submit", async function(e){
+// Hardcoded admin
+const adminUser = {
+  username: "Ghostly",
+  password: "Dare2995!"
+};
+
+// Load users from localStorage or create empty array
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+// Sign In
+document.getElementById("signin-form").addEventListener("submit", function(e){
   e.preventDefault();
-  const username=document.getElementById("username").value;
-  const password=document.getElementById("password").value;
-  try{
-    const res = await fetch("/signin", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({username,password})
-    });
-    const data = await res.json();
-    if(data.status==="pending"){ window.location.href="pending.html"; }
-    else if(data.status==="approved"){
-      const statusRes = await fetch("/status");
-      const statusData = await statusRes.json();
-      if(statusData.disabled){ alert("Website is down for updates."); return; }
-      window.location.href="index.html";
-    } else { alert(data.message||"Invalid login"); }
-  }catch(err){console.error(err); alert("Error signing in");}
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  // Admin login
+  if(username === adminUser.username && password === adminUser.password){
+    alert(`Welcome Admin ${username}!`);
+    sendWebhook(`${username} signed in as ADMIN`);
+    window.location.href = "admin.html";
+    return;
+  }
+
+  // Regular user login
+  const user = users.find(u => u.username === username && u.password === password);
+  if(!user){
+    alert("Invalid username or password");
+    return;
+  }
+
+  alert(`Welcome ${user.username}!`);
+  sendWebhook(`${user.username} signed in`);
+
+  if(user.status === "approved"){
+    window.location.href = "index.html";
+  } else {
+    window.location.href = "pending.html";
+  }
 });
-</script>
-</body>
-</html>
+
+// Sign Up
+document.getElementById("signup-form")?.addEventListener("submit", function(e){
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  if(users.find(u => u.username === username)){
+    alert("Username already exists!");
+    return;
+  }
+
+  const newUser = { username, password, status: "pending", ip: "Unknown", area: "Unknown" };
+  users.push(newUser);
+  localStorage.setItem("users", JSON.stringify(users));
+
+  alert("Account created! Waiting for admin approval.");
+  sendWebhook(`${username} signed up (pending)`);
+  window.location.href = "pending.html";
+});
+
+// Webhook function
+function sendWebhook(message){
+  fetch(webhookURL, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ content: message })
+  });
+}
