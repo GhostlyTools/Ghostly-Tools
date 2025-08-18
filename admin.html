@@ -24,6 +24,25 @@ body {
   box-shadow: 0 0 25px red;
 }
 
+h1, h3, p, label {
+  text-shadow: 0 0 10px red;
+  color: #ff5555;
+}
+
+button {
+  background: red;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  margin: 5px 3px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+button:hover { background: darkred; }
+
 .user-dropdown {
   background: rgba(0,0,0,0.8);
   border: 2px solid red;
@@ -57,8 +76,6 @@ body {
 
 .user-dropdown-content p { margin: 5px 0; font-size: 0.9em; }
 
-.user-dropdown-content button { margin: 5px 3px; width: 80px; font-weight: bold; }
-
 .pending-label { color: red; font-weight: bold; margin-left: 10px; animation: pulseRed 1.2s infinite; }
 
 @keyframes pendingFlicker { 0%,50%,100% { box-shadow: 0 0 10px red; } 25%,75% { box-shadow: 0 0 20px darkred; } }
@@ -78,6 +95,8 @@ body {
   font-weight: bold;
   cursor: pointer;
   font-size: 1.2em;
+  text-shadow: 0 0 10px red;
+  color: #ff5555;
 }
 
 .toggle-container input {
