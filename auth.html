@@ -5,26 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
 <link rel="stylesheet" href="style.css">
-<style>
-body {
-  margin:0; padding:0; font-family:"Creepster", cursive; color:#fff;
-  background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-  background-size:cover;
-}
-.haunted-box {
-  background: rgba(0,0,0,0.7); padding:20px; border-radius:10px;
-  text-align:center; margin:50px auto; max-width:400px; box-shadow:0 0 25px red;
-}
-input, button { width:90%; padding:10px; margin:10px auto; border-radius:5px; border:none; display:block; }
-button { background:red; color:#fff; font-weight:bold; cursor:pointer; transition:0.3s; }
-button:hover { background:darkred; }
-a { color:#f55; text-decoration:none; }
-a:hover { text-decoration:underline; }
-</style>
 </head>
 <body>
-
-<div class="haunted-box">
+<div class="login-container">
 <h1>Ghostly Tools 👻</h1>
 <form id="signin-form">
 <input type="text" id="username" placeholder="Username" required>
@@ -37,36 +20,48 @@ a:hover { text-decoration:underline; }
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
+// Hardcoded admin credentials
+const ADMIN_USER = "Ghostly";
+const ADMIN_PASS = "Dare2995!";
+
 document.getElementById("signin-form").addEventListener("submit", function(e){
-  e.preventDefault();
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+    e.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
 
-  const storedUsername = localStorage.getItem("username");
-  const storedPassword = localStorage.getItem("password");
-  const status = localStorage.getItem("status");
-
-  if(username===storedUsername && password===storedPassword){
-    alert(`Welcome back, ${username}!`);
-    fetch(webhookURL, {
-      method:"POST",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify({content:`🔑 ${username} signed in, Status: ${status}`})
-    });
-
-    if(username.toLowerCase()==="admin"){
-      window.location.href="admin.html";
-    } else if(status==="approved"){
-      window.location.href="index.html";
-    } else {
-      window.location.href="pending.html";
+    // Check if admin
+    if(username === ADMIN_USER && password === ADMIN_PASS){
+        alert(`Welcome back, ${username}!`);
+        // Send webhook
+        fetch(webhookURL, {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({content:`🔑 Admin signed in: ${username}`})
+        });
+        window.location.href = "admin.html";
+        return;
     }
 
-  } else {
-    alert("Invalid username or password.");
-  }
+    // Check normal users stored in localStorage
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const user = users.find(u => u.username === username && u.password === password);
+
+    if(user){
+        alert(`Welcome back, ${username}!`);
+        fetch(webhookURL, {
+            method:"POST",
+            headers:{"Content-Type":"application/json"},
+            body: JSON.stringify({content:`👤 User signed in: ${username}`})
+        });
+        if(user.status === "pending"){
+            window.location.href = "pending.html";
+        } else {
+            window.location.href = "index.html";
+        }
+    } else {
+        alert("Invalid username or password.");
+    }
 });
 </script>
-
 </body>
 </html>
