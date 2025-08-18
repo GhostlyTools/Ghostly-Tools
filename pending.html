@@ -11,11 +11,20 @@ body {
   background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
   background-size:cover; overflow:hidden;
 }
+
+/* Only change: bigger pending box */
 .pending-box {
-  background:rgba(0,0,0,0.7); padding:20px; border-radius:10px;
-  text-align:center; box-shadow:0 0 20px red;
+  background:rgba(0,0,0,0.7); 
+  padding:40px;       /* bigger padding */
+  border-radius:10px;
+  text-align:center;
+  box-shadow:0 0 20px red;
   z-index:2; position:relative;
+  width:450px;       /* wider box */
+  max-width:90%;     /* responsive on smaller screens */
+  font-size:1.1rem;  /* slightly larger text */
 }
+
 .floating {
   position:absolute; font-size:2rem; color:rgba(255,0,0,0.7);
   animation:float 12s linear infinite; pointer-events:none;
