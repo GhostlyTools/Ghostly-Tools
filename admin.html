@@ -6,37 +6,39 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div class="admin-container">
 <h1>👻 Ghostly Admin Panel</h1>
-<button onclick="toggleWebsite()">Disable/Enable Website</button>
+<button onclick="toggleWebsite()">Toggle Website On/Off</button>
 <div id="users"></div>
+</div>
 
 <script>
 async function loadUsers(){
-  const res = await fetch("/users");
-  const users = await res.json();
-  const container = document.getElementById("users");
-  container.innerHTML = "";
-  users.forEach(u=>{
-    const div = document.createElement("div");
-    div.className="user-dropdown"+(u.status==="pending"?" pending":"");
-    div.innerHTML=`<h3>${u.username}${u.status==="pending"?'<span class="pending-label"> (Pending)</span>':''}</h3>
-      <div class="user-dropdown-content">
+    const res = await fetch("/users");
+    const users = await res.json();
+    const container = document.getElementById("users");
+    container.innerHTML = "";
+
+    users.forEach(u=>{
+        const div = document.createElement("div");
+        div.className="user-dropdown"+(u.status==="pending"?" pending":"");
+        div.innerHTML=`<h3>${u.username} ${u.status==="pending"?'<span class="pending-label">Pending</span>':''}</h3>
+        <div class="user-dropdown-content open">
         <p>Status: ${u.status}</p>
         <p>IP: ${u.ip}</p>
         <p>Area: ${u.area}</p>
-        <button onclick="approveUser('${u.username}')">✅ Approve</button>
-        <button onclick="denyUser('${u.username}')">❌ Deny</button>
-        <button onclick="kickUser('${u.username}')">💥 Kick</button>
-      </div>`;
-    div.querySelector("h3").onclick=()=>div.querySelector(".user-dropdown-content").classList.toggle("open");
-    container.appendChild(div);
-  });
+        <button onclick="approve('${u.username}')">✅ Approve</button>
+        <button onclick="deny('${u.username}')">❌ Deny</button>
+        <button onclick="kick('${u.username}')">⚡ Kick</button>
+        </div>`;
+        container.appendChild(div);
+    });
 }
 
-async function approveUser(u){ await fetch("/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u})}); loadUsers(); }
-async function denyUser(u){ await fetch("/deny",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u})}); loadUsers(); }
-async function kickUser(u){ await fetch("/kick",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:u})}); loadUsers(); }
-async function toggleWebsite(){ await fetch("/toggle",{method:"POST"}); alert("Toggled website status"); }
+async function approve(username){ await fetch("/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})}); loadUsers(); }
+async function deny(username){ await fetch("/deny",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})}); loadUsers(); }
+async function kick(username){ await fetch("/kick",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})}); loadUsers(); }
+async function toggleWebsite(){ await fetch("/toggle-website",{method:"POST"}); alert("Toggled website on/off"); }
 
 loadUsers();
 setInterval(loadUsers,5000);
