@@ -4,6 +4,23 @@
 <meta charset="UTF-8">
 <title></title>
 <link rel="stylesheet" href="style.css">
+<style>
+/* Ensure the links are clickable */
+#downloads-content a {
+  pointer-events: auto;
+  display: inline-block;
+  padding: 10px 15px;
+  margin: 5px 0;
+  background: rgba(255,0,0,0.8);
+  color: white !important;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+}
+#downloads-content a:hover {
+  background: red;
+}
+</style>
 </head>
 <body>
 
@@ -22,19 +39,14 @@ const downloadsContent = document.getElementById("downloads-content");
 if (!currentUser || currentUser.status !== "approved") {
   downloadsContent.innerHTML = "<p>Downloads 👻 (Pending admin approval)</p>";
 } else {
-  // Use proper HTML escaping and attributes
   downloadsContent.innerHTML = `
-    <ul style="list-style:none; padding:0; font-size:1.3rem; line-height:2;">
-      <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank" rel="noopener noreferrer" style="color:red; text-decoration:none;">Ghostly Toolkit</a></li>
-      <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank" rel="noopener noreferrer" style="color:red; text-decoration:none;">Pingers</a></li>
-      <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank" rel="noopener noreferrer" style="color:red; text-decoration:none;">Savage Multitool</a></li>
-      <li><a href="https://www.mediafire.com/folder/133z6qltkuybu/Iplookup" target="_blank" rel="noopener noreferrer" style="color:red; text-decoration:none;">IP Lookup</a></li>
-      <li><a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank" rel="noopener noreferrer" style="color:red; text-decoration:none;">DDoS v3</a></li>
-    </ul>
+      <a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank" rel="noopener noreferrer">Ghostly Toolkit</a>
+      <a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank" rel="noopener noreferrer">Pingers</a>
+      <a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank" rel="noopener noreferrer">Savage Multitool</a>
+      <a href="https://www.mediafire.com/folder/133z6qltkuybu/Iplookup" target="_blank" rel="noopener noreferrer">IP Lookup</a>
+      <a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank" rel="noopener noreferrer">DDoS v3</a>
   `;
 }
-
-// YouTube video removed
 </script>
 
 </body>
