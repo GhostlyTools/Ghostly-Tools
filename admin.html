@@ -22,7 +22,7 @@ h1 { text-shadow:0 0 15px red; }
   transition:all 0.3s;
 }
 .user-dropdown.pending { border:2px dashed red; animation: pendingFlicker 1.5s infinite; }
-.user-dropdown h3 { margin:10px; text-shadow:0 0 10px red; }
+.user-dropdown h3 { margin:10px; text-shadow:0 0 10px red; cursor:pointer; }
 .user-dropdown-content {
   display:none; background: rgba(0,0,0,0.9); padding:10px;
   border-top:1px solid red; text-align:center; max-height:0; overflow:hidden;
@@ -38,6 +38,7 @@ h1 { text-shadow:0 0 15px red; }
 </style>
 </head>
 <body>
+
 <div class="admin-container">
 <h1>👻 Ghostly Admin Panel</h1>
 <button id="disableToggle">Disable Website</button>
@@ -46,106 +47,82 @@ h1 { text-shadow:0 0 15px red; }
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-let websiteDisabled = false;
 
-// send message to Discord webhook
-function sendWebhook(message) {
-  fetch(webhookURL, {
+function sendWebhook(message){
+  fetch(webhookURL,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({content: message})
   });
 }
 
-// fetch all users from localStorage
-function fetchUsers(){
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  renderUsers(users);
-}
-
-// render all users instantly in dropdowns
-function renderUsers(users){
+function renderUsers() {
   const container = document.getElementById("users");
-  container.innerHTML = "";
+  container.innerHTML="";
+  const storedUsername = localStorage.getItem("username");
+  const status = localStorage.getItem("status");
+  const ip = "Unknown"; // can implement IP fetch
+  const area = "Unknown";
 
-  users.forEach(u=>{
-    const dropdown = document.createElement("div");
-    dropdown.className = "user-dropdown";
-    if(u.status==="pending") dropdown.classList.add("pending");
+  const dropdown = document.createElement("div");
+  dropdown.className="user-dropdown";
+  if(status==="pending") dropdown.classList.add("pending");
 
-    const h3 = document.createElement("h3");
-    h3.textContent = u.username;
-    if(u.status==="pending"){
-      const label = document.createElement("span");
-      label.textContent=" (Pending)";
-      label.className="pending-label";
-      h3.appendChild(label);
-    }
-
-    const content = document.createElement("div");
-    content.className="user-dropdown-content";
-    content.innerHTML=`
-      <p>Status: ${u.status}</p>
-      <p>IP: ${u.ip}</p>
-      <p>Area: ${u.area}</p>
-      <button onclick="approveUser('${u.username}')">✅ Approve</button>
-      <button onclick="denyUser('${u.username}')">❌ Deny</button>
-      <button onclick="kickUser('${u.username}')">💀 Kick</button>
-    `;
-    h3.onclick = ()=>content.classList.toggle("open");
-
-    dropdown.appendChild(h3);
-    dropdown.appendChild(content);
-    container.appendChild(dropdown);
-  });
-}
-
-// approve, deny, kick functions with webhook
-function approveUser(username){
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  const user = users.find(u=>u.username===username);
-  if(user){ 
-    user.status="approved"; 
-    localStorage.setItem("users", JSON.stringify(users));
-    fetchUsers();
-    sendWebhook(`✅ ${username} approved by admin`);
+  const h3 = document.createElement("h3");
+  h3.textContent=storedUsername;
+  if(status==="pending"){
+    const label = document.createElement("span");
+    label.textContent=" (Pending)";
+    label.className="pending-label";
+    h3.appendChild(label);
   }
+  const content = document.createElement("div");
+  content.className="user-dropdown-content";
+  content.innerHTML=`
+    <p>Status: ${status}</p>
+    <p>IP: ${ip}</p>
+    <p>Area: ${area}</p>
+    <button onclick="approveUser()">✅ Approve</button>
+    <button onclick="denyUser()">❌ Deny</button>
+    <button onclick="kickUser()">💀 Kick</button>
+  `;
+  h3.onclick = ()=>content.classList.toggle("open");
+  dropdown.appendChild(h3);
+  dropdown.appendChild(content);
+  container.appendChild(dropdown);
 }
 
-function denyUser(username){
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  const user = users.find(u=>u.username===username);
-  if(user){ 
-    user.status="denied"; 
-    localStorage.setItem("users", JSON.stringify(users));
-    fetchUsers();
-    sendWebhook(`❌ ${username} denied by admin`);
-  }
+function approveUser(){
+  localStorage.setItem("status","approved");
+  renderUsers();
+  sendWebhook(`✅ Admin approved user: ${localStorage.getItem("username")}`);
+}
+function denyUser(){
+  localStorage.setItem("status","denied");
+  renderUsers();
+  sendWebhook(`❌ Admin denied user: ${localStorage.getItem("username")}`);
+}
+function kickUser(){
+  localStorage.removeItem("username");
+  localStorage.removeItem("password");
+  localStorage.removeItem("status");
+  renderUsers();
+  sendWebhook(`💀 Admin kicked user`);
 }
 
-function kickUser(username){
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  users = users.filter(u=>u.username!==username);
-  localStorage.setItem("users", JSON.stringify(users));
-  fetchUsers();
-  sendWebhook(`💀 ${username} kicked by admin`);
-}
-
-// toggle website status
 document.getElementById("disableToggle").onclick = ()=>{
-  websiteDisabled = !websiteDisabled;
+  const websiteDisabled = confirm("Do you want to disable the website for updates?");
   if(websiteDisabled){
-    alert("Website is now disabled for updates.");
     sendWebhook("⚠️ Website disabled by admin for updates.");
+    alert("Website disabled.");
   } else {
-    alert("Website is now enabled.");
     sendWebhook("✅ Website re-enabled by admin.");
+    alert("Website enabled.");
   }
 }
 
-// auto-refresh all users every 5 seconds
-setInterval(fetchUsers, 5000);
-fetchUsers();
+renderUsers();
 </script>
+
 </body>
 </html>
