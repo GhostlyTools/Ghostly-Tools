@@ -8,35 +8,66 @@
 /* Downloads box styling */
 #downloads-container {
   background: rgba(0,0,0,0.85);
-  padding: 30px;
-  border-radius: 15px;
+  padding: 40px;           /* Bigger padding for readability */
+  border-radius: 20px;     /* Slightly larger corners */
   text-align: center;
-  width: 400px;
+  width: 95%;              /* Full width on small screens */
+  max-width: 600px;        /* Bigger max width for desktop */
   margin: 50px auto;
-  box-shadow: 0 0 25px red;
+  box-shadow: 0 0 35px red; /* Stronger glow */
+  position: relative;
+  z-index: 10;
 }
 
 #downloads-container h2 {
-  margin-bottom: 20px;
-  text-shadow: 0 0 15px red;
+  margin-bottom: 25px;
+  font-size: 2rem;         /* Larger title */
+  text-shadow: 0 0 20px red;
 }
 
 /* Links styling */
 #downloads-content a {
   display: block;
-  padding: 10px 15px;
-  margin: 10px 0;
-  background: rgba(255,0,0,0.8);
+  padding: 18px 25px;      /* Bigger clickable area */
+  margin: 15px 0;
+  background: rgba(255,0,0,0.85);
   color: white !important;
   text-decoration: none;
-  border-radius: 5px;
-  font-size: 1.2rem;
+  border-radius: 8px;
+  font-size: 1.5rem;       /* Larger text */
   transition: all 0.3s ease;
 }
 
 #downloads-content a:hover {
   background: red;
-  box-shadow: 0 0 15px red;
+  box-shadow: 0 0 20px red;
+}
+
+/* Floating ghosts and text */
+.floating {
+  position: absolute;
+  font-size: 2.2rem;       /* Slightly bigger ghosts */
+  color: rgba(255,0,0,0.7);
+  animation: float 12s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.waiting {
+  position: absolute;
+  font-size: 2.8rem;       /* Bigger "Downloads…" text */
+  color: rgba(255,0,0,0.8);
+  font-weight: bold;
+  animation: float 15s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes float {
+  0% {transform: translateY(100vh) translateX(0) rotate(0deg); opacity:0;}
+  10% {opacity:1;}
+  50% {transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.7;}
+  100% {transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0;}
 }
 </style>
 </head>
@@ -46,6 +77,19 @@
   <h2>Downloads</h2>
   <div id="downloads-content"></div>
 </div>
+
+<!-- Floating ghosts -->
+<div class="floating" style="left:10%; animation-delay:0s;">👻</div>
+<div class="floating" style="left:30%; animation-delay:2s;">👻</div>
+<div class="floating" style="left:50%; animation-delay:4s;">👻</div>
+<div class="floating" style="left:70%; animation-delay:1s;">👻</div>
+<div class="floating" style="left:90%; animation-delay:3s;">👻</div>
+
+<!-- Floating "Downloads..." text -->
+<div class="waiting" style="left:15%; animation-delay:1s;">Downloads…</div>
+<div class="waiting" style="left:40%; animation-delay:3s;">Downloads…</div>
+<div class="waiting" style="left:65%; animation-delay:2s;">Downloads…</div>
+<div class="waiting" style="left:85%; animation-delay:4s;">Downloads…</div>
 
 <script>
 const signedInUser = localStorage.getItem("signedInUser");
@@ -65,8 +109,6 @@ if (!currentUser || currentUser.status !== "approved") {
       <a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank" rel="noopener noreferrer">DDoS v3</a>
   `;
 }
-
-// YouTube video removed
 </script>
 
 </body>
