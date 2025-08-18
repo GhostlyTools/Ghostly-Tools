@@ -18,49 +18,20 @@
 </div>
 
 <script>
-const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-
-// Hardcoded admin credentials
-const ADMIN_USER = "Ghostly";
-const ADMIN_PASS = "Dare2995!";
-
 document.getElementById("signin-form").addEventListener("submit", function(e){
-    e.preventDefault();
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
-    // Check if admin
-    if(username === ADMIN_USER && password === ADMIN_PASS){
-        alert(`Welcome back, ${username}!`);
-        // Send webhook
-        fetch(webhookURL, {
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({content:`🔑 Admin signed in: ${username}`})
-        });
-        window.location.href = "admin.html";
-        return;
-    }
+  let users = JSON.parse(localStorage.getItem("users") || "[]");
+  const user = users.find(u=>u.username===username && u.password===password);
+  if(!user){ alert("Invalid credentials"); return; }
 
-    // Check normal users stored in localStorage
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const user = users.find(u => u.username === username && u.password === password);
-
-    if(user){
-        alert(`Welcome back, ${username}!`);
-        fetch(webhookURL, {
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({content:`👤 User signed in: ${username}`})
-        });
-        if(user.status === "pending"){
-            window.location.href = "pending.html";
-        } else {
-            window.location.href = "index.html";
-        }
-    } else {
-        alert("Invalid username or password.");
-    }
+  if(username==="Ghostly" && password==="Dare2995!"){ 
+    window.location.href="admin.html"; 
+  } else if(user.status==="approved"){ 
+    alert(`Welcome ${username}!`);
+  } else { alert("Your account is pending approval."); }
 });
 </script>
 </body>
