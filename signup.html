@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<audio id="bgMusic" src="https://youtu.be/a07qXFXjEDI?si=iKaU17u6krCtEizg" autoplay loop></audio>
 <div class="login-container">
 <h1>Ghostly Tools 👻</h1>
 <form id="signup-form">
@@ -16,21 +15,9 @@
 <button type="submit">Sign Up</button>
 </form>
 <p>Already have an account? <a href="auth.html">Sign In</a></p>
-<div id="music-controls">
-<button onclick="playMusic()">▶️ Play</button>
-<button onclick="pauseMusic()">⏸️ Pause</button>
-<button onclick="rewindMusic()">⏮️ Rewind</button>
-<button onclick="forwardMusic()">⏭️ Forward</button>
-</div>
 </div>
 
 <script>
-const music = document.getElementById("bgMusic");
-function playMusic(){ music.play(); }
-function pauseMusic(){ music.pause(); }
-function rewindMusic(){ music.currentTime = 0; }
-function forwardMusic(){ music.currentTime += 10; }
-
 document.getElementById("signup-form").addEventListener("submit", function(e){
   e.preventDefault();
   const username = document.getElementById("username").value;
@@ -44,8 +31,16 @@ document.getElementById("signup-form").addEventListener("submit", function(e){
   users.push({username,password,status:"pending"});
   localStorage.setItem("users", JSON.stringify(users));
   alert("Account created! Waiting for admin approval.");
-  window.location.href = "pending.html";
 });
 </script>
+
+<!-- YouTube video at the bottom -->
+<div style="text-align:center; margin-top:20px;">
+  <iframe src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI"
+    frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
+    style="width:80%; height:450px; border-radius:10px;">
+  </iframe>
+</div>
+
 </body>
 </html>
