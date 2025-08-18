@@ -6,60 +6,67 @@
 <title>Ghostly Tools 👻 - Sign In</title>
 <link rel="stylesheet" href="style.css">
 <style>
+/* Body and overlay */
 body {
-  margin:0; padding:0;
-  font-family:"Creepster", cursive;
-  color:#fff;
-  background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-  background-size:cover;
-  display:flex; justify-content:center; align-items:center; height:100vh;
+  margin: 0;
+  padding: 0;
+  font-family: "Creepster", cursive;
+  color: #fff;
+  background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: relative;
 }
+body::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.3);
+  z-index: 0;
+}
+
+/* Sign In container */
 .login-container {
-  background: rgba(0,0,0,0.8);
-  padding:30px;
-  border-radius:15px;
-  box-shadow:0 0 25px red;
-  text-align:center;
-  width:300px;
+  position: relative;
+  z-index: 1;
+  background: rgba(0,0,0,0.85);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 0 25px red;
+  animation: heartbeatGlow 1.5s ease-in-out infinite, flicker 0.2s infinite;
 }
-.login-container h1 {
-  text-shadow:0 0 15px red;
-  margin-bottom:20px;
-}
+.login-container h1 { margin-bottom: 20px; text-shadow: 0 0 15px red; }
 .login-container input {
-  width:100%;
-  padding:10px;
-  margin:10px 0;
-  border:none;
-  border-radius:5px;
+  width: 100%; padding: 10px; margin: 10px 0; border: none;
+  border-radius: 5px; background: #222; color: #fff; outline: none;
 }
 .login-container button {
-  width:100%;
-  padding:10px;
-  background:red;
-  border:none;
-  color:white;
-  font-weight:bold;
-  border-radius:5px;
-  cursor:pointer;
+  width: 100%; padding: 10px; background: red; border: none;
+  color: white; font-weight: bold; border-radius: 5px; cursor: pointer;
 }
-.login-container button:hover {
-  background:#ff0000cc;
+.login-container button:hover { background: #ff0000cc; }
+.login-container p { margin-top: 10px; font-size: 0.9em; }
+.login-container a { color: red; text-decoration: none; }
+.login-container a:hover { text-decoration: underline; }
+
+/* Animations */
+@keyframes heartbeatGlow {
+  0%,100% { box-shadow: 0 0 15px red; }
+  25%     { box-shadow: 0 0 50px red; }
+  50%     { box-shadow: 0 0 20px red; }
+  75%     { box-shadow: 0 0 40px red; }
 }
-.login-container p {
-  margin-top:10px;
-  font-size:0.9em;
-}
-.login-container a {
-  color:red;
-  text-decoration:none;
-}
-.login-container a:hover {
-  text-decoration:underline;
-}
+@keyframes flicker { 0%,100% { opacity: 1; } 50% { opacity: 0.95; } }
 </style>
 </head>
 <body>
+
 <div class="login-container">
 <h1>Ghostly Tools 👻</h1>
 <form id="signin-form">
@@ -71,38 +78,50 @@ body {
 </div>
 
 <script>
+const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+
 document.getElementById("signin-form").addEventListener("submit", function(e){
   e.preventDefault();
-  const username = document.getElementById("username").value;
+  const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
 
-  // Admin credentials
-  const adminUser = "admin";
-  const adminPass = "Dare2995!";
+  let users = JSON.parse(localStorage.getItem("users") || "[]");
 
-  if(username === adminUser && password === adminPass){
-      localStorage.setItem("signedInUser", username);
-      window.location.href = "admin.html";
-      return;
+  // Check if admin login
+  if(username === "Ghostly" && password === "Dare2995!"){
+    localStorage.setItem("signedInUser", username);
+    fetch(webhookURL,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({content:`💀 Admin Ghostly signed in`})
+    });
+    alert("✅ Admin signed in!");
+    window.location.href = "admin.html";
+    return;
   }
 
-  // Check normal users in localStorage
-  let users = JSON.parse(localStorage.getItem("users")||"[]");
-  const currentUser = users.find(u=>u.username===username && u.password===password);
+  // Check normal users
+  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
 
-  if(!currentUser){
-      alert("Invalid username or password.");
-      return;
+  if(!user){
+    alert("⚠️ Invalid username or password");
+    return;
   }
 
-  if(currentUser.status !== "approved"){
-      localStorage.setItem("signedInUser", username);
-      window.location.href = "pending.html";
-      return;
+  if(user.status !== "approved"){
+    alert("⏳ Your account is pending approval.");
+    window.location.href = "pending.html";
+    return;
   }
 
-  localStorage.setItem("signedInUser", username);
-  window.location.href = "index.html";
+  localStorage.setItem("signedInUser", user.username);
+  fetch(webhookURL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({content:`💀 User ${username} signed in`})
+  });
+  alert("✅ Signed in successfully!");
+  window.location.href = "downloads.html";
 });
 </script>
 </body>
