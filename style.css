@@ -1,46 +1,79 @@
 /* General body styles for all pages */
 body {
-  margin:0;
-  padding:0;
-  font-family:"Creepster", cursive;
-  color:#fff;
-  background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-  background-size:cover;
-  overflow:hidden;
+  margin: 0;
+  padding: 0;
+  font-family: "Creepster", cursive;
+  color: #fff;
+  background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
+  background-size: cover;
+  overflow: hidden;
 }
 
-/* Pending box */
-.pending-box {
-  background:rgba(0,0,0,0.7);
-  padding:20px;
-  border-radius:10px;
-  text-align:center;
-  box-shadow:0 0 20px red;
+/* General container boxes */
+.login-container, .admin-container, .pending-box, #downloads-container {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px red;
+  text-align: center;
+  margin: 20px auto;
+  max-width: 800px;
 }
 
-/* Floating ghosts - ONLY for pending.html */
+/* Headers */
+h1, h2 {
+  text-shadow: 0 0 10px red, 0 0 20px darkred;
+}
+
+/* Links */
+a {
+  color: #f55;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Buttons */
+button {
+  background: red;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  box-shadow: 0 0 15px darkred;
+}
+
+/* Floating ghosts and waiting text only for pending.html */
 .floating {
-  position:absolute;
-  font-size:2rem;
-  color:rgba(255,0,0,0.7);
-  animation:float 12s linear infinite;
-  pointer-events:none;
+  position: absolute;
+  font-size: 2rem;
+  color: rgba(255, 0, 0, 0.7);
+  animation: float 12s linear infinite;
+  pointer-events: none;
 }
 
-/* Floating "Waiting..." text - ONLY for pending.html */
 .waiting {
-  position:absolute;
-  font-size:2.5rem;
-  color:rgba(255,0,0,0.9);
-  font-weight:bold;
-  font-family:"Creepster", cursive;
+  position: absolute;
+  font-size: 2.5rem;
+  color: rgba(255, 0, 0, 0.9);
+  font-weight: bold;
+  font-family: "Creepster", cursive;
   text-shadow: 0 0 5px darkred, 0 0 10px red, 0 0 20px darkred;
-  animation:float 15s linear infinite;
+  animation: float 15s linear infinite;
 }
 
+/* Floating animation */
 @keyframes float {
-  0% {transform:translateY(100vh) translateX(0) rotate(0deg);opacity:0;}
-  10% {opacity:1;}
-  50% {transform:translateY(50vh) translateX(100px) rotate(180deg);opacity:0.7;}
-  100% {transform:translateY(-20vh) translateX(200px) rotate(360deg);opacity:0;}
+  0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity:0; }
+  10% { opacity:1; }
+  50% { transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.7; }
+  100% { transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0; }
 }
