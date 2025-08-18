@@ -17,28 +17,34 @@
 <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 </div>
 
+<!-- Persistent background music via YouTube embed -->
+<div style="display:none;">
+<iframe id="bgMusic" width="0" height="0" src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI" frameborder="0" allow="autoplay"></iframe>
+</div>
+
 <script>
 document.getElementById("signin-form").addEventListener("submit", function(e){
   e.preventDefault();
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   // Admin login
-  if(username==="admin" && password==="Dare2995!"){
+  if(username === "admin" && password === "Dare2995!"){
     localStorage.setItem("signedInUser","admin");
-    window.location.href="admin.html";
+    window.location.href = "admin.html";
     return;
   }
 
   // Regular users
-  let users = JSON.parse(localStorage.getItem("users")||"[]");
-  const user = users.find(u=>u.username===username && u.password===password);
+  let users = JSON.parse(localStorage.getItem("users") || "[]");
+  const user = users.find(u => u.username === username && u.password === password);
+
   if(user){
-    localStorage.setItem("signedInUser",username);
-    if(user.status==="approved"){
-      window.location.href="index.html";
+    localStorage.setItem("signedInUser", username);
+    if(user.status === "approved"){
+      window.location.href = "index.html"; // main downloads page
     } else {
-      window.location.href="pending.html";
+      window.location.href = "pending.html"; // pending approval page
     }
   } else {
     alert("Invalid credentials or account not found.");
