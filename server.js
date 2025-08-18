@@ -1,117 +1,94 @@
-// server.js
-const express = require("express");
-const bodyParser = require("body-parser");
-const fetch = require("node-fetch"); // For Discord webhook
+const express = require('express');
+const bodyParser = require('body-parser');
+const axios = require('axios');
+const geoip = require('geoip-lite');
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = 3000;
 
-app.use(bodyParser.json());
-app.use(express.static("public")); // serve auth.html, signup.html, index.html, pending.html, style.css
-
-// In-memory users storage
-let users = [];
-let websiteDisabled = false;
-
-// Discord webhook URL
 const WEBHOOK_URL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-// Helper to send webhook notifications
-async function sendWebhook(content) {
-  await fetch(WEBHOOK_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content }),
-  });
-}
+// In-memory user store
+let users = []; // { username, password, status: pending/approved/admin, ip, area }
 
-// Signup
-app.post("/signup", async (req, res) => {
-  const { username, password } = req.body;
-  const ip = req.ip;
-  const exists = users.find(u => u.username === username);
-  if (exists) return res.json({ message: "Username already exists" });
+// Admin credentials
+const ADMIN_USERNAME = "Ghostly";
+const ADMIN_PASSWORD = "Dare2995!";
 
-  const newUser = { username, password, status: "pending", ip };
-  users.push(newUser);
+app.use(bodyParser.json());
+app.use(express.static('public'));
 
-  await sendWebhook(`📝 New signup:\nUsername: ${username}\nIP: ${ip}\nStatus: Pending`);
-  res.json({ message: "Signup successful! Waiting for admin approval." });
+// ---------------- Sign Up ----------------
+app.post('/signup', async (req, res) => {
+    const { username, password } = req.body;
+    const ip = req.ip;
+    const geo = geoip.lookup(ip);
+    const area = geo ? `${geo.city || "Unknown"}, ${geo.country}` : "Unknown";
+
+    if(users.find(u => u.username === username)) {
+        return res.json({ success:false, message: "Username already exists!" });
+    }
+
+    users.push({ username, password, status: "pending", ip, area });
+
+    await axios.post(WEBHOOK_URL, {
+        content: `🆕 New signup: **${username}** | IP: ${ip} | Area: ${area}`
+    }).catch(console.error);
+
+    res.json({ success:true, message: "Signed up! Waiting for admin approval." });
 });
 
-// Signin
-app.post("/signin", async (req, res) => {
-  const { username, password } = req.body;
-  const ip = req.ip;
-  const user = users.find(u => u.username === username && u.password === password);
-  if (!user) return res.json({ message: "Invalid credentials" });
+// ---------------- Sign In ----------------
+app.post('/signin', async (req, res) => {
+    const { username, password } = req.body;
+    const ip = req.ip;
+    const geo = geoip.lookup(ip);
+    const area = geo ? `${geo.city || "Unknown"}, ${geo.country}` : "Unknown";
 
-  await sendWebhook(`🔑 User signed in:\nUsername: ${username}\nIP: ${ip}\nStatus: ${user.status}`);
-  if (user.status === "pending") return res.json({ status: "pending" });
-  res.json({ status: "approved" });
+    // Admin check
+    if(username === ADMIN_USERNAME && password === ADMIN_PASSWORD){
+        return res.json({ success:true, role: "admin" });
+    }
+
+    const user = users.find(u => u.username === username && u.password === password);
+    if(!user) return res.json({ success:false, message:"Invalid credentials" });
+
+    // Send webhook notification
+    await axios.post(WEBHOOK_URL, {
+        content: `🔑 Signin: **${username}** | IP: ${ip} | Area: ${area}`
+    }).catch(console.error);
+
+    if(user.status === "pending") return res.json({ success:true, role: "pending" });
+    if(user.status === "approved") return res.json({ success:true, role: "user" });
 });
 
-// Admin authentication middleware
-function adminAuth(req, res, next) {
-  const { username, password } = req.headers;
-  if (username === "Ghostly" && password === "Dare2995!") return next();
-  res.status(403).json({ message: "Forbidden" });
-}
+// ---------------- Get Users ----------------
+app.get('/users', (req,res) => res.json(users));
 
-// Get all users
-app.get("/users", adminAuth, (req, res) => {
-  res.json(users);
+// ---------------- Approve ----------------
+app.post('/approve', async (req,res) => {
+    const { username } = req.body;
+    const user = users.find(u => u.username === username);
+    if(user){
+        user.status = "approved";
+        await axios.post(WEBHOOK_URL, { content: `✅ Approved: **${username}**` }).catch(console.error);
+    }
+    res.json({ success:true });
 });
 
-// Approve user
-app.post("/approve", adminAuth, async (req, res) => {
-  const { username } = req.body;
-  const user = users.find(u => u.username === username);
-  if (user) {
-    user.status = "approved";
-    await sendWebhook(`✅ User approved:\nUsername: ${username}\nIP: ${user.ip}`);
-    return res.json({ message: "User approved" });
-  }
-  res.json({ message: "User not found" });
+// ---------------- Deny ----------------
+app.post('/deny', async (req,res) => {
+    const { username } = req.body;
+    users = users.filter(u => u.username !== username);
+    await axios.post(WEBHOOK_URL, { content: `❌ Denied/Kicked: **${username}**` }).catch(console.error);
+    res.json({ success:true });
 });
 
-// Deny user
-app.post("/deny", adminAuth, async (req, res) => {
-  const { username } = req.body;
-  const user = users.find(u => u.username === username);
-  if (user) {
-    user.status = "denied";
-    await sendWebhook(`❌ User denied:\nUsername: ${username}\nIP: ${user.ip}`);
-    return res.json({ message: "User denied" });
-  }
-  res.json({ message: "User not found" });
+// ---------------- Disable Website ----------------
+let siteDisabled = false;
+app.post('/disable', (req,res) => {
+    siteDisabled = true;
+    res.json({ success:true });
 });
+app.get('/check-disabled', (req,res) => res.json({ disabled: siteDisabled }));
 
-// Kick user
-app.post("/kick", adminAuth, async (req, res) => {
-  const { username } = req.body;
-  const index = users.findIndex(u => u.username === username);
-  if (index !== -1) {
-    const kickedUser = users.splice(index, 1)[0];
-    await sendWebhook(`🦵 User kicked:\nUsername: ${kickedUser.username}\nIP: ${kickedUser.ip}`);
-    return res.json({ message: "User kicked" });
-  }
-  res.json({ message: "User not found" });
-});
-
-// Disable/enable website
-app.post("/disable", adminAuth, async (req, res) => {
-  const { disable } = req.body;
-  websiteDisabled = disable;
-  await sendWebhook(`⚠️ Website ${disable ? "disabled" : "enabled"} by admin`);
-  res.json({ message: `Website ${disable ? "disabled" : "enabled"}` });
-});
-
-// Check website status
-app.get("/status", (req, res) => {
-  res.json({ disabled: websiteDisabled });
-});
-
-// Start server
-app.listen(port, () => {
-  console.log(`Ghostly Tools server running on port ${port}`);
-});
+app.listen(PORT, () => console.log(`Ghostly Tools server running on http://localhost:${PORT}`));
