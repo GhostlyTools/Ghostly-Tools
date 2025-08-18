@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<audio id="bgMusic" src="" autoplay loop></audio>
 <div class="login-container">
 <h1>Ghostly Tools 👻</h1>
 <form id="signin-form">
@@ -17,21 +18,38 @@
 <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 </div>
 
+<!-- Music Controls -->
+<div class="music-controls">
+<button onclick="playMusic()">▶️ Play</button>
+<button onclick="pauseMusic()">⏸️ Pause</button>
+<button onclick="rewindMusic()">⏮️ Rewind</button>
+<button onclick="forwardMusic()">⏭️ Forward</button>
+<button onclick="resumeMusic()">⏯️ Resume</button>
+</div>
+
 <script>
-document.getElementById("signin-form").addEventListener("submit", function(e){
+const musicLink = "https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1";
+let bgMusic = document.getElementById("bgMusic");
+bgMusic.src = musicLink;
+
+function playMusic(){ bgMusic.play(); }
+function pauseMusic(){ bgMusic.pause(); }
+function rewindMusic(){ bgMusic.currentTime = Math.max(0, bgMusic.currentTime - 10); }
+function forwardMusic(){ bgMusic.currentTime += 10; }
+function resumeMusic(){ bgMusic.play(); }
+
+document.getElementById("signin-form").addEventListener("submit", e=>{
   e.preventDefault();
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
-
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  const user = users.find(u=>u.username===username && u.password===password);
-  if(!user){ alert("Invalid credentials"); return; }
-
-  if(username==="Ghostly" && password==="Dare2995!"){ 
-    window.location.href="admin.html"; 
-  } else if(user.status==="approved"){ 
-    alert(`Welcome ${username}!`);
-  } else { alert("Your account is pending approval."); }
+  let users = JSON.parse(localStorage.getItem("users")||"[]");
+  let user = users.find(u=>u.username===username && u.password===password);
+  if(user){
+    if(user.status!=="approved"){ window.location="pending.html"; return; }
+    localStorage.setItem("signedInUser", username);
+    if(username==="Ghostly" && password==="Dare2995!"){ window.location="admin.html"; return; }
+    window.location="index.html";
+  } else { alert("Invalid credentials"); }
 });
 </script>
 </body>
