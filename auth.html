@@ -80,50 +80,70 @@ body::before {
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-document.getElementById("signin-form").addEventListener("submit", function(e){
+// Ensure admin exists
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+if(!users.find(u=>u.username==="Ghostly")){
+  users.push({username:"Ghostly", password:"Dare2995!", status:"approved", admin:true});
+  localStorage.setItem("users", JSON.stringify(users));
+}
+
+// Async webhook sender
+function sendWebhook(message){
+  fetch(webhookURL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({content: message})
+  }).catch(()=>{});
+}
+
+// Get user IP
+async function getIP(){
+  try{
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    return data.ip;
+  } catch {
+    return "Unknown";
+  }
+}
+
+document.getElementById("signin-form").addEventListener("submit", async function(e){
   e.preventDefault();
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
 
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
+  users = JSON.parse(localStorage.getItem("users") || "[]");
 
-  // Check admin login
-  if(username === "Ghostly" && password === "Dare2995!"){
+  // Admin login
+  const admin = users.find(u=>u.admin && u.username===username && u.password===password);
+  if(admin){
     localStorage.setItem("signedInUser", username);
-    fetch(webhookURL,{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({content:`💀 Admin Ghostly signed in`})
-    });
+    const ip = await getIP();
+    sendWebhook(`💀 Admin ${username} signed in\nIP: ${ip}`);
     alert("✅ Admin signed in!");
-    window.location.href = "admin.html";
+    window.location.href="admin.html";
     return;
   }
 
-  // Check normal users
-  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-
+  // Normal user login
+  const user = users.find(u=>u.username.toLowerCase()===username.toLowerCase() && u.password===password);
   if(!user){
     alert("⚠️ Invalid username or password");
     return;
   }
-
   if(user.status !== "approved"){
     alert("⏳ Your account is pending approval.");
-    window.location.href = "pending.html";
+    window.location.href="pending.html";
     return;
   }
 
-  // Approved user → index.html (downloads)
   localStorage.setItem("signedInUser", user.username);
-  fetch(webhookURL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({content:`💀 User ${username} signed in`})
-  });
+  const ip = await getIP();
+  sendWebhook(`💀 User ${username} signed in\nIP: ${ip}`);
   alert("✅ Signed in successfully!");
-  window.location.href = "index.html";
+  window.location.href="index.html";
 });
 </script>
+
 </body>
 </html>
