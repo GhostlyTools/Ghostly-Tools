@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Dashboard</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<audio id="bgMusic" autoplay loop>
-  <source src="Ghostly_music.mp3" type="audio/mp3">
-</audio>
+<audio id="bgMusic" src="Ghostly_music.mp3" autoplay loop volume="1"></audio>
 
 <div id="downloads-container">
 <h2>Downloads</h2>
@@ -18,20 +15,21 @@
 
 <script>
 const downloadsContent = document.getElementById("downloads-content");
-let users = JSON.parse(localStorage.getItem("ghostlyUsers") || "[]");
-let currentUser = users.find(u => u.username === localStorage.getItem("currentUser"));
+const signedInUser = localStorage.getItem("signedInUser");
+let users = JSON.parse(localStorage.getItem("users")||"[]");
+let currentUser = users.find(u=>u.username===signedInUser);
 
-if(!currentUser || currentUser.status !== "approved"){
-  window.location.href = "pending.html";
-} else {
-  downloadsContent.innerHTML = `
-  <ul>
-    <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
-    <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pingers</a></li>
-    <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage Multitool</a></li>
-    <li><a href="https://www.mediafire.com/folder/133z6qltkuybu/Iplookup" target="_blank">IP Lookup</a></li>
-    <li><a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank">DDoS v3</a></li>
-  </ul>`;
+if(!currentUser || currentUser.status!=="approved"){
+  downloadsContent.innerHTML="<p>Waiting for admin to approve downloads 👻</p>";
+}else{
+  downloadsContent.innerHTML=`
+    <ul>
+      <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
+      <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pingers</a></li>
+      <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage Multitool</a></li>
+      <li><a href="https://www.mediafire.com/folder/133z6qltkuybu/Iplookup" target="_blank">IP Lookup</a></li>
+      <li><a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank">DDoS v3</a></li>
+    </ul>`;
 }
 </script>
 </body>
