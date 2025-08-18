@@ -20,6 +20,8 @@ h1 { text-shadow:0 0 15px red; }
   background: rgba(0,0,0,0.8); border: 2px solid red; border-radius:10px;
   margin:10px auto; max-width:400px; cursor:pointer; box-shadow:0 0 15px red;
   transition:all 0.3s;
+  opacity:0;
+  transform: translateY(-10px);
 }
 .user-dropdown.pending { border:2px dashed red; animation: pendingFlicker 1.5s infinite; }
 .user-dropdown h3 { margin:10px; text-shadow:0 0 10px red; }
@@ -33,6 +35,17 @@ h1 { text-shadow:0 0 15px red; }
 .user-dropdown-content button { margin:5px 3px; width:80px; font-weight:bold; }
 .pending-label { color:red; font-weight:bold; margin-left:10px; animation:pulseRed 1.2s infinite; }
 #disableToggle { margin:20px; padding:10px 20px; font-weight:bold; background:red; border:none; color:white; cursor:pointer; }
+
+/* fade-in animation */
+.fade-in {
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeIn 0.5s forwards;
+}
+@keyframes fadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
 @keyframes pendingFlicker { 0%,50%,100%{box-shadow:0 0 10px red;} 25%,75%{box-shadow:0 0 20px darkred;} }
 @keyframes pulseRed {0%,100%{opacity:1;text-shadow:0 0 5px red;}50%{opacity:0.6;text-shadow:0 0 20px darkred;}}
 </style>
@@ -46,7 +59,7 @@ h1 { text-shadow:0 0 15px red; }
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-let users = [];
+let users = []; // real users
 let websiteDisabled = false;
 
 function sendWebhook(message) {
@@ -57,34 +70,33 @@ function sendWebhook(message) {
   });
 }
 
-// Called whenever a real user signs up or signs in
 function addUser(username, status, ip, area) {
-  users.push({username, status, ip, area});
+  users.push({username,status,ip,area});
   renderUsersSlow();
 }
 
-// Render all users slowly in dropdowns
 function renderUsersSlow() {
   const container = document.getElementById("users");
-  container.innerHTML = "";
-  users.forEach((u, index) => {
-    setTimeout(() => {
+  container.innerHTML="";
+
+  users.forEach((u,index)=>{
+    setTimeout(()=>{
       const dropdown = document.createElement("div");
-      dropdown.className = "user-dropdown";
-      if(u.status === "pending") dropdown.classList.add("pending");
+      dropdown.className="user-dropdown fade-in";
+      if(u.status==="pending") dropdown.classList.add("pending");
 
       const h3 = document.createElement("h3");
-      h3.textContent = u.username;
-      if(u.status === "pending"){
+      h3.textContent=u.username;
+      if(u.status==="pending"){
         const label = document.createElement("span");
-        label.textContent = " (Pending)";
-        label.className = "pending-label";
+        label.textContent=" (Pending)";
+        label.className="pending-label";
         h3.appendChild(label);
       }
 
       const content = document.createElement("div");
-      content.className = "user-dropdown-content";
-      content.innerHTML = `
+      content.className="user-dropdown-content";
+      content.innerHTML=`
         <p>Status: ${u.status}</p>
         <p>IP: ${u.ip}</p>
         <p>Area: ${u.area}</p>
@@ -92,12 +104,12 @@ function renderUsersSlow() {
         <button onclick="denyUser('${u.username}')">❌ Deny</button>
         <button onclick="kickUser('${u.username}')">💀 Kick</button>
       `;
-      h3.onclick = () => content.classList.toggle("open");
+      h3.onclick = ()=>content.classList.toggle("open");
 
       dropdown.appendChild(h3);
       dropdown.appendChild(content);
       container.appendChild(dropdown);
-    }, index * 200); // slow appearance for each user
+    }, index * 400); // slow appearance stagger
   });
 }
 
@@ -128,10 +140,10 @@ document.getElementById("disableToggle").onclick = ()=>{
   }
 }
 
-// Example: Add a real user dynamically (no fake users)
-function onUserSignIn(username, status="pending", ip="Unknown", area="Unknown"){
-  addUser(username, status, ip, area);
-  sendWebhook(`👤 ${username} signed in. Status: ${status}, IP: ${ip}, Area: ${area}`);
+// Example: real users added dynamically (you can call this when they sign in)
+function onUserSignIn(username, ip, area, status="pending") {
+  addUser(username,status,ip,area);
+  sendWebhook(`👤 ${username} signed in from IP: ${ip}, Area: ${area}`);
 }
 </script>
 </body>
