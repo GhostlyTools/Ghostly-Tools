@@ -12,19 +12,68 @@ body {
   background-size:cover; overflow:hidden;
 }
 
-/* Only change: bigger pending box */
+/* Bigger and Readable Pending Box */
 .pending-box {
-  background:rgba(0,0,0,0.7); 
-  padding:40px;       /* bigger padding */
-  border-radius:10px;
+  background:rgba(0,0,0,0.9); 
+  padding:60px 50px; 
+  border-radius:25px;
   text-align:center;
-  box-shadow:0 0 20px red;
-  z-index:2; position:relative;
-  width:450px;       /* wider box */
-  max-width:90%;     /* responsive on smaller screens */
-  font-size:1.1rem;  /* slightly larger text */
+  box-shadow:0 0 50px red;
+  border:3px solid red;
+  width:520px; max-width:90%;
+  position:relative; z-index:2;
 }
 
+/* Heading style - glowing heartbeat */
+.pending-box h1 {
+  font-size:3rem;
+  color:#ff4d4d;
+  text-shadow:0 0 25px red, 0 0 40px darkred;
+  margin-bottom:20px;
+  animation:heartbeatText 2s infinite;
+}
+
+/* Paragraph style - readable with subtle glow */
+.pending-box p {
+  font-size:1.3rem;
+  line-height:1.8;
+  color:#fff;
+  text-shadow:0 0 5px #ff0000aa;
+  margin-bottom:25px;
+}
+
+/* Strong emphasis for IG contact */
+.pending-box p strong {
+  color:#ff3333;
+  text-shadow:0 0 10px red;
+  font-weight:bold;
+}
+
+/* Link style - glowing button effect */
+.pending-box a {
+  display:inline-block;
+  padding:10px 25px;
+  font-size:1.3rem;
+  color:#ff4d4d;
+  font-weight:bold;
+  text-decoration:none;
+  border:2px solid #ff4d4d;
+  border-radius:10px;
+  box-shadow:0 0 15px red;
+  transition:0.3s;
+}
+.pending-box a:hover {
+  box-shadow:0 0 30px red, 0 0 50px darkred;
+  text-shadow:0 0 20px red;
+}
+
+/* Pulse animation for heading */
+@keyframes heartbeatText {
+  0%, 100% { text-shadow:0 0 25px red, 0 0 40px darkred; }
+  50% { text-shadow:0 0 45px red, 0 0 60px darkred; }
+}
+
+/* Floating ghosts and "Waiting..." text */
 .floating {
   position:absolute; font-size:2rem; color:rgba(255,0,0,0.7);
   animation:float 12s linear infinite; pointer-events:none;
@@ -40,13 +89,6 @@ body {
   10% {opacity:1;}
   50% {transform:translateY(50vh) translateX(100px) rotate(180deg);opacity:0.7;}
   100% {transform:translateY(-20vh) translateX(200px) rotate(360deg);opacity:0;}
-}
-.youtube-video {
-  position:fixed; bottom:0; left:0; width:100%; height:300px;
-  opacity:0.85; pointer-events:none; z-index:0;
-}
-.youtube-video iframe {
-  width:100%; height:100%; background:transparent; allowTransparency:true;
 }
 </style>
 </head>
