@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="style.css">
 <style>
 body {
-  margin:0;padding:0;font-family:"Creepster", cursive;color:#fff;
+  margin:0; padding:0; font-family:"Creepster", cursive; color:#fff;
   height:100vh; display:flex; justify-content:center; align-items:center;
   background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
   background-size:cover; overflow:hidden;
@@ -14,36 +14,60 @@ body {
 .pending-box {
   background:rgba(0,0,0,0.7); padding:20px; border-radius:10px;
   text-align:center; box-shadow:0 0 20px red;
+  z-index:2; position:relative;
 }
-.floating {position:absolute;font-size:2rem;color:rgba(255,0,0,0.7);animation:float 12s linear infinite;pointer-events:none;}
+.floating {
+  position:absolute; font-size:2rem; color:rgba(255,0,0,0.7);
+  animation:float 12s linear infinite; pointer-events:none;
+  z-index:1;
+}
+.waiting {
+  position:absolute; font-size:2.5rem; color:rgba(255,0,0,0.8);
+  font-weight:bold; animation:float 15s linear infinite;
+  z-index:1;
+}
 @keyframes float {
   0% {transform:translateY(100vh) translateX(0) rotate(0deg);opacity:0;}
   10% {opacity:1;}
   50% {transform:translateY(50vh) translateX(100px) rotate(180deg);opacity:0.7;}
   100% {transform:translateY(-20vh) translateX(200px) rotate(360deg);opacity:0;}
 }
+.youtube-video {
+  position:fixed; bottom:0; left:0; width:100%; height:300px;
+  opacity:0.85; pointer-events:none; z-index:0;
+}
+.youtube-video iframe {
+  width:100%; height:100%; background:transparent; allowTransparency:true;
+}
 </style>
 </head>
 <body>
+
 <div class="pending-box">
-<h1>⏳ Pending Approval</h1>
-<p>Your account is awaiting admin approval.<br>
-If not approved within 24 hours, contact: <strong>@weedboysavage420 on IG</strong></p>
-<a href="auth.html">Return to Sign In</a>
+  <h1>⏳ Pending Approval</h1>
+  <p>Your account is awaiting admin approval.<br>
+  If not approved within 24 hours, contact: <strong>@weedboysavage420 on IG</strong></p>
+  <a href="auth.html">Return to Sign In</a>
 </div>
 
+<!-- Floating ghosts -->
 <div class="floating" style="left:10%; animation-delay:0s;">👻</div>
 <div class="floating" style="left:30%; animation-delay:2s;">👻</div>
 <div class="floating" style="left:50%; animation-delay:4s;">👻</div>
 <div class="floating" style="left:70%; animation-delay:1s;">👻</div>
 <div class="floating" style="left:90%; animation-delay:3s;">👻</div>
 
+<!-- Floating "Waiting..." text -->
+<div class="waiting" style="left:15%; animation-delay:1s;">Waiting…</div>
+<div class="waiting" style="left:40%; animation-delay:3s;">Waiting…</div>
+<div class="waiting" style="left:65%; animation-delay:2s;">Waiting…</div>
+<div class="waiting" style="left:85%; animation-delay:4s;">Waiting…</div>
+
 <!-- YouTube Video Under Everything -->
-<div class="youtube-video" style="position:fixed;bottom:0;left:0;width:100%;height:300px;opacity:0.85;pointer-events:none;">
-<iframe src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI&modestbranding=1&controls=0&showinfo=0" 
-frameborder="0" allow="autoplay; encrypted-media" allowfullscreen 
-style="width:100%; height:100%; background:transparent;" allowTransparency="true">
-</iframe>
+<div class="youtube-video">
+  <iframe src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI&modestbranding=1&controls=0&rel=0" 
+  frameborder="0" allow="autoplay; encrypted-media" allowfullscreen>
+  </iframe>
 </div>
 
 </body>
