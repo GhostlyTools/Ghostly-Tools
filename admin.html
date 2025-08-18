@@ -2,76 +2,57 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ghostly Admin Panel 👻</title>
+<title>Ghostly Tools 👻 - Admin Panel</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <h1>👻 Ghostly Admin Panel</h1>
-<button onclick="toggleWebsite()">Disable/Enable Website</button>
-<div id="users-container"></div>
+<button id="disableBtn">Disable Website for Updates</button>
+<div id="users"></div>
 
 <script>
 const WEBHOOK_URL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+function sendWebhook(message){ fetch(WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:message})}); }
+
+function getUsers(){ return JSON.parse(localStorage.getItem("users")||"[]"); }
+function saveUsers(users){ localStorage.setItem("users",JSON.stringify(users)); }
 
 function loadUsers(){
-  let users = JSON.parse(localStorage.getItem("ghostlyUsers") || "[]");
-  const container = document.getElementById("users-container");
-  container.innerHTML = "";
-
-  users.forEach(u=>{
+  const container = document.getElementById("users");
+  container.innerHTML="";
+  const users = getUsers();
+  users.forEach(user=>{
     const div = document.createElement("div");
-    div.className = "user-dropdown" + (u.status==="pending"?" pending":"");
-    div.innerHTML = `<h3>${u.username}${u.status==="pending"?'<span class="pending-label"> (Pending)</span>':''}</h3>
+    div.className="user-dropdown";
+    if(user.status==="pending") div.classList.add("pending");
+    div.innerHTML = `<h3>${user.username}${user.status==="pending"?'<span class="pending-label"> Pending</span>':''}</h3>
       <div class="user-dropdown-content">
-        <p>Status: ${u.status}</p>
-        <p>IP: ${u.ip || "Unknown"} | Location: ${u.location || "Unknown"}</p>
-        <button onclick="approve('${u.username}')">✅ Approve</button>
-        <button onclick="deny('${u.username}')">❌ Deny</button>
-        <button onclick="kick('${u.username}')">🛑 Kick</button>
+        <p>Status: ${user.status}</p>
+        <p>IP: ${user.ip||"Unknown"}, Area: ${user.area||"Unknown"}</p>
+        <button onclick="approveUser('${user.username}')">✅ Approve</button>
+        <button onclick="denyUser('${user.username}')">❌ Deny</button>
+        <button onclick="kickUser('${user.username}')">🛑 Kick</button>
       </div>`;
-    div.querySelector("h3").onclick = ()=>div.querySelector(".user-dropdown-content").classList.toggle("open");
+    div.querySelector("h3").onclick=()=>div.querySelector(".user-dropdown-content").classList.toggle("open");
     container.appendChild(div);
   });
 }
 
-async function sendWebhook(content){
-  await fetch(WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json"},body: JSON.stringify({content})});
-}
-
-function approve(username){
-  let users = JSON.parse(localStorage.getItem("ghostlyUsers")||"[]");
+function approveUser(username){
+  let users = getUsers();
   let user = users.find(u=>u.username===username);
-  if(user){user.status="approved";localStorage.setItem("ghostlyUsers",JSON.stringify(users)); loadUsers();
-    sendWebhook(`User Approved: ${username}`);
-  }
+  if(user){ user.status="approved"; saveUsers(users); sendWebhook(`User ${username} approved`); loadUsers(); }
 }
-
-function deny(username){
-  let users = JSON.parse(localStorage.getItem("ghostlyUsers")||"[]");
-  let user = users.find(u=>u.username===username);
-  if(user){user.status="denied";localStorage.setItem("ghostlyUsers",JSON.stringify(users)); loadUsers();
-    sendWebhook(`User Denied: ${username}`);
-  }
-}
-
-function kick(username){
-  let users = JSON.parse(localStorage.getItem("ghostlyUsers")||"[]");
+function denyUser(username){
+  let users = getUsers();
   users = users.filter(u=>u.username!==username);
-  localStorage.setItem("ghostlyUsers",JSON.stringify(users));
-  loadUsers();
-  sendWebhook(`User Kicked: ${username}`);
+  saveUsers(users); sendWebhook(`User ${username} denied`); loadUsers();
+}
+function kickUser(username){
+  alert(`${username} has been kicked from the site.`);
+  sendWebhook(`User ${username} kicked`);
 }
 
-function toggleWebsite(){
-  let disabled = localStorage.getItem("websiteDisabled")==="true";
-  localStorage.setItem("websiteDisabled",!disabled);
-  alert("Website "+(!disabled?"Disabled":"Enabled")+" for updates.");
-  sendWebhook("Website " + (!disabled?"Disabled":"Enabled")+" for updates.");
-}
-
-// Automatically reload users every 5s
-setInterval(loadUsers,5000);
-loadUsers();
-</script>
-</body>
-</html>
+document.getElementById("disableBtn").onclick=function(){
+  localStorage.setItem("siteDisabled","true");
+  alert("Website disabled for updates. Users will see site down message
