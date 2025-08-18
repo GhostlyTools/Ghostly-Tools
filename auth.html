@@ -87,7 +87,7 @@ document.getElementById("signin-form").addEventListener("submit", function(e){
 
   let users = JSON.parse(localStorage.getItem("users") || "[]");
 
-  // Check if admin login
+  // Check admin login
   if(username === "Ghostly" && password === "Dare2995!"){
     localStorage.setItem("signedInUser", username);
     fetch(webhookURL,{
@@ -114,6 +114,7 @@ document.getElementById("signin-form").addEventListener("submit", function(e){
     return;
   }
 
+  // Approved user → index.html (downloads)
   localStorage.setItem("signedInUser", user.username);
   fetch(webhookURL,{
     method:"POST",
@@ -121,7 +122,7 @@ document.getElementById("signin-form").addEventListener("submit", function(e){
     body: JSON.stringify({content:`💀 User ${username} signed in`})
   });
   alert("✅ Signed in successfully!");
-  window.location.href = "downloads.html";
+  window.location.href = "index.html";
 });
 </script>
 </body>
