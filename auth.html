@@ -2,15 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<audio id="bgMusic" src="" autoplay loop></audio>
+<audio id="bgMusic" src="https://www.youtube.com/watch?v=a07qXFXjEDI" autoplay loop></audio>
+
+<!-- Music Controls -->
+<div id="musicBar">
+  <button onclick="rewindMusic()" class="music-btn">⏮️</button>
+  <button onclick="playMusic()" class="music-btn">▶️</button>
+  <button onclick="pauseMusic()" class="music-btn">⏸️</button>
+  <button onclick="forwardMusic()" class="music-btn">⏭️</button>
+  <button onclick="resumeMusic()" class="music-btn">⏯️</button>
+  <div id="progressContainer"><div id="progressBar"></div></div>
+</div>
+
 <div class="login-container">
 <h1>Ghostly Tools 👻</h1>
-<form id="signin-form">
+<form id="login-form">
 <input type="text" id="username" placeholder="Username" required>
 <input type="password" id="password" placeholder="Password" required>
 <button type="submit">Sign In</button>
@@ -18,37 +28,25 @@
 <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 </div>
 
-<!-- Music Controls -->
-<div class="music-controls">
-<button onclick="playMusic()">▶️ Play</button>
-<button onclick="pauseMusic()">⏸️ Pause</button>
-<button onclick="rewindMusic()">⏮️ Rewind</button>
-<button onclick="forwardMusic()">⏭️ Forward</button>
-<button onclick="resumeMusic()">⏯️ Resume</button>
-</div>
-
 <script>
-const musicLink = "https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1";
-let bgMusic = document.getElementById("bgMusic");
-bgMusic.src = musicLink;
+const bgMusic = document.getElementById("bgMusic");
+const progressBar = document.getElementById("progressBar");
+bgMusic.ontimeupdate = ()=> { if(bgMusic.duration) progressBar.style.width = (bgMusic.currentTime/bgMusic.duration*100)+"%"; }
+function playMusic(){bgMusic.play();} function pauseMusic(){bgMusic.pause();}
+function resumeMusic(){bgMusic.play();} function forwardMusic(){bgMusic.currentTime+=10;}
+function rewindMusic(){bgMusic.currentTime-=10;}
 
-function playMusic(){ bgMusic.play(); }
-function pauseMusic(){ bgMusic.pause(); }
-function rewindMusic(){ bgMusic.currentTime = Math.max(0, bgMusic.currentTime - 10); }
-function forwardMusic(){ bgMusic.currentTime += 10; }
-function resumeMusic(){ bgMusic.play(); }
-
-document.getElementById("signin-form").addEventListener("submit", e=>{
+document.getElementById("login-form").addEventListener("submit", function(e){
   e.preventDefault();
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-  let users = JSON.parse(localStorage.getItem("users")||"[]");
-  let user = users.find(u=>u.username===username && u.password===password);
-  if(user){
-    if(user.status!=="approved"){ window.location="pending.html"; return; }
-    localStorage.setItem("signedInUser", username);
-    if(username==="Ghostly" && password==="Dare2995!"){ window.location="admin.html"; return; }
+  const username=document.getElementById("username").value;
+  const password=document.getElementById("password").value;
+  let users=JSON.parse(localStorage.getItem("users")||"[]");
+  const user=users.find(u=>u.username===username && u.password===password);
+  if(user && user.status==="approved"){
+    localStorage.setItem("signedInUser",username);
     window.location="index.html";
+  } else if(user && user.status==="pending") {
+    window.location="pending.html";
   } else { alert("Invalid credentials"); }
 });
 </script>
