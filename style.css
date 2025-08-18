@@ -7,58 +7,80 @@ body {
   background-size: cover;
 }
 
-.login-container, .admin-container, .haunted-box, .pending-box {
+.login-container, .admin-container, .pending-box {
   background: rgba(0,0,0,0.7);
-  padding: 20px;
-  border-radius: 10px;
+  padding: 25px;
+  border-radius: 15px;
   text-align: center;
   margin: 20px auto;
   max-width: 600px;
-  box-shadow: 0 0 25px red;
+  box-shadow: 0 0 35px red;
+}
+
+h1, h2, h3, p, label {
+  color: #ff0000;
+  text-shadow: 0 0 10px #ff0000, 0 0 20px darkred, 0 0 30px red;
+  font-weight: bold;
 }
 
 input, button {
   display: block;
   width: 90%;
-  margin: 10px auto;
-  padding: 10px;
-  border-radius: 5px;
+  margin: 12px auto;
+  padding: 12px;
+  border-radius: 6px;
   border: none;
+  font-family: "Creepster", cursive;
+  font-weight: bold;
 }
 
 button {
-  background: red;
+  background: darkred;
   color: #fff;
   cursor: pointer;
-  font-weight: bold;
   transition: 0.3s;
+  text-shadow: 0 0 5px #ff0000;
 }
 
-button:hover { background: darkred; }
+button:hover {
+  background: black;
+  color: red;
+  box-shadow: 0 0 15px red, 0 0 30px darkred;
+  transform: scale(1.05);
+}
 
 a {
-  color: #f55;
+  color: #ff5555;
   text-decoration: none;
+  text-shadow: 0 0 5px red;
 }
 
-a:hover { text-decoration: underline; }
+a:hover {
+  text-decoration: underline;
+  color: #ff0000;
+}
 
+/* User dropdown scary style */
 .user-dropdown {
   background: rgba(0,0,0,0.8);
   border: 2px solid red;
-  border-radius: 10px;
+  border-radius: 12px;
   margin: 10px auto;
-  max-width: 300px;
+  max-width: 320px;
   cursor: pointer;
-  box-shadow: 0 0 15px red;
+  box-shadow: 0 0 25px red;
   transition: all 0.3s;
+  font-family: "Creepster", cursive;
 }
 
-.user-dropdown.pending { border: 2px dashed red; animation: pendingFlicker 1.5s infinite; }
+.user-dropdown.pending {
+  border: 2px dashed red;
+  animation: pendingFlicker 1.5s infinite;
+}
 
 .user-dropdown h3 {
   margin: 10px;
-  text-shadow: 0 0 10px red;
+  text-shadow: 0 0 10px red, 0 0 20px darkred, 0 0 30px crimson;
 }
 
 .user-dropdown-content {
@@ -75,29 +97,40 @@ a:hover { text-decoration: underline; }
 
 .user-dropdown-content.open { display: block; max-height: 200px; padding: 10px; }
 
-.user-dropdown-content p { margin: 5px 0; font-size: 0.9em; }
-
-.user-dropdown-content button { margin: 5px 3px; width: 80px; font-weight: bold; }
-
-.pending-label { color: red; font-weight: bold; margin-left: 10px; animation: pulseRed 1.2s infinite; }
-
-@keyframes hauntedFlicker { 0%,19%,21%,23%,25%,54%,56%,100% { box-shadow: 0 0 15px red; } 20%,24%,55% { box-shadow: 0 0 5px darkred; } }
-
-@keyframes pendingFlicker { 0%,50%,100% { box-shadow: 0 0 10px red; } 25%,75% { box-shadow: 0 0 20px darkred; } }
-
-@keyframes pulseRed { 0%,100% { opacity: 1; text-shadow:0 0 5px red;} 50% { opacity:0.6; text-shadow:0 0 20px darkred;} }
-
-.floating {
-  position: absolute;
-  font-size: 2rem;
-  color: rgba(255, 0, 0, 0.7);
-  animation: float 12s linear infinite;
-  pointer-events: none;
+.user-dropdown-content p {
+  margin: 5px 0;
+  font-size: 0.9em;
+  text-shadow: 0 0 10px red, 0 0 20px darkred;
 }
 
-@keyframes float {
-  0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity:0; }
-  10% { opacity:1; }
-  50% { transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.7; }
-  100% { transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0; }
+.user-dropdown-content button {
+  margin: 5px 3px;
+  width: 80px;
+  font-weight: bold;
+  background: crimson;
+  color: #fff;
+  text-shadow: 0 0 5px darkred;
+}
+
+.pending-label {
+  color: red;
+  font-weight: bold;
+  margin-left: 10px;
+  animation: pulseRed 1.2s infinite;
+}
+
+/* Flicker animations for scary glow */
+@keyframes hauntedFlicker {
+  0%,19%,21%,23%,25%,54%,56%,100% { box-shadow: 0 0 20px red; }
+  20%,24%,55% { box-shadow: 0 0 5px darkred; }
+}
+
+@keyframes pendingFlicker {
+  0%,50%,100% { box-shadow: 0 0 10px red; }
+  25%,75% { box-shadow: 0 0 25px darkred; }
+}
+
+@keyframes pulseRed {
+  0%,100% { opacity: 1; text-shadow:0 0 10px red; }
+  50% { opacity:0.6; text-shadow:0 0 25px darkred; }
 }
