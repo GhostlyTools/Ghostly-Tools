@@ -1,79 +1,99 @@
-/* Base styles */
+/* Body background + text */
 body {
-  margin:0; padding:0;
-  font-family:"Creepster", cursive;
-  color:#fff;
-  background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-  background-size:cover;
-  display:flex; justify-content:center; align-items:center; height:100vh;
+  margin: 0;
+  padding: 0;
+  font-family: "Creepster", cursive;
+  color: #fff;
+  background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: relative;
 }
 
+/* Dark overlay to enhance glow */
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 0;
+}
+
+/* Login/Signup container with heartbeat glow */
 .login-container {
-  background: rgba(0,0,0,0.85);
-  padding:30px;
-  border-radius:15px;
-  box-shadow:0 0 25px red;
-  text-align:center;
-  width:300px;
-  animation: flickerRandom 1.5s infinite;
+  position: relative;
+  z-index: 1;
+  background: rgba(0, 0, 0, 0.85); /* dark box */
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 0 25px red; /* initial red glow */
+  animation: heartbeatGlow 1.5s ease-in-out infinite, flicker 0.2s infinite;
 }
 
+/* Title */
 .login-container h1 {
-  margin-bottom:20px;
-  animation: flickerRandom 1.3s infinite;
+  margin-bottom: 20px;
+  text-shadow: 0 0 15px red;
 }
 
-.login-container input,
+/* Input fields (stable) */
+.login-container input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  background: #222;
+  color: #fff;
+  outline: none;
+}
+
+/* Button (stable) */
 .login-container button {
-  width:100%;
-  padding:10px;
-  margin:10px 0;
-  border:none;
-  border-radius:5px;
-  animation: flickerRandom 1.2s infinite;
+  width: 100%;
+  padding: 10px;
+  background: red;
+  border: none;
+  color: white;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
 }
-
-.login-container button {
-  background:red;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-
 .login-container button:hover {
-  background:#ff0000cc;
+  background: #ff0000cc;
 }
 
+/* Links (stable) */
 .login-container p {
-  margin-top:10px;
-  font-size:0.9em;
-  animation: flickerRandom 1.4s infinite;
+  margin-top: 10px;
+  font-size: 0.9em;
 }
-
 .login-container a {
-  color:red;
-  text-decoration:none;
+  color: red;
+  text-decoration: none;
 }
-
 .login-container a:hover {
-  text-decoration:underline;
+  text-decoration: underline;
 }
 
-/* Random flicker animation */
-@keyframes flickerRandom {
-  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 5px red, 0 0 10px crimson;
-    box-shadow: 0 0 25px red;
-  }
-  20%, 22%, 24%, 55% {
-    opacity: 0.7;
-    text-shadow: 0 0 2px red, 0 0 5px crimson;
-    box-shadow: 0 0 8px red inset;
-  }
-  30%, 40%, 60%, 70% {
-    opacity: 0.85;
-    text-shadow: 0 0 4px red, 0 0 8px crimson;
-    box-shadow: 0 0 15px red;
-  }
+/* Heartbeat pulse effect */
+@keyframes heartbeatGlow {
+  0%, 100% { box-shadow: 0 0 15px red; }
+  25%      { box-shadow: 0 0 50px red; }
+  50%      { box-shadow: 0 0 20px red; }
+  75%      { box-shadow: 0 0 40px red; }
+}
+
+/* Subtle flicker effect */
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.95; }
 }
