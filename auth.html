@@ -5,57 +5,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
 <link rel="stylesheet" href="style.css">
-<style>
-body{margin:0;padding:0;font-family:"Creepster",cursive;color:#fff;background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;background-size:cover;}
-.login-container{width:360px;margin:80px auto;padding:20px;background:rgba(0,0,0,0.7);border-radius:10px;text-align:center;box-shadow:0 0 20px red;}
-.login-container h1{margin-bottom:20px;text-shadow:0 0 15px red;}
-.login-container input{width:80%;padding:10px;margin:8px 0;border-radius:5px;border:none;}
-.login-container button{padding:10px 20px;background:red;color:white;border:none;border-radius:5px;font-weight:bold;cursor:pointer;}
-.login-container button:hover{background:darkred;}
-</style>
 </head>
 <body>
+<audio id="bgMusic" autoplay loop></audio>
 <div class="login-container">
 <h1>Ghostly Tools 👻</h1>
-<form id="login-form">
+<form id="signin-form">
 <input type="text" id="username" placeholder="Username" required>
 <input type="password" id="password" placeholder="Password" required>
 <button type="submit">Sign In</button>
 </form>
 <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
-</div>
 
-<audio id="bgMusic" src="https://www.youtube.com/watch?v=a07qXFXjEDI" autoplay loop></audio>
-<div id="musicBar">
-  <button onclick="rewindMusic()" class="music-btn">⏮️</button>
-  <button onclick="playMusic()" class="music-btn">▶️</button>
-  <button onclick="pauseMusic()" class="music-btn">⏸️</button>
-  <button onclick="forwardMusic()" class="music-btn">⏭️</button>
-  <button onclick="resumeMusic()" class="music-btn">⏯️</button>
-  <div id="progressContainer"><div id="progressBar"></div></div>
+<div class="music-controls">
+<button onclick="playMusic()">▶️</button>
+<button onclick="pauseMusic()">⏸️</button>
+<button onclick="rewindMusic()">⏪</button>
+<button onclick="forwardMusic()">⏩</button>
+</div>
 </div>
 
 <script>
-document.getElementById("login-form").addEventListener("submit",function(e){
-  e.preventDefault();
-  const username=document.getElementById("username").value;
-  const password=document.getElementById("password").value;
-  let users=JSON.parse(localStorage.getItem("users")||"[]");
-  let user=users.find(u=>u.username===username&&u.password===password);
-  if(!user){alert("Invalid credentials");return;}
-  localStorage.setItem("signedInUser",user.username);
-  if(user.status==="pending"){location.href="pending.html";}else{location.href="index.html";}
-});
+const music = document.getElementById('bgMusic');
+music.src = "https://www.youtube.com/watch?v=a07qXFXjEDI";
 
-// Music
-const bgMusic=document.getElementById("bgMusic");
-const progressBar=document.getElementById("progressBar");
-bgMusic.ontimeupdate=()=>{if(bgMusic.duration) progressBar.style.width=(bgMusic.currentTime/bgMusic.duration*100)+"%";}
-function playMusic(){bgMusic.play();}
-function pauseMusic(){bgMusic.pause();}
-function resumeMusic(){bgMusic.play();}
-function forwardMusic(){bgMusic.currentTime+=10;}
-function rewindMusic(){bgMusic.currentTime-=10;}
+function playMusic(){ music.play(); }
+function pauseMusic(){ music.pause(); }
+function rewindMusic(){ music.currentTime = Math.max(0, music.currentTime-10); }
+function forwardMusic(){ music.currentTime += 10; }
+
+const users = JSON.parse(localStorage.getItem('users')||"[]");
+
+document.getElementById("signin-form").addEventListener("submit", function(e){
+    e.preventDefault();
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+    const user = users.find(u=>u.username===username && u.password===password);
+
+    if(!user){
+        alert("Invalid credentials");
+        return;
+    }
+    localStorage.setItem("signedInUser", username);
+
+    if(user.status==="pending"){
+        window.location.href="pending.html";
+    } else {
+        window.location.href="index.html";
+    }
+});
 </script>
 </body>
 </html>
