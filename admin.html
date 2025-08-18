@@ -46,9 +46,10 @@ h1 { text-shadow:0 0 15px red; }
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+let users = [];
 let websiteDisabled = false;
 
-// Send message to Discord webhook
+// Send admin actions to Discord
 function sendWebhook(message) {
   fetch(webhookURL, {
     method:"POST",
@@ -57,30 +58,32 @@ function sendWebhook(message) {
   });
 }
 
-// Get users from localStorage
-function getUsers() {
-  return JSON.parse(localStorage.getItem("ghostlyUsers") || "[]");
+// Fetch real users from your server
+async function fetchUsers() {
+  try {
+    const res = await fetch("/get-users"); // your backend endpoint
+    const data = await res.json();
+    users = data; // replace existing list
+    renderUsersSlow();
+  } catch(e) {
+    console.error("Failed to fetch users:", e);
+  }
 }
 
-// Save users to localStorage
-function saveUsers(users) {
-  localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-}
-
-// Slow-render all users into dropdowns
+// Slowly render users into the admin panel
 function renderUsersSlow() {
   const container = document.getElementById("users");
   container.innerHTML="";
-  const users = getUsers();
   let delay = 0;
-  users.forEach(u=>{
+
+  users.forEach(u => {
     setTimeout(()=>{
       const dropdown = document.createElement("div");
       dropdown.className="user-dropdown";
       if(u.status==="pending") dropdown.classList.add("pending");
 
       const h3 = document.createElement("h3");
-      h3.textContent=u.username;
+      h3.textContent = u.username;
       if(u.status==="pending"){
         const label = document.createElement("span");
         label.textContent=" (Pending)";
@@ -99,41 +102,26 @@ function renderUsersSlow() {
         <button onclick="kickUser('${u.username}')">💀 Kick</button>
       `;
       h3.onclick = ()=>content.classList.toggle("open");
+
       dropdown.appendChild(h3);
       dropdown.appendChild(content);
       container.appendChild(dropdown);
     }, delay);
-    delay += 150;
+    delay += 100; // slow each user in
   });
 }
 
-// Approve, deny, kick functions
+// Admin actions
 function approveUser(username){
-  const users = getUsers();
   const user = users.find(u=>u.username===username);
-  if(user){ 
-    user.status="approved"; 
-    saveUsers(users); 
-    renderUsersSlow(); 
-    sendWebhook(`✅ ${username} approved by admin`);
-  }
+  if(user){ user.status="approved"; renderUsersSlow(); sendWebhook(`✅ ${username} approved by admin`);}
 }
-
 function denyUser(username){
-  const users = getUsers();
   const user = users.find(u=>u.username===username);
-  if(user){ 
-    user.status="denied"; 
-    saveUsers(users); 
-    renderUsersSlow(); 
-    sendWebhook(`❌ ${username} denied by admin`);
-  }
+  if(user){ user.status="denied"; renderUsersSlow(); sendWebhook(`❌ ${username} denied by admin`);}
 }
-
 function kickUser(username){
-  let users = getUsers();
   users = users.filter(u=>u.username!==username);
-  saveUsers(users);
   renderUsersSlow();
   sendWebhook(`💀 ${username} kicked by admin`);
 }
@@ -150,11 +138,11 @@ document.getElementById("disableToggle").onclick = ()=>{
   }
 }
 
-// Auto-update users every 5 seconds to show new signups
-setInterval(renderUsersSlow, 5000);
+// Auto-refresh users every 5 seconds
+setInterval(fetchUsers, 5000);
 
-// Initial render
-renderUsersSlow();
+// Initial load
+fetchUsers();
 </script>
 </body>
 </html>
