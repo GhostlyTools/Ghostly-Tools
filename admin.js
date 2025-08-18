@@ -1,74 +1,96 @@
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+// ---- admin.js ----
+const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-// Admin credentials
-const ADMIN_USERNAME = "Ghostly";
-const ADMIN_PASSWORD = "Dare2995!";
+// Load users from localStorage
+let users = JSON.parse(localStorage.getItem("users")) || [];
 
-document.getElementById('admin-login').addEventListener('click', ()=>{
-    const username = document.getElementById('admin-username').value.trim();
-    const password = document.getElementById('admin-password').value.trim();
+// Container for users
+const container = document.getElementById("users");
 
-    if(username === ADMIN_USERNAME && password === ADMIN_PASSWORD){
-        document.getElementById('admin-username').style.display = 'none';
-        document.getElementById('admin-password').style.display = 'none';
-        document.getElementById('admin-login').style.display = 'none';
-        document.getElementById('user-list').style.display = 'block';
-        loadUsers();
-    } else {
-        showPopup("Incorrect username or password.");
+// Flag for site disabled
+let siteDisabled = JSON.parse(localStorage.getItem("siteDisabled")) || false;
+
+// Display users
+function displayUsers() {
+  container.innerHTML = "";
+
+  users.forEach(user => {
+    const div = document.createElement("div");
+    div.className = "user-dropdown";
+    if(user.status === "pending") div.classList.add("pending");
+
+    const header = document.createElement("h3");
+    header.textContent = user.username;
+    if(user.status === "pending"){
+      const pendingLabel = document.createElement("span");
+      pendingLabel.textContent = " (Pending)";
+      pendingLabel.className = "pending-label";
+      header.appendChild(pendingLabel);
     }
+    div.appendChild(header);
+
+    const content = document.createElement("div");
+    content.className = "user-dropdown-content";
+    content.innerHTML = `
+      <p>Status: ${user.status}</p>
+      <p>IP: ${user.ip}</p>
+      <p>Area: ${user.area}</p>
+      <button onclick="approveUser('${user.username}')">✅ Approve</button>
+      <button onclick="denyUser('${user.username}')">❌ Deny</button>
+      <button onclick="kickUser('${user.username}')">🦵 Kick</button>
+    `;
+    div.appendChild(content);
+
+    header.onclick = () => content.classList.toggle("open");
+    container.appendChild(div);
+  });
+}
+
+// Approve user
+function approveUser(username){
+  const user = users.find(u => u.username === username);
+  if(user) user.status = "approved";
+  localStorage.setItem("users", JSON.stringify(users));
+  sendWebhook(`${username} approved by admin`);
+  displayUsers();
+}
+
+// Deny user
+function denyUser(username){
+  const user = users.find(u => u.username === username);
+  if(user) user.status = "denied";
+  localStorage.setItem("users", JSON.stringify(users));
+  sendWebhook(`${username} denied by admin`);
+  displayUsers();
+}
+
+// Kick user (removes from localStorage)
+function kickUser(username){
+  users = users.filter(u => u.username !== username);
+  localStorage.setItem("users", JSON.stringify(users));
+  sendWebhook(`${username} kicked by admin`);
+  displayUsers();
+}
+
+// Disable website
+document.getElementById("disableSiteBtn")?.addEventListener("click", () => {
+  siteDisabled = !siteDisabled;
+  localStorage.setItem("siteDisabled", JSON.stringify(siteDisabled));
+  alert(siteDisabled ? "Website is now DISABLED" : "Website ENABLED");
+  sendWebhook(`Website ${siteDisabled ? "disabled" : "enabled"} by admin`);
 });
 
-function loadUsers(){
-    const users = JSON.parse(localStorage.getItem('ghostlyUsers')) || {};
-    const ul = document.getElementById('users-ul');
-    ul.innerHTML = '';
-    for(let username in users){
-        const li = document.createElement('li');
-        li.innerText = username + ' ';
-        
-        if(!users[username].approved){
-            const approveBtn = document.createElement('button');
-            approveBtn.innerText = 'Approve';
-            approveBtn.addEventListener('click', ()=>{
-                users[username].approved = true;
-                localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-                sendDiscord("Approved User", username);
-                showPopup(User ${username} approved.);
-                li.remove();
-            });
-            li.style.marginBottom='5px';
-            li.appendChild(approveBtn);
-        }
-
-        const kickBtn = document.createElement('button');
-        kickBtn.innerText = 'Kick';
-        kickBtn.style.marginLeft = '5px';
-        kickBtn.addEventListener('click', ()=>{
-            confirmKick(username, ()=>{
-                delete users[username];
-                localStorage.setItem('ghostlyUsers', JSON.stringify(users));
-                sendDiscord("Kicked User", username);
-                showPopup(User ${username} kicked.);
-                li.remove();
-            });
-        });
-        li.appendChild(kickBtn);
-        ul.appendChild(li);
-    }
+// Webhook function
+function sendWebhook(message){
+  fetch(webhookURL, {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({content: message})
+  });
 }
 
-// Confirm kick with popup
-function confirmKick(username, callback){
-    showPopup(Are you sure you want to kick ${username}?);
-    const btn = document.querySelector('#popup .popup-content button');
-    btn.onclick = () => { closePopup(); callback(); };
-}
+// Initial load
+displayUsers();
 
-function sendDiscord(type, username){
-    fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({content:`${type}: ${username}`})
-    }).catch(err => console.log(err));
-}
+// Auto-refresh every 5 seconds
+setInterval(displayUsers, 5000);
