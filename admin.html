@@ -6,42 +6,72 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="admin-container">
 <h1>👻 Ghostly Admin Panel</h1>
-<button onclick="toggleWebsite()">Toggle Website On/Off</button>
-<div id="users"></div>
-</div>
+<button onclick="toggleWebsite()">Disable/Enable Website</button>
+<div id="users-container"></div>
 
 <script>
-async function loadUsers(){
-    const res = await fetch("/users");
-    const users = await res.json();
-    const container = document.getElementById("users");
-    container.innerHTML = "";
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-    users.forEach(u=>{
-        const div = document.createElement("div");
-        div.className="user-dropdown"+(u.status==="pending"?" pending":"");
-        div.innerHTML=`<h3>${u.username} ${u.status==="pending"?'<span class="pending-label">Pending</span>':''}</h3>
-        <div class="user-dropdown-content open">
+function loadUsers(){
+  let users = JSON.parse(localStorage.getItem("ghostlyUsers") || "[]");
+  const container = document.getElementById("users-container");
+  container.innerHTML = "";
+
+  users.forEach(u=>{
+    const div = document.createElement("div");
+    div.className = "user-dropdown" + (u.status==="pending"?" pending":"");
+    div.innerHTML = `<h3>${u.username}${u.status==="pending"?'<span class="pending-label"> (Pending)</span>':''}</h3>
+      <div class="user-dropdown-content">
         <p>Status: ${u.status}</p>
-        <p>IP: ${u.ip}</p>
-        <p>Area: ${u.area}</p>
+        <p>IP: ${u.ip || "Unknown"} | Location: ${u.location || "Unknown"}</p>
         <button onclick="approve('${u.username}')">✅ Approve</button>
         <button onclick="deny('${u.username}')">❌ Deny</button>
-        <button onclick="kick('${u.username}')">⚡ Kick</button>
-        </div>`;
-        container.appendChild(div);
-    });
+        <button onclick="kick('${u.username}')">🛑 Kick</button>
+      </div>`;
+    div.querySelector("h3").onclick = ()=>div.querySelector(".user-dropdown-content").classList.toggle("open");
+    container.appendChild(div);
+  });
 }
 
-async function approve(username){ await fetch("/approve",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})}); loadUsers(); }
-async function deny(username){ await fetch("/deny",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})}); loadUsers(); }
-async function kick(username){ await fetch("/kick",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})}); loadUsers(); }
-async function toggleWebsite(){ await fetch("/toggle-website",{method:"POST"}); alert("Toggled website on/off"); }
+async function sendWebhook(content){
+  await fetch(WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json"},body: JSON.stringify({content})});
+}
 
-loadUsers();
+function approve(username){
+  let users = JSON.parse(localStorage.getItem("ghostlyUsers")||"[]");
+  let user = users.find(u=>u.username===username);
+  if(user){user.status="approved";localStorage.setItem("ghostlyUsers",JSON.stringify(users)); loadUsers();
+    sendWebhook(`User Approved: ${username}`);
+  }
+}
+
+function deny(username){
+  let users = JSON.parse(localStorage.getItem("ghostlyUsers")||"[]");
+  let user = users.find(u=>u.username===username);
+  if(user){user.status="denied";localStorage.setItem("ghostlyUsers",JSON.stringify(users)); loadUsers();
+    sendWebhook(`User Denied: ${username}`);
+  }
+}
+
+function kick(username){
+  let users = JSON.parse(localStorage.getItem("ghostlyUsers")||"[]");
+  users = users.filter(u=>u.username!==username);
+  localStorage.setItem("ghostlyUsers",JSON.stringify(users));
+  loadUsers();
+  sendWebhook(`User Kicked: ${username}`);
+}
+
+function toggleWebsite(){
+  let disabled = localStorage.getItem("websiteDisabled")==="true";
+  localStorage.setItem("websiteDisabled",!disabled);
+  alert("Website "+(!disabled?"Disabled":"Enabled")+" for updates.");
+  sendWebhook("Website " + (!disabled?"Disabled":"Enabled")+" for updates.");
+}
+
+// Automatically reload users every 5s
 setInterval(loadUsers,5000);
+loadUsers();
 </script>
 </body>
 </html>
