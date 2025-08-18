@@ -4,46 +4,108 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Admin</title>
-<link rel="stylesheet" href="style.css">
 <style>
-body {margin:0; padding:0; font-family:"Creepster", cursive; color:#fff;
-background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-background-size:cover;}
-.admin-container {background: rgba(0,0,0,0.7); padding:20px; border-radius:10px; text-align:center; margin:20px auto; max-width:800px; box-shadow:0 0 25px red;}
+/* Body background + text */
+body {
+  margin:0; padding:0; font-family:"Creepster", cursive; color:#fff;
+  background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
+  background-size:cover; position:relative;
+}
+
+/* Dark overlay for contrast */
+body::before {
+  content:"";
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.3);
+  z-index:0; pointer-events:none;
+}
+
+/* Admin container - static, no heartbeat */
+.admin-container {
+  position:relative; z-index:1;
+  background: rgba(0,0,0,0.85);
+  padding:30px; border-radius:15px;
+  text-align:center; margin:20px auto;
+  max-width:800px; box-shadow:0 0 25px red;
+}
+
+/* Titles */
 h1 { text-shadow:0 0 15px red; }
-.user-dropdown { background: rgba(0,0,0,0.8); border: 2px solid red; border-radius:10px; margin:10px auto; max-width:400px; cursor:pointer; box-shadow:0 0 15px red; transition:all 0.3s; max-height:400px; overflow-y:auto;}
-.user-dropdown h3 { margin:10px; text-shadow:0 0 10px red; }
-.user-dropdown-content { display:none; background: rgba(0,0,0,0.9); padding:10px; border-top:1px solid red; text-align:center; max-height:0; overflow:hidden; transition:max-height 0.5s ease, padding 0.5s ease;}
-.user-dropdown-content.open { display:block; max-height:200px; padding:10px; }
+
+/* Disable button */
+#disableToggle {
+  margin:20px; padding:10px 20px; font-weight:bold;
+  background:red; border:none; color:white; cursor:pointer;
+}
+#disableToggle:hover { background:#ff0000cc; }
+
+/* User dropdown */
+.user-dropdown {
+  background: rgba(0,0,0,0.8);
+  border: 2px solid red; border-radius:10px;
+  margin:10px auto; max-width:400px;
+  cursor:pointer; box-shadow:0 0 15px red;
+  transition:all 0.3s;
+  overflow:hidden;
+}
+.user-dropdown h3 {
+  margin:10px; text-shadow:0 0 10px red;
+  user-select:none;
+  display:flex; justify-content:space-between; align-items:center;
+}
+
+/* Dropdown content */
+.user-dropdown-content {
+  max-height:0; overflow:hidden;
+  background: rgba(0,0,0,0.9);
+  transition: max-height 0.5s ease, padding 0.5s ease;
+  padding:0 10px;
+  text-align:center;
+}
+.user-dropdown-content.open {
+  max-height:250px;
+  padding:10px;
+}
 .user-dropdown-content p { margin:5px 0; font-size:0.9em; }
-.user-dropdown-content button { margin:5px 3px; width:80px; font-weight:bold; }
+.user-dropdown-content button { margin:5px 3px; width:80px; font-weight:bold; cursor:pointer; }
+
+/* Pending label */
 .pending-label { color:red; font-weight:bold; margin-left:10px; animation:pulseRed 1.2s infinite; }
-#disableToggle { margin:20px; padding:10px 20px; font-weight:bold; background:red; border:none; color:white; cursor:pointer; }
-@keyframes pulseRed {0%,100%{opacity:1;text-shadow:0 0 5px red;}50%{opacity:0.6;text-shadow:0 0 20px darkred;}}
+@keyframes pulseRed { 0%,100%{opacity:1;text-shadow:0 0 5px red;}50%{opacity:0.6;text-shadow:0 0 20px darkred;} }
+
 </style>
 </head>
 <body>
+
 <div class="admin-container">
-<h1>👻 Ghostly Admin Panel</h1>
-<button id="disableToggle">Disable Website</button>
-<div id="users"></div>
+  <h1>👻 Ghostly Admin Panel</h1>
+  <button id="disableToggle">Disable Website</button>
+  <div id="users"></div>
 </div>
 
 <script>
+// Webhook URL
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 let users = JSON.parse(localStorage.getItem("users")||"[]");
 let websiteDisabled = false;
 
+// Send webhook
 function sendWebhook(message){
-  fetch(webhookURL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:message})});
+  fetch(webhookURL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({content:message})
+  });
 }
 
+// Render user dropdowns
 function renderUsers(){
   const container = document.getElementById("users");
   container.innerHTML="";
   users.forEach(u=>{
     const dropdown = document.createElement("div");
     dropdown.className="user-dropdown";
+
     const h3 = document.createElement("h3");
     h3.textContent = u.username;
     if(u.status==="pending"){ 
@@ -52,6 +114,7 @@ function renderUsers(){
       label.className="pending-label";
       h3.appendChild(label);
     }
+
     const content = document.createElement("div");
     content.className="user-dropdown-content";
     content.innerHTML = `
@@ -62,24 +125,47 @@ function renderUsers(){
       <button onclick="denyUser('${u.username}')">❌ Deny</button>
       <button onclick="kickUser('${u.username}')">💀 Kick</button>
     `;
-    h3.onclick = ()=>content.classList.toggle("open");
+
+    // Toggle dropdown
+    h3.addEventListener("click", ()=> content.classList.toggle("open"));
+
     dropdown.appendChild(h3);
     dropdown.appendChild(content);
     container.appendChild(dropdown);
   });
 }
 
-function approveUser(username){const user=users.find(u=>u.username===username);if(user){user.status="approved"; localStorage.setItem("users",JSON.stringify(users)); renderUsers(); sendWebhook(`✅ ${username} approved by admin`);}}
-function denyUser(username){const user=users.find(u=>u.username===username);if(user){user.status="denied"; localStorage.setItem("users",JSON.stringify(users)); renderUsers(); sendWebhook(`❌ ${username} denied by admin`);}}
-function kickUser(username){users=users.filter(u=>u.username!==username);localStorage.setItem("users",JSON.stringify(users)); renderUsers(); sendWebhook(`💀 ${username} kicked by admin`);}
-
-document.getElementById("disableToggle").onclick = ()=>{
-  websiteDisabled = !websiteDisabled;
-  if(websiteDisabled){alert("Website is now disabled for updates.");sendWebhook("⚠️ Website disabled by admin for updates.");}
-  else{alert("Website is now enabled.");sendWebhook("✅ Website re-enabled by admin.");}
+// User actions
+function approveUser(username){
+  const user = users.find(u=>u.username===username);
+  if(user){ user.status="approved"; localStorage.setItem("users",JSON.stringify(users)); renderUsers(); sendWebhook(`✅ ${username} approved by admin`); }
+}
+function denyUser(username){
+  const user = users.find(u=>u.username===username);
+  if(user){ user.status="denied"; localStorage.setItem("users",JSON.stringify(users)); renderUsers(); sendWebhook(`❌ ${username} denied by admin`); }
+}
+function kickUser(username){
+  users = users.filter(u=>u.username!==username);
+  localStorage.setItem("users",JSON.stringify(users));
+  renderUsers();
+  sendWebhook(`💀 ${username} kicked by admin`);
 }
 
+// Disable/Enable website
+document.getElementById("disableToggle").onclick = ()=>{
+  websiteDisabled = !websiteDisabled;
+  if(websiteDisabled){
+    alert("Website is now disabled for updates.");
+    sendWebhook("⚠️ Website disabled by admin for updates.");
+  } else {
+    alert("Website is now enabled.");
+    sendWebhook("✅ Website re-enabled by admin.");
+  }
+}
+
+// Initial render
 renderUsers();
 </script>
+
 </body>
 </html>
