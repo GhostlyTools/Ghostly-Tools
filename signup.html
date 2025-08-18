@@ -2,13 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign Up</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="login-container">
-<h1>Ghostly Tools 👻 - Sign Up</h1>
+<div class="haunted-box">
+<h1>Ghostly Tools 👻</h1>
 <form id="signup-form">
 <input type="text" id="username" placeholder="Username" required>
 <input type="password" id="password" placeholder="Password" required>
@@ -20,33 +19,25 @@
 <script>
 const WEBHOOK_URL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-document.getElementById("signup-form").addEventListener("submit", async function(e){
-  e.preventDefault();
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
+function sendWebhook(message){
+  fetch(WEBHOOK_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:message})});
+}
 
-  let users = JSON.parse(localStorage.getItem("ghostlyUsers") || "[]");
-  if(users.find(u => u.username === username)){
-    alert("Username already exists");
+document.getElementById("signup-form").addEventListener("submit",function(e){
+  e.preventDefault();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  let users = JSON.parse(localStorage.getItem("users")||"[]");
+  if(users.find(u=>u.username===username)){
+    alert("Username already exists!");
     return;
   }
-
-  const newUser = { username, password, status: "pending" };
-  users.push(newUser);
-  localStorage.setItem("ghostlyUsers", JSON.stringify(users));
-
-  // Send Discord webhook for new signup
-  const ipData = await fetch("https://ipinfo.io/json?token=YOUR_IPINFO_TOKEN").then(r=>r.json());
-  await fetch(WEBHOOK_URL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      content: `New User Sign Up: ${username}\nIP: ${ipData.ip}\nLocation: ${ipData.city}, ${ipData.region}, ${ipData.country}`
-    })
-  });
-
-  alert("Sign Up Successful! Awaiting admin approval.");
-  window.location.href = "pending.html";
+  const user = { username, password, status:"pending" };
+  users.push(user);
+  localStorage.setItem("users",JSON.stringify(users));
+  sendWebhook(`New signup: ${username}`);
+  alert("Signup successful! Waiting for admin approval.");
+  window.location.href="auth.html";
 });
 </script>
 </body>
