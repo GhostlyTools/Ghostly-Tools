@@ -18,6 +18,8 @@
 </div>
 
 <script>
+const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+
 document.getElementById("signup-form").addEventListener("submit", function(e){
   e.preventDefault();
   const username = document.getElementById("username").value;
@@ -30,17 +32,14 @@ document.getElementById("signup-form").addEventListener("submit", function(e){
   }
   users.push({username,password,status:"pending"});
   localStorage.setItem("users", JSON.stringify(users));
+  fetch(webhookURL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({content:`New signup: ${username}`})
+  });
   alert("Account created! Waiting for admin approval.");
+  window.location.href = "pending.html";
 });
 </script>
-
-<!-- YouTube video at the bottom -->
-<div style="text-align:center; margin-top:20px;">
-  <iframe src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI"
-    frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
-    style="width:80%; height:450px; border-radius:10px;">
-  </iframe>
-</div>
-
 </body>
 </html>
