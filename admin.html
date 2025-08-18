@@ -20,8 +20,6 @@ h1 { text-shadow:0 0 15px red; }
   background: rgba(0,0,0,0.8); border: 2px solid red; border-radius:10px;
   margin:10px auto; max-width:400px; cursor:pointer; box-shadow:0 0 15px red;
   transition:all 0.3s;
-  opacity:0;
-  transform: translateY(-10px);
 }
 .user-dropdown.pending { border:2px dashed red; animation: pendingFlicker 1.5s infinite; }
 .user-dropdown h3 { margin:10px; text-shadow:0 0 10px red; }
@@ -35,17 +33,6 @@ h1 { text-shadow:0 0 15px red; }
 .user-dropdown-content button { margin:5px 3px; width:80px; font-weight:bold; }
 .pending-label { color:red; font-weight:bold; margin-left:10px; animation:pulseRed 1.2s infinite; }
 #disableToggle { margin:20px; padding:10px 20px; font-weight:bold; background:red; border:none; color:white; cursor:pointer; }
-
-/* fade-in animation */
-.fade-in {
-  opacity: 0;
-  transform: translateY(-10px);
-  animation: fadeIn 0.5s forwards;
-}
-@keyframes fadeIn {
-  to { opacity: 1; transform: translateY(0); }
-}
-
 @keyframes pendingFlicker { 0%,50%,100%{box-shadow:0 0 10px red;} 25%,75%{box-shadow:0 0 20px darkred;} }
 @keyframes pulseRed {0%,100%{opacity:1;text-shadow:0 0 5px red;}50%{opacity:0.6;text-shadow:0 0 20px darkred;}}
 </style>
@@ -59,7 +46,7 @@ h1 { text-shadow:0 0 15px red; }
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-let users = []; // real users
+let users = []; // All users
 let websiteDisabled = false;
 
 function sendWebhook(message) {
@@ -70,27 +57,30 @@ function sendWebhook(message) {
   });
 }
 
-function addUser(username, status, ip, area) {
+// Add a new user (call this on real sign-in)
+function addUser(username, status, ip, area){
   users.push({username,status,ip,area});
+  sendWebhook(`👤 ${username} signed in from ${ip} (${area})`);
   renderUsersSlow();
 }
 
-function renderUsersSlow() {
+// Render all users slowly
+function renderUsersSlow(){
   const container = document.getElementById("users");
   container.innerHTML="";
-
-  users.forEach((u,index)=>{
+  let delay = 0;
+  users.forEach(u=>{
     setTimeout(()=>{
       const dropdown = document.createElement("div");
-      dropdown.className="user-dropdown fade-in";
+      dropdown.className="user-dropdown";
       if(u.status==="pending") dropdown.classList.add("pending");
 
       const h3 = document.createElement("h3");
-      h3.textContent=u.username;
+      h3.textContent = u.username;
       if(u.status==="pending"){
         const label = document.createElement("span");
-        label.textContent=" (Pending)";
-        label.className="pending-label";
+        label.textContent = " (Pending)";
+        label.className = "pending-label";
         h3.appendChild(label);
       }
 
@@ -109,26 +99,27 @@ function renderUsersSlow() {
       dropdown.appendChild(h3);
       dropdown.appendChild(content);
       container.appendChild(dropdown);
-    }, index * 400); // slow appearance stagger
+    }, delay);
+    delay += 150; // slow each user in sequence
   });
 }
 
+// Admin actions
 function approveUser(username){
   const user = users.find(u=>u.username===username);
   if(user){ user.status="approved"; renderUsersSlow(); sendWebhook(`✅ ${username} approved by admin`);}
 }
-
 function denyUser(username){
   const user = users.find(u=>u.username===username);
   if(user){ user.status="denied"; renderUsersSlow(); sendWebhook(`❌ ${username} denied by admin`);}
 }
-
 function kickUser(username){
   users = users.filter(u=>u.username!==username);
   renderUsersSlow();
   sendWebhook(`💀 ${username} kicked by admin`);
 }
 
+// Toggle website
 document.getElementById("disableToggle").onclick = ()=>{
   websiteDisabled = !websiteDisabled;
   if(websiteDisabled){
@@ -140,11 +131,9 @@ document.getElementById("disableToggle").onclick = ()=>{
   }
 }
 
-// Example: real users added dynamically (you can call this when they sign in)
-function onUserSignIn(username, ip, area, status="pending") {
-  addUser(username,status,ip,area);
-  sendWebhook(`👤 ${username} signed in from IP: ${ip}, Area: ${area}`);
-}
+// Auto-update every 2 seconds to catch new users
+setInterval(renderUsersSlow, 2000);
+
 </script>
 </body>
 </html>
