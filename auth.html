@@ -9,7 +9,7 @@
 <body>
 <div class="login-container">
 <h1>Ghostly Tools 👻</h1>
-<form id="signin-form">
+<form id="login-form">
 <input type="text" id="username" placeholder="Username" required>
 <input type="password" id="password" placeholder="Password" required>
 <button type="submit">Sign In</button>
@@ -17,33 +17,37 @@
 <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 </div>
 
+<!-- YouTube Video Below -->
+<div class="youtube-video">
+<iframe src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI" 
+frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="width:100%; height:300px; opacity:0.85;"></iframe>
+</div>
+
 <script>
-document.getElementById("signin-form").addEventListener("submit", function(e){
+document.getElementById("login-form").addEventListener("submit", function(e){
   e.preventDefault();
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
+
+  // Admin Login
+  if(username==="Ghostly" && password==="Dare2995!"){
+    window.location.href="admin.html";
+    return;
+  }
+
   let users = JSON.parse(localStorage.getItem("users") || "[]");
   const user = users.find(u=>u.username===username && u.password===password);
   if(!user){
-    alert("Invalid credentials");
-    return;
-  }
-  if(user.status==="pending"){
-    window.location.href="pending.html";
+    alert("Invalid login");
     return;
   }
   localStorage.setItem("signedInUser", username);
-  window.location.href="index.html";
+  if(user.status==="approved"){
+    window.location.href="index.html";
+  } else {
+    window.location.href="pending.html";
+  }
 });
 </script>
-
-<!-- YouTube video at the bottom -->
-<div style="text-align:center; margin-top:20px;">
-  <iframe src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI"
-    frameborder="0" allow="autoplay; encrypted-media" allowfullscreen
-    style="width:80%; height:450px; border-radius:10px;">
-  </iframe>
-</div>
-
 </body>
 </html>
