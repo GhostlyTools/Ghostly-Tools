@@ -2,104 +2,178 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>👻 Ghostly Admin Panel</title>
+<title>Ghostly Tools 👻 - Admin</title>
 <link rel="stylesheet" href="style.css">
+<style>
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Creepster", cursive, sans-serif;
+  color: #fff;
+  background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
+  background-size: cover;
+}
+
+.admin-container {
+  background: rgba(0,0,0,0.7);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  margin: 20px auto;
+  max-width: 800px;
+  box-shadow: 0 0 25px red;
+}
+
+.user-dropdown {
+  background: rgba(0,0,0,0.8);
+  border: 2px solid red;
+  border-radius: 10px;
+  margin: 10px auto;
+  max-width: 350px;
+  cursor: pointer;
+  box-shadow: 0 0 15px red;
+  transition: all 0.3s;
+}
+
+.user-dropdown.pending { border: 2px dashed red; animation: pendingFlicker 1.5s infinite; }
+
+.user-dropdown h3 {
+  margin: 10px;
+  text-shadow: 0 0 10px red;
+}
+
+.user-dropdown-content {
+  display: none;
+  background: rgba(0,0,0,0.9);
+  padding: 10px;
+  border-top: 1px solid red;
+  text-align: center;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.5s ease, padding 0.5s ease;
+}
+
+.user-dropdown-content.open { display: block; max-height: 250px; padding: 10px; }
+
+.user-dropdown-content p { margin: 5px 0; font-size: 0.9em; }
+
+.user-dropdown-content button { margin: 5px 3px; width: 80px; font-weight: bold; }
+
+.pending-label { color: red; font-weight: bold; margin-left: 10px; animation: pulseRed 1.2s infinite; }
+
+@keyframes pendingFlicker { 0%,50%,100% { box-shadow: 0 0 10px red; } 25%,75% { box-shadow: 0 0 20px darkred; } }
+
+@keyframes pulseRed { 0%,100% { opacity: 1; text-shadow:0 0 5px red;} 50% { opacity:0.6; text-shadow:0 0 20px darkred;} }
+
+.toggle-container {
+  margin: 20px auto;
+  max-width: 400px;
+  background: rgba(0,0,0,0.8);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px red;
+}
+
+.toggle-container label {
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+
+.toggle-container input {
+  margin-left: 10px;
+  transform: scale(1.5);
+  cursor: pointer;
+}
+</style>
 </head>
 <body>
 <div class="admin-container">
-  <h1>👻 Ghostly Admin Panel</h1>
-  <button onclick="toggleWebsite()">Toggle Website Status</button>
-  <div id="users"></div>
+<h1>👻 Ghostly Admin Panel</h1>
+
+<div class="toggle-container">
+  <label>
+    Disable Website:
+    <input type="checkbox" id="disableWebsiteToggle">
+  </label>
 </div>
 
-<script src="script.js"></script>
+<div id="users"></div>
+</div>
+
 <script>
-const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+// Users stored in localStorage
+let users = JSON.parse(localStorage.getItem("users") || "[]");
 
-function sendWebhook(content){
-  fetch(webhookURL, {
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({content})
-  }).catch(console.error);
-}
-
+// Website status stored in localStorage
 let websiteDisabled = localStorage.getItem("websiteDisabled") === "true";
+document.getElementById("disableWebsiteToggle").checked = websiteDisabled;
 
-function toggleWebsite() {
-  websiteDisabled = !websiteDisabled;
+document.getElementById("disableWebsiteToggle").addEventListener("change", function(){
+  websiteDisabled = this.checked;
   localStorage.setItem("websiteDisabled", websiteDisabled);
-  alert("Website " + (websiteDisabled?"disabled for updates":"enabled"));
-  sendWebhook(`Website ${websiteDisabled?"disabled for updates":"enabled"} by admin`);
-}
+  alert(websiteDisabled ? "Website is now DISABLED for updates." : "Website is now ENABLED.");
+});
 
-// Load and display users
+// Render users
 function loadUsers(){
   const container = document.getElementById("users");
-  const users = JSON.parse(localStorage.getItem("users") || "[]");
   container.innerHTML = "";
 
-  users.forEach(user=>{
-    const div = document.createElement("div");
-    div.className = "user-dropdown " + (user.status==="pending"?"pending":"");
+  users.forEach(user => {
+    const dropdown = document.createElement("div");
+    dropdown.className = "user-dropdown" + (user.status === "pending" ? " pending" : "");
     
-    const h3 = document.createElement("h3");
-    h3.textContent = user.username;
-    if(user.status==="pending"){
-      const span = document.createElement("span");
-      span.className = "pending-label";
-      span.textContent = " Pending";
-      h3.appendChild(span);
+    const header = document.createElement("h3");
+    header.textContent = user.username;
+    if(user.status === "pending"){
+      const label = document.createElement("span");
+      label.textContent = " (Pending)";
+      label.className = "pending-label";
+      header.appendChild(label);
     }
-    div.appendChild(h3);
 
     const content = document.createElement("div");
     content.className = "user-dropdown-content";
     content.innerHTML = `
       <p>Status: ${user.status}</p>
-      <p>IP: ${user.ip}</p>
-      <p>Area: ${user.area}</p>
+      <p>IP: ${user.ip || 'Unknown'}</p>
+      <p>Area: ${user.area || 'Unknown'}</p>
       <button onclick="approveUser('${user.username}')">✅ Approve</button>
       <button onclick="denyUser('${user.username}')">❌ Deny</button>
-      <button onclick="kickUser('${user.username}')">🛑 Kick</button>
+      <button onclick="kickUser('${user.username}')">💀 Kick</button>
     `;
-    div.appendChild(content);
 
-    h3.onclick = () => content.classList.toggle("open");
-    container.appendChild(div);
+    header.onclick = () => content.classList.toggle("open");
+
+    dropdown.appendChild(header);
+    dropdown.appendChild(content);
+    container.appendChild(dropdown);
   });
 }
 
-// Actions
+// Approve user
 function approveUser(username){
-  const users = JSON.parse(localStorage.getItem("users") || "[]");
-  const user = users.find(u=>u.username===username);
-  if(user){ 
-    user.status="approved"; 
-    localStorage.setItem("users", JSON.stringify(users));
-    sendWebhook(`User approved: ${username}`);
-  }
+  users = users.map(u => u.username === username ? {...u, status:"approved"} : u);
+  localStorage.setItem("users", JSON.stringify(users));
   loadUsers();
 }
 
+// Deny user
 function denyUser(username){
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  users = users.filter(u=>u.username!==username);
+  users = users.map(u => u.username === username ? {...u, status:"denied"} : u);
   localStorage.setItem("users", JSON.stringify(users));
-  sendWebhook(`User denied: ${username}`);
   loadUsers();
 }
 
+// Kick user
 function kickUser(username){
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  users = users.filter(u=>u.username!==username);
+  users = users.filter(u => u.username !== username);
   localStorage.setItem("users", JSON.stringify(users));
-  sendWebhook(`User kicked: ${username}`);
   loadUsers();
 }
 
 loadUsers();
-setInterval(loadUsers, 5000); // Auto refresh every 5s
 </script>
 </body>
 </html>
