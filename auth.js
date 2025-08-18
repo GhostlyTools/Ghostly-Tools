@@ -1,71 +1,54 @@
-// ---- auth.js ----
-const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ghostly Tools 👻 - Sign In</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body {margin:0; padding:0; font-family:"Creepster", cursive; color:#fff; background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed; background-size:cover;}
+.login-container {background: rgba(0,0,0,0.7); padding:30px; border-radius:10px; text-align:center; margin:50px auto; max-width:400px; box-shadow:0 0 25px red;}
+input, button {margin:10px 0; padding:10px; width:80%; border-radius:5px; border:none;}
+button {background:red; color:white; font-weight:bold; cursor:pointer;}
+#yt-video {position:absolute; top:20px; right:20px; width:300px; height:170px;}
+</style>
+</head>
+<body>
 
-// Hardcoded admin
-const adminUser = {
-  username: "Ghostly",
-  password: "Dare2995!"
-};
+<div class="login-container">
+<h1>Ghostly Tools 👻</h1>
+<form id="signin-form">
+<input type="text" id="username" placeholder="Username" required>
+<input type="password" id="password" placeholder="Password" required>
+<button type="submit">Sign In</button>
+</form>
+<p>Don't have an account? <a href="signup.html" style="color:#f55;">Sign Up</a></p>
+</div>
 
-// Load users from localStorage or create empty array
-let users = JSON.parse(localStorage.getItem("users")) || [];
+<iframe id="yt-video" src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
 
-// Sign In
+<script>
 document.getElementById("signin-form").addEventListener("submit", function(e){
   e.preventDefault();
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
-  // Admin login
-  if(username === adminUser.username && password === adminUser.password){
-    alert(`Welcome Admin ${username}!`);
-    sendWebhook(`${username} signed in as ADMIN`);
-    window.location.href = "admin.html";
+  if(username==="Ghostly" && password==="Dare2995!"){
+    window.location.href="admin.html";
     return;
   }
 
-  // Regular user login
-  const user = users.find(u => u.username === username && u.password === password);
-  if(!user){
-    alert("Invalid username or password");
+  let users = JSON.parse(localStorage.getItem("users") || "[]");
+  let user = users.find(u=>u.username===username && u.password===password);
+  if(!user) { alert("Invalid credentials"); return; }
+
+  if(user.status==="pending") {
+    window.location.href="pending.html";
     return;
   }
 
-  alert(`Welcome ${user.username}!`);
-  sendWebhook(`${user.username} signed in`);
-
-  if(user.status === "approved"){
-    window.location.href = "index.html";
-  } else {
-    window.location.href = "pending.html";
-  }
+  localStorage.setItem("signedInUser", username);
+  window.location.href="index.html";
 });
-
-// Sign Up
-document.getElementById("signup-form")?.addEventListener("submit", function(e){
-  e.preventDefault();
-  const username = document.getElementById("username").value;
-  const password = document.getElementById("password").value;
-
-  if(users.find(u => u.username === username)){
-    alert("Username already exists!");
-    return;
-  }
-
-  const newUser = { username, password, status: "pending", ip: "Unknown", area: "Unknown" };
-  users.push(newUser);
-  localStorage.setItem("users", JSON.stringify(users));
-
-  alert("Account created! Waiting for admin approval.");
-  sendWebhook(`${username} signed up (pending)`);
-  window.location.href = "pending.html";
-});
-
-// Webhook function
-function sendWebhook(message){
-  fetch(webhookURL, {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({ content: message })
-  });
-}
+</script>
+</body>
+</html>
