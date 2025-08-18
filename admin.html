@@ -5,48 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Admin</title>
 <link rel="stylesheet" href="style.css">
-<style>
-body {
-  margin:0; padding:0; font-family:"Creepster", cursive; color:#fff;
-  background:url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-  background-size:cover;
-}
-.admin-container {
-  background: rgba(0,0,0,0.7); padding:20px; border-radius:10px;
-  text-align:center; margin:20px auto; max-width:800px; box-shadow:0 0 25px red;
-}
-h1 { text-shadow:0 0 15px red; }
-.user-dropdown {
-  background: rgba(0,0,0,0.8); border: 2px solid red; border-radius:10px;
-  margin:10px auto; max-width:400px; cursor:pointer; box-shadow:0 0 15px red;
-  transition:all 0.3s;
-}
-.user-dropdown.pending { border:2px dashed red; animation: pendingFlicker 1.5s infinite; }
-.user-dropdown h3 { margin:10px; text-shadow:0 0 10px red; cursor:pointer; }
-.user-dropdown-content {
-  display:none; background: rgba(0,0,0,0.9); padding:10px;
-  border-top:1px solid red; text-align:center; max-height:0; overflow:hidden;
-  transition:max-height 0.5s ease, padding 0.5s ease;
-}
-.user-dropdown-content.open { display:block; max-height:200px; padding:10px; }
-.user-dropdown-content p { margin:5px 0; font-size:0.9em; }
-.user-dropdown-content button { margin:5px 3px; width:80px; font-weight:bold; }
-.pending-label { color:red; font-weight:bold; margin-left:10px; animation:pulseRed 1.2s infinite; }
-#disableToggle { margin:20px; padding:10px 20px; font-weight:bold; background:red; border:none; color:white; cursor:pointer; }
-@keyframes pendingFlicker { 0%,50%,100%{box-shadow:0 0 10px red;} 25%,75%{box-shadow:0 0 20px darkred;} }
-@keyframes pulseRed {0%,100%{opacity:1;text-shadow:0 0 5px red;}50%{opacity:0.6;text-shadow:0 0 20px darkred;}}
-</style>
 </head>
 <body>
-
 <div class="admin-container">
 <h1>👻 Ghostly Admin Panel</h1>
 <button id="disableToggle">Disable Website</button>
 <div id="users"></div>
+
+<div class="music-controls">
+<button onclick="playMusic()">▶️ Play</button>
+<button onclick="pauseMusic()">⏸ Pause</button>
+<button onclick="rewindMusic()">⏪ Rewind</button>
+<button onclick="forwardMusic()">⏩ Forward</button>
+<button onclick="resumeMusic()">▶ Resume</button>
+</div>
+<div id="music-lines">🎵 Haunted vibes...</div>
+<audio id="bg-music" src="music.mp3" loop></audio>
 </div>
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+let websiteDisabled = false;
 
 function sendWebhook(message){
   fetch(webhookURL,{
@@ -56,73 +36,93 @@ function sendWebhook(message){
   });
 }
 
-function renderUsers() {
+// Render users with pending feature
+function renderUsers(){
   const container = document.getElementById("users");
-  container.innerHTML="";
-  const storedUsername = localStorage.getItem("username");
-  const status = localStorage.getItem("status");
-  const ip = "Unknown"; // can implement IP fetch
-  const area = "Unknown";
+  container.innerHTML = "";
+  users.forEach(u => {
+    const dropdown = document.createElement("div");
+    dropdown.className = "user-dropdown";
+    if(u.status === "pending") dropdown.classList.add("pending");
 
-  const dropdown = document.createElement("div");
-  dropdown.className="user-dropdown";
-  if(status==="pending") dropdown.classList.add("pending");
+    const h3 = document.createElement("h3");
+    h3.textContent = u.username;
+    if(u.status==="pending"){
+      const label = document.createElement("span");
+      label.textContent=" (Pending)";
+      label.className="pending-label";
+      h3.appendChild(label);
+    }
 
-  const h3 = document.createElement("h3");
-  h3.textContent=storedUsername;
-  if(status==="pending"){
-    const label = document.createElement("span");
-    label.textContent=" (Pending)";
-    label.className="pending-label";
-    h3.appendChild(label);
+    const content = document.createElement("div");
+    content.className = "user-dropdown-content";
+    content.innerHTML = `
+      <p>Status: ${u.status}</p>
+      <p>IP: ${u.ip || "Unknown"}</p>
+      <p>Area: ${u.area || "Unknown"}</p>
+      <button onclick="approveUser('${u.username}')">✅ Approve</button>
+      <button onclick="denyUser('${u.username}')">❌ Deny</button>
+      <button onclick="kickUser('${u.username}')">💀 Kick</button>
+    `;
+
+    h3.onclick = ()=>content.classList.toggle("open");
+    dropdown.appendChild(h3);
+    dropdown.appendChild(content);
+    container.appendChild(dropdown);
+  });
+}
+
+// Admin actions
+function approveUser(username){
+  const user = users.find(u=>u.username===username);
+  if(user){
+    user.status = "approved";
+    localStorage.setItem("users", JSON.stringify(users));
+    sendWebhook(`✅ ${username} approved by admin`);
+    renderUsers();
   }
-  const content = document.createElement("div");
-  content.className="user-dropdown-content";
-  content.innerHTML=`
-    <p>Status: ${status}</p>
-    <p>IP: ${ip}</p>
-    <p>Area: ${area}</p>
-    <button onclick="approveUser()">✅ Approve</button>
-    <button onclick="denyUser()">❌ Deny</button>
-    <button onclick="kickUser()">💀 Kick</button>
-  `;
-  h3.onclick = ()=>content.classList.toggle("open");
-  dropdown.appendChild(h3);
-  dropdown.appendChild(content);
-  container.appendChild(dropdown);
+}
+function denyUser(username){
+  const user = users.find(u=>u.username===username);
+  if(user){
+    user.status = "denied";
+    localStorage.setItem("users", JSON.stringify(users));
+    sendWebhook(`❌ ${username} denied by admin`);
+    renderUsers();
+  }
+}
+function kickUser(username){
+  users = users.filter(u=>u.username!==username);
+  localStorage.setItem("users", JSON.stringify(users));
+  sendWebhook(`💀 ${username} kicked by admin`);
+  renderUsers();
 }
 
-function approveUser(){
-  localStorage.setItem("status","approved");
-  renderUsers();
-  sendWebhook(`✅ Admin approved user: ${localStorage.getItem("username")}`);
-}
-function denyUser(){
-  localStorage.setItem("status","denied");
-  renderUsers();
-  sendWebhook(`❌ Admin denied user: ${localStorage.getItem("username")}`);
-}
-function kickUser(){
-  localStorage.removeItem("username");
-  localStorage.removeItem("password");
-  localStorage.removeItem("status");
-  renderUsers();
-  sendWebhook(`💀 Admin kicked user`);
-}
-
+// Toggle website
 document.getElementById("disableToggle").onclick = ()=>{
-  const websiteDisabled = confirm("Do you want to disable the website for updates?");
+  websiteDisabled = !websiteDisabled;
   if(websiteDisabled){
-    sendWebhook("⚠️ Website disabled by admin for updates.");
-    alert("Website disabled.");
+    alert("Website disabled for updates");
+    sendWebhook("⚠️ Website disabled by admin");
   } else {
-    sendWebhook("✅ Website re-enabled by admin.");
-    alert("Website enabled.");
+    alert("Website enabled");
+    sendWebhook("✅ Website re-enabled");
   }
 }
 
+// Initial render
 renderUsers();
-</script>
 
+// Music controls
+const music = document.getElementById("bg-music");
+function playMusic(){ music.play(); }
+function pauseMusic(){ music.pause(); }
+function rewindMusic(){ music.currentTime = 0; }
+function forwardMusic(){ music.currentTime += 10; }
+function resumeMusic(){ music.play(); }
+
+// Lines sync demo
+setInterval(()=>{document.getElementById("music-lines").textContent="🎵 Haunted vibes...";},500);
+</script>
 </body>
 </html>
