@@ -5,20 +5,38 @@
 <title></title>
 <link rel="stylesheet" href="style.css">
 <style>
-/* Ensure the links are clickable */
+/* Downloads box styling */
+#downloads-container {
+  background: rgba(0,0,0,0.85);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  width: 400px;
+  margin: 50px auto;
+  box-shadow: 0 0 25px red;
+}
+
+#downloads-container h2 {
+  margin-bottom: 20px;
+  text-shadow: 0 0 15px red;
+}
+
+/* Links styling */
 #downloads-content a {
-  pointer-events: auto;
-  display: inline-block;
+  display: block;
   padding: 10px 15px;
-  margin: 5px 0;
+  margin: 10px 0;
   background: rgba(255,0,0,0.8);
   color: white !important;
   text-decoration: none;
   border-radius: 5px;
   font-size: 1.2rem;
+  transition: all 0.3s ease;
 }
+
 #downloads-content a:hover {
   background: red;
+  box-shadow: 0 0 15px red;
 }
 </style>
 </head>
@@ -47,6 +65,8 @@ if (!currentUser || currentUser.status !== "approved") {
       <a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank" rel="noopener noreferrer">DDoS v3</a>
   `;
 }
+
+// YouTube video removed
 </script>
 
 </body>
