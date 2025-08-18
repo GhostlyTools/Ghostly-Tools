@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ghostly Tools 👻 - Dashboard</title>
+<title></title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div id="downloads-container">
-<h2>Downloads</h2>
-<div id="downloads-content"></div>
+  <h2>Downloads</h2>
+  <div id="downloads-content"></div>
 </div>
 
 <script>
@@ -20,24 +20,20 @@ let currentUser = users.find(u=>u.username===signedInUser);
 const downloadsContent = document.getElementById("downloads-content");
 
 if(!currentUser || currentUser.status!=="approved"){
-  downloadsContent.innerHTML="<p>Waiting for admin to approve downloads 👻</p>";
+  downloadsContent.innerHTML="<p>Downloads 👻 (Pending admin approval)</p>";
 }else{
   downloadsContent.innerHTML=`
-    <ul>
-      <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank">Ghostly Toolkit</a></li>
-      <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank">Pingers</a></li>
-      <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank">Savage Multitool</a></li>
-      <li><a href="https://www.mediafire.com/folder/133z6qltkuybu/Iplookup" target="_blank">IP Lookup</a></li>
-      <li><a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank">DDoS v3</a></li>
+    <ul style="list-style:none; padding:0; font-size:1.3rem; line-height:2;">
+      <li><a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank" style="color:red; text-decoration:none;">Ghostly Toolkit</a></li>
+      <li><a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank" style="color:red; text-decoration:none;">Pingers</a></li>
+      <li><a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank" style="color:red; text-decoration:none;">Savage Multitool</a></li>
+      <li><a href="https://www.mediafire.com/folder/133z6qltkuybu/Iplookup" target="_blank" style="color:red; text-decoration:none;">IP Lookup</a></li>
+      <li><a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank" style="color:red; text-decoration:none;">DDoS v3</a></li>
     </ul>`;
 }
 
-// YouTube video under everything
-const ytDiv = document.createElement("div");
-ytDiv.className="youtube-video";
-ytDiv.style="position:fixed;bottom:0;left:0;width:100%;height:300px;opacity:0.85;pointer-events:none;";
-ytDiv.innerHTML=`<iframe src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI&modestbranding=1&controls=0&showinfo=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen style="width:100%; height:100%; background:transparent;" allowTransparency="true"></iframe>`;
-document.body.appendChild(ytDiv);
+// YouTube video completely removed
 </script>
+
 </body>
 </html>
