@@ -22,12 +22,14 @@ const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKp
 
 document.getElementById("signup-form").addEventListener("submit", function(e){
   e.preventDefault();
-  const username = document.getElementById("username").value;
+  const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
 
   let users = JSON.parse(localStorage.getItem("users") || "[]");
-  if(users.find(u=>u.username===username)){
-    alert("Username taken");
+
+  // Check if username already exists (case-insensitive)
+  if(users.some(u => u.username.toLowerCase() === username.toLowerCase())){
+    alert(`Username "${username}" already exists! Please choose another.`);
     return;
   }
 
