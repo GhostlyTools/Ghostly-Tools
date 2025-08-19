@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign Up</title>
 <style>
-/* Full Ghostly Tools style */
-
 body {
     margin: 0;
     padding: 0;
@@ -18,6 +16,24 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow: hidden;
+}
+
+/* Subtle floating "Sign Up" text */
+.floating-text {
+    position: absolute;
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: rgba(255,0,0,0.15);
+    pointer-events: none;
+    animation: float 12s linear infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity:0; }
+    10% { opacity:0.2; }
+    50% { transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.15; }
+    100% { transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0; }
 }
 
 .login-container {
@@ -30,6 +46,8 @@ body {
     max-width: 90%;
     animation: heartbeat 1.5s infinite;
     box-shadow: 0 0 20px rgba(255,0,0,0.7);
+    position: relative;
+    z-index: 10;
 }
 
 .login-container h1 {
@@ -93,6 +111,51 @@ body {
     50% { box-shadow: 0 0 25px red; }
 }
 
+/* About button */
+#about-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255,0,0,0.85);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 20;
+    box-shadow: 0 0 15px red;
+    transition: 0.3s;
+}
+
+#about-btn:hover {
+    background: red;
+    box-shadow: 0 0 25px red;
+}
+
+/* About dropdown */
+#about-dropdown {
+    display: none;
+    position: fixed;
+    bottom: 70px; /* Above the button */
+    right: 20px;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 15px;
+    width: 300px;
+    max-width: 90%;
+    box-shadow: 0 0 20px red;
+    font-size: 14px;
+    z-index: 19;
+}
+
+#about-dropdown ul {
+    margin-left: 15px;
+}
+
 @media (max-width: 400px) {
     .login-container {
         width: 90%;
@@ -109,6 +172,13 @@ body {
 </head>
 <body>
 
+<!-- Floating Sign Up texts -->
+<div class="floating-text" style="left:10%; animation-delay:0s;">Sign Up</div>
+<div class="floating-text" style="left:30%; animation-delay:3s;">Sign Up</div>
+<div class="floating-text" style="left:50%; animation-delay:6s;">Sign Up</div>
+<div class="floating-text" style="left:70%; animation-delay:1s;">Sign Up</div>
+<div class="floating-text" style="left:90%; animation-delay:4s;">Sign Up</div>
+
 <div class="login-container">
   <h1>Ghostly Tools 👻</h1>
   <form id="signup-form">
@@ -119,52 +189,74 @@ body {
   <p>Already have an account? <a href="auth.html">Sign In</a></p>
 </div>
 
+<!-- About Button -->
+<button id="about-btn">?</button>
+
+<!-- About Dropdown -->
+<div id="about-dropdown">
+    <p>
+        Welcome to Ghostly Tools! This site gives you access to some really handy utilities, but first you need admin approval. Once you're approved, you'll get access to:
+    </p>
+    <ul>
+        <li><strong>Ghostly Toolkit:</strong> A set of scripts and utilities for checking and testing networks safely.</li>
+        <li><strong>Pingers:</strong> Quick tools to see if a server is alive and how fast it responds.</li>
+        <li><strong>Savage Multitool:</strong> A versatile tool that can help with multiple network tasks at once.</li>
+        <li><strong>IP Lookup:</strong> Find out info about any IP address in a snap.</li>
+        <li><strong>DDoS v3:</strong> Simulated stress-testing tools for your own servers. (Only for testing purposes!)</li>
+    </ul>
+    <p>Sign up, wait for the admin’s approval, and enjoy all the features! 👻</p>
+</div>
+
 <script>
+const aboutBtn = document.getElementById("about-btn");
+const aboutDropdown = document.getElementById("about-dropdown");
+
+aboutBtn.addEventListener("click", () => {
+    aboutDropdown.style.display = aboutDropdown.style.display === "block" ? "none" : "block";
+});
+
+// Sign Up functionality
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-async function sendWebhook(message) {
-  try {
-    await fetch(webhookURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ content: message })
-    });
-  } catch (err) {
-    console.log("Webhook failed:", err);
-  }
+async function getIP() {
+    try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        return data.ip;
+    } catch { return "Unknown IP"; }
 }
 
-async function getIP() {
-  try {
-    const res = await fetch("https://api.ipify.org?format=json");
-    const data = await res.json();
-    return data.ip;
-  } catch { return "Unknown"; }
+async function sendWebhook(message) {
+    try {
+        await fetch(webhookURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: message })
+        });
+    } catch (err) { console.log("Webhook failed:", err); }
 }
 
 document.getElementById("signup-form").addEventListener("submit", async function(e){
-  e.preventDefault();
+    e.preventDefault();
 
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value;
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
 
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  if(users.some(u => u.username.toLowerCase() === username.toLowerCase())){
-    alert("⚠️ Username \"" + username + "\" already exists!");
-    return;
-  }
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+    if(users.some(u => u.username.toLowerCase() === username.toLowerCase())){
+        alert("⚠️ Username \"" + username + "\" already exists!");
+        return;
+    }
 
-  const newUser = { username, password, status: "pending" };
-  users.push(newUser);
-  localStorage.setItem("users", JSON.stringify(users));
+    const newUser = { username, password, status: "pending" };
+    users.push(newUser);
+    localStorage.setItem("users", JSON.stringify(users));
 
-  const ip = await getIP();
-  await sendWebhook("💀 New user: " + username + "\nIP: " + ip);
+    const ip = await getIP();
+    await sendWebhook(`💀 New user signed up: ${username}\nIP: ${ip}\nTotal Users: ${users.length}`);
 
-  setTimeout(() => {
     alert("✅ Account created! Waiting for admin approval.");
     window.location.href = "pending.html";
-  }, 1000);
 });
 </script>
 
