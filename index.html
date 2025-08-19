@@ -14,7 +14,7 @@ body {
     color: #fff;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: flex-start; /* desktop: top alignment */
     min-height: 100vh;
     padding-top: 50px;
 }
@@ -81,7 +81,7 @@ body {
     100% {transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0;}
 }
 
-/* Subtle video styling */
+/* Video styling */
 #bg-video {
     width: 90%;
     max-width: 550px;
@@ -89,25 +89,22 @@ body {
     border-radius: 15px;
     border: none;
     box-shadow: 0 0 25px rgba(255,0,0,0.5);
-    opacity: 0.55; /* Slightly brighter */
+    opacity: 0.55; /* slightly brighter */
     margin-bottom: 25px;
 }
 
-/* Mobile tweaks */
+/* Mobile optimization */
 @media (max-width: 600px) {
     body {
-        align-items: center; /* Center container vertically */
+        align-items: center; /* center Downloads box vertically */
         padding-top: 0;
+        flex-direction: column;
     }
 
     #downloads-container {
         width: 90%;
-        padding: 30px;
-    }
-
-    #bg-video {
-        width: 95%;
-        height: 250px;
+        padding: 25px;
+        margin: 0;
     }
 
     #downloads-container h2 {
@@ -117,6 +114,12 @@ body {
     #downloads-content a {
         font-size: 1.3rem;
         padding: 14px 20px;
+    }
+
+    #bg-video {
+        width: 95%;
+        height: 250px;
+        opacity: 0.6; /* slightly brighter on mobile */
     }
 }
 </style>
@@ -159,7 +162,6 @@ let currentUser = users.find(u => u.username === signedInUser);
 const downloadsContent = document.getElementById("downloads-content");
 
 if (!currentUser || currentUser.status !== "approved") {
-    // Redirect pending users
     window.location.href = "pending.html";
 } else {
     downloadsContent.innerHTML = `
