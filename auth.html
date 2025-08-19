@@ -4,12 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
-<link rel="stylesheet" href="style.css">
 <style>
 body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     background: #111;
     color: #fff;
     display: flex;
@@ -21,35 +20,44 @@ body {
 .login-container {
     background: #111;
     border: 3px solid red;
-    padding: 40px;
-    border-radius: 15px;
+    padding: 40px 30px;
+    border-radius: 20px;
     text-align: center;
-    width: 320px;
+    width: 340px;
     animation: heartbeat 1.5s infinite;
+    box-shadow: 0 0 15px rgba(255,0,0,0.5);
 }
 
 .login-container h1 {
     color: red;
     margin-bottom: 25px;
+    font-size: 28px;
 }
 
 .login-container input {
     width: 90%;
-    padding: 10px;
-    margin: 10px 0;
+    padding: 12px;
+    margin: 12px 0;
     border: 2px solid red;
-    border-radius: 5px;
+    border-radius: 8px;
     background: #111;
     color: #fff;
     font-size: 16px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.login-container input:focus {
+    border-color: #ff4444;
+    box-shadow: 0 0 8px red;
 }
 
 .login-container button {
     width: 95%;
-    padding: 10px;
-    margin-top: 10px;
+    padding: 12px;
+    margin-top: 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     background: red;
     color: #fff;
     font-size: 18px;
@@ -62,6 +70,11 @@ body {
     color: red;
 }
 
+.login-container p {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
 .login-container p a {
     color: red;
     text-decoration: underline;
@@ -69,8 +82,8 @@ body {
 }
 
 @keyframes heartbeat {
-    0%, 100% { box-shadow: 0 0 5px red; }
-    50% { box-shadow: 0 0 20px red; }
+    0%, 100% { box-shadow: 0 0 10px red; }
+    50% { box-shadow: 0 0 25px red; }
 }
 </style>
 </head>
