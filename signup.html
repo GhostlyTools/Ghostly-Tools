@@ -19,7 +19,7 @@ body {
     overflow: hidden;
 }
 
-/* Subtle floating "Sign Up" text */
+/* Floating "Sign Up" text */
 .floating-text {
     position: absolute;
     font-size: 2.2rem;
@@ -156,17 +156,22 @@ body {
     margin-left: 15px;
 }
 
-@media (max-width: 400px) {
+/* Mobile-specific adjustments */
+@media (max-width: 480px) {
     .login-container {
         width: 90%;
         padding: 30px 20px;
+        position: relative;
+        top: 0;
+        margin: auto;
+        box-shadow: 0 0 25px rgba(255,0,0,0.7);
     }
-    .login-container h1 {
-        font-size: 24px;
-    }
-    .login-container button, .login-container input {
-        font-size: 15px;
-    }
+    .login-container h1 { font-size: 24px; margin-bottom: 20px; }
+    .login-container input, .login-container button { font-size: 14px; padding: 12px; }
+
+    .floating-text { font-size: 1.6rem; animation-duration: 18s; }
+    #about-dropdown { width: 90%; bottom: 70px; right: 5%; padding: 12px 15px; font-size: 13px; }
+    #about-btn { width: 40px; height: 40px; font-size: 22px; }
 }
 </style>
 </head>
@@ -195,16 +200,16 @@ body {
 <!-- About Dropdown -->
 <div id="about-dropdown">
     <p>
-        Welcome to Ghostly Tools! This site gives you access to some really handy utilities, but first you need admin approval. Once you're approved, you'll get access to:
+        Welcome to Ghostly Tools! This site gives you access to some handy utilities. Once approved by admin, you can use:
     </p>
     <ul>
-        <li><strong>Ghostly Toolkit:</strong> A set of scripts and utilities for checking and testing networks safely.</li>
-        <li><strong>Pingers:</strong> Quick tools to see if a server is alive and how fast it responds.</li>
-        <li><strong>Savage Multitool:</strong> A versatile tool that can help with multiple network tasks at once.</li>
-        <li><strong>IP Lookup:</strong> Find out info about any IP address in a snap.</li>
-        <li><strong>DDoS v3:</strong> stress-testing tools for your own servers. </li>
+        <li><strong>Ghostly Toolkit:</strong> Scripts and utilities for safe network checks.</li>
+        <li><strong>Pingers:</strong> Quickly see if a server is alive and responsive.</li>
+        <li><strong>Savage Multitool:</strong> Multi-purpose tool for network tasks.</li>
+        <li><strong>IP Lookup:</strong> Quickly find info about any IP.</li>
+        <li><strong>DDoS v3:</strong> Simulated stress-testing tools for testing only.</li>
     </ul>
-    <p>Sign up, wait for the admin’s approval, and enjoy all the features! 👻</p>
+    <p>Sign up, wait for admin approval, and enjoy all features! 👻</p>
 </div>
 
 <script>
