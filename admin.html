@@ -20,7 +20,7 @@ body::before {
   z-index:0; pointer-events:none;
 }
 
-/* Admin container - static, no heartbeat */
+/* Admin container */
 .admin-container {
   position:relative; z-index:1;
   background: rgba(0,0,0,0.85);
@@ -72,7 +72,6 @@ h1 { text-shadow:0 0 15px red; }
 /* Pending label */
 .pending-label { color:red; font-weight:bold; margin-left:10px; animation:pulseRed 1.2s infinite; }
 @keyframes pulseRed { 0%,100%{opacity:1;text-shadow:0 0 5px red;}50%{opacity:0.6;text-shadow:0 0 20px darkred;} }
-
 </style>
 </head>
 <body>
@@ -84,21 +83,24 @@ h1 { text-shadow:0 0 15px red; }
 </div>
 
 <script>
-// Webhook URL
-const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-let users = JSON.parse(localStorage.getItem("users")||"[]");
-let websiteDisabled = false;
+// Load users.json
+let users = [];
+async function loadUsers(){
+  const res = await fetch("users.json?nocache="+Date.now());
+  users = await res.json();
+  renderUsers();
+}
 
-// Send webhook
-function sendWebhook(message){
-  fetch(webhookURL,{
+// Save users.json via PHP
+function saveUsers(){
+  fetch("save_users.php", {
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({content:message})
+    body:JSON.stringify(users)
   });
 }
 
-// Render user dropdowns
+// Render users
 function renderUsers(){
   const container = document.getElementById("users");
   container.innerHTML="";
@@ -126,7 +128,6 @@ function renderUsers(){
       <button onclick="kickUser('${u.username}')">💀 Kick</button>
     `;
 
-    // Toggle dropdown
     h3.addEventListener("click", ()=> content.classList.toggle("open"));
 
     dropdown.appendChild(h3);
@@ -138,34 +139,27 @@ function renderUsers(){
 // User actions
 function approveUser(username){
   const user = users.find(u=>u.username===username);
-  if(user){ user.status="approved"; localStorage.setItem("users",JSON.stringify(users)); renderUsers(); sendWebhook(`✅ ${username} approved by admin`); }
+  if(user){ user.status="approved"; saveUsers(); renderUsers(); }
 }
 function denyUser(username){
   const user = users.find(u=>u.username===username);
-  if(user){ user.status="denied"; localStorage.setItem("users",JSON.stringify(users)); renderUsers(); sendWebhook(`❌ ${username} denied by admin`); }
+  if(user){ user.status="denied"; saveUsers(); renderUsers(); }
 }
 function kickUser(username){
   users = users.filter(u=>u.username!==username);
-  localStorage.setItem("users",JSON.stringify(users));
+  saveUsers();
   renderUsers();
-  sendWebhook(`💀 ${username} kicked by admin`);
 }
 
-// Disable/Enable website
+// Website toggle
+let websiteDisabled = false;
 document.getElementById("disableToggle").onclick = ()=>{
   websiteDisabled = !websiteDisabled;
-  if(websiteDisabled){
-    alert("Website is now disabled for updates.");
-    sendWebhook("⚠️ Website disabled by admin for updates.");
-  } else {
-    alert("Website is now enabled.");
-    sendWebhook("✅ Website re-enabled by admin.");
-  }
+  alert(websiteDisabled ? "Website Disabled" : "Website Enabled");
 }
 
-// Initial render
-renderUsers();
+// Initial load
+loadUsers();
 </script>
-
 </body>
 </html>
