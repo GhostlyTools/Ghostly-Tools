@@ -9,14 +9,25 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Arial', sans-serif;
-    background: url('https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg') no-repeat center center fixed;
-    background-size: cover;
-    color: #fff;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* desktop: top alignment */
+    align-items: flex-start;
     min-height: 100vh;
     padding-top: 50px;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+/* Background image */
+#bg-img {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg') no-repeat center center;
+    background-size: cover;
+    z-index: -1;
 }
 
 #downloads-container {
@@ -29,6 +40,7 @@ body {
     box-shadow: 0 0 35px red;
     position: relative;
     z-index: 10;
+    transition: transform 0.3s ease;
 }
 
 #downloads-container h2 {
@@ -62,6 +74,7 @@ body {
     animation: float 12s linear infinite;
     pointer-events: none;
     z-index: 1;
+    transition: transform 0.2s ease;
 }
 
 .waiting {
@@ -72,6 +85,7 @@ body {
     animation: float 15s linear infinite;
     pointer-events: none;
     z-index: 1;
+    transition: transform 0.2s ease;
 }
 
 @keyframes float {
@@ -89,43 +103,59 @@ body {
     border-radius: 15px;
     border: none;
     box-shadow: 0 0 25px rgba(255,0,0,0.5);
-    opacity: 0.55; /* slightly brighter */
+    opacity: 0.55;
     margin-bottom: 25px;
 }
 
 /* Mobile optimization */
 @media (max-width: 600px) {
     body {
-        align-items: center; /* vertically center container */
-        padding-top: 0;
+        align-items: center;
+        padding-top: 20px;
         flex-direction: column;
-        background-attachment: scroll; /* make background move on scroll */
+    }
+
+    #bg-img {
+        position: absolute;
+        background-attachment: scroll; /* scrolls with page */
     }
 
     #downloads-container {
+        background: rgba(0,0,0,0.35); /* more visible background */
         width: 90%;
-        padding: 25px;
-        margin: 0;
+        padding: 30px 20px;
+        margin: 20px auto;
     }
 
-    #downloads-container h2 {
-        font-size: 1.8rem;
-    }
+    #downloads-container h2 { font-size: 1.8rem; }
+    #downloads-content a { font-size: 1.4rem; padding: 16px 20px; }
+    #bg-video { width: 95%; height: 250px; opacity: 0.65; margin-bottom: 20px; }
 
-    #downloads-content a {
-        font-size: 1.3rem;
-        padding: 14px 20px;
+    /* Reduce ghost size and reposition on mobile */
+    .floating { 
+        font-size: 1.5rem; 
+        animation-duration: 20s;
     }
+    .floating:nth-child(1) { left:5%; }
+    .floating:nth-child(2) { left:25%; }
+    .floating:nth-child(3) { left:50%; }
+    .floating:nth-child(4) { left:75%; }
+    .floating:nth-child(5) { left:90%; }
 
-    #bg-video {
-        width: 95%;
-        height: 250px;
-        opacity: 0.6; /* slightly brighter on mobile */
+    .waiting { 
+        font-size: 2rem; 
+        animation-duration: 25s;
     }
+    .waiting:nth-child(6) { left:20%; }
+    .waiting:nth-child(7) { left:40%; }
+    .waiting:nth-child(8) { left:60%; }
+    .waiting:nth-child(9) { left:80%; }
 }
 </style>
 </head>
 <body>
+
+<div id="bg-img"></div>
 
 <div id="downloads-container">
 
@@ -133,7 +163,7 @@ body {
 
   <!-- YouTube video -->
   <iframe id="bg-video"
-      src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI&controls=0&modestbranding=1&rel=0"
+      src="https://www.youtube.com/embed/a07qXFXjEDI?autoplay=1&loop=1&playlist=a07qXFXjEDI&controls=0&modestbranding=1&rel=0&mute=0"
       frameborder="0"
       allow="autoplay; encrypted-media; clipboard-write; accelerometer; gyroscope; picture-in-picture"
       allowfullscreen>
@@ -173,13 +203,6 @@ if (!currentUser || currentUser.status !== "approved") {
         <a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank" rel="noopener noreferrer">DDoS v3</a>
     `;
 }
-
-// Attempt to unmute video on first user interaction
-const videoFrame = document.getElementById("bg-video");
-function unmuteVideo() {
-    videoFrame.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
-}
-document.body.addEventListener("click", unmuteVideo, { once: true });
 </script>
 
 </body>
