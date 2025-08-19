@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
 <style>
+/* Full Ghostly Tools style */
 body {
     margin: 0;
     padding: 0;
@@ -124,7 +125,7 @@ document.getElementById("signin-form").addEventListener("submit", function(e){
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
 
-  // Admin credentials
+  // Admin login
   if(username === "Ghostly" && password === "Dare2995!"){
       alert("✅ Admin login successful!");
       window.location.href = "admin.html"; // Redirect to admin.html
