@@ -89,8 +89,35 @@ body {
     border-radius: 15px;
     border: none;
     box-shadow: 0 0 25px rgba(255,0,0,0.5);
-    opacity: 0.35;
+    opacity: 0.55; /* Slightly brighter */
     margin-bottom: 25px;
+}
+
+/* Mobile tweaks */
+@media (max-width: 600px) {
+    body {
+        align-items: center; /* Center container vertically */
+        padding-top: 0;
+    }
+
+    #downloads-container {
+        width: 90%;
+        padding: 30px;
+    }
+
+    #bg-video {
+        width: 95%;
+        height: 250px;
+    }
+
+    #downloads-container h2 {
+        font-size: 1.8rem;
+    }
+
+    #downloads-content a {
+        font-size: 1.3rem;
+        padding: 14px 20px;
+    }
 }
 </style>
 </head>
@@ -144,7 +171,7 @@ if (!currentUser || currentUser.status !== "approved") {
     `;
 }
 
-// Attempt to unmute video on user interaction
+// Attempt to unmute video on first user interaction
 const videoFrame = document.getElementById("bg-video");
 function unmuteVideo() {
     videoFrame.contentWindow.postMessage('{"event":"command","func":"unMute","args":""}', '*');
