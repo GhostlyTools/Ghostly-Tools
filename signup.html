@@ -19,7 +19,6 @@ body {
     overflow: hidden;
 }
 
-/* Floating "Sign Up" text */
 .floating-text {
     position: absolute;
     font-size: 2.2rem;
@@ -111,57 +110,11 @@ body {
     50% { box-shadow: 0 0 25px red; }
 }
 
-/* About button */
-#about-btn {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(255,0,0,0.85);
-    color: #fff;
-    border: none;
-    border-radius: 50%;
-    width: 45px;
-    height: 45px;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 20;
-    box-shadow: 0 0 15px red;
-    transition: 0.3s;
-}
-
-#about-btn:hover {
-    background: red;
-    box-shadow: 0 0 25px red;
-}
-
-/* About dropdown */
-#about-dropdown {
-    display: none;
-    position: fixed;
-    bottom: 70px;
-    right: 20px;
-    background: rgba(0,0,0,0.85);
-    color: #fff;
-    padding: 15px 20px;
-    border-radius: 15px;
-    width: 300px;
-    max-width: 90%;
-    box-shadow: 0 0 20px red;
-    font-size: 14px;
-    z-index: 19;
-}
-
-#about-dropdown ul { margin-left: 15px; }
-
-/* Mobile-specific adjustments */
 @media (max-width: 480px) {
     .login-container { width: 90%; padding: 30px 20px; top:0; margin:auto; box-shadow:0 0 25px rgba(255,0,0,0.7); }
     .login-container h1 { font-size: 24px; margin-bottom: 20px; }
     .login-container input, .login-container button { font-size: 14px; padding: 12px; }
     .floating-text { font-size: 1.6rem; animation-duration: 18s; }
-    #about-dropdown { width: 90%; bottom: 70px; right: 5%; padding: 12px 15px; font-size: 13px; }
-    #about-btn { width: 40px; height: 40px; font-size: 22px; }
 }
 </style>
 </head>
@@ -181,34 +134,10 @@ body {
     <input type="password" id="password" placeholder="Password" required>
     <button type="submit">Sign Up</button>
   </form>
-  <p>Already have an account? <a href="auth.html">Sign In</a></p>
-</div>
-
-<!-- About Button -->
-<button id="about-btn">?</button>
-
-<!-- About Dropdown -->
-<div id="about-dropdown">
-    <p>Welcome to Ghostly Tools! This site gives you access to handy utilities. Once approved by admin, you can use:</p>
-    <ul>
-        <li><strong>Ghostly Toolkit:</strong> Scripts and utilities for safe network checks.</li>
-        <li><strong>Pingers:</strong> Quickly see if a server is alive and responsive.</li>
-        <li><strong>Savage Multitool:</strong> Multi-purpose tool for network tasks.</li>
-        <li><strong>IP Lookup:</strong> Quickly find info about any IP.</li>
-        <li><strong>DDoS v3:</strong> Simulated stress-testing tools for testing only.</li>
-    </ul>
-    <p>Sign up, wait for admin approval, and enjoy all features! 👻</p>
+  <p>Already have an account? <a href="signin.html">Sign In</a></p>
 </div>
 
 <script>
-const aboutBtn = document.getElementById("about-btn");
-const aboutDropdown = document.getElementById("about-dropdown");
-
-aboutBtn.addEventListener("click", () => {
-    aboutDropdown.style.display = aboutDropdown.style.display === "block" ? "none" : "block";
-});
-
-// Sign Up functionality
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
 async function getIP() {
@@ -224,7 +153,9 @@ async function sendWebhook(username, ip, userCount) {
         await fetch(webhookURL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: `💀 New user signed up:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}` })
+            body: JSON.stringify({ 
+                content: `💀 New User Sign Up:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}`
+            })
         });
     } catch (err) { console.error("Webhook failed:", err); }
 }
@@ -235,14 +166,15 @@ document.getElementById("signup-form").addEventListener("submit", async function
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
-    if (!username || !password) {
-        alert("⚠️ Please fill in all fields.");
+    // Prevent admin signup
+    if(username === "Ghostly" && password === "Dare2995!") {
+        alert("⚠️ Cannot create admin account!");
         return;
     }
 
     let users = JSON.parse(localStorage.getItem("users") || "[]");
     if(users.some(u => u.username.toLowerCase() === username.toLowerCase())){
-        alert(`⚠️ Username "${username}" already exists!`);
+        alert("⚠️ Username already exists!");
         return;
     }
 
@@ -251,6 +183,8 @@ document.getElementById("signup-form").addEventListener("submit", async function
     localStorage.setItem("users", JSON.stringify(users));
 
     const ip = await getIP();
+
+    // Send webhook immediately for admin to detect
     await sendWebhook(username, ip, users.length);
 
     alert("✅ Account created! Waiting for admin approval.");
