@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
 <style>
-/* Full Ghostly Tools style */
 body {
     margin: 0;
     padding: 0;
@@ -119,40 +118,70 @@ body {
 </div>
 
 <script>
-document.getElementById("signin-form").addEventListener("submit", function(e){
-  e.preventDefault();
+const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value;
+async function getIP() {
+    try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        return data.ip;
+    } catch {
+        return "Unknown IP";
+    }
+}
 
-  // Admin login
-  if(username === "Ghostly" && password === "Dare2995!"){
-      alert("✅ Admin login successful!");
-      window.location.href = "admin.html"; // Redirect to admin.html
-      return;
-  }
+async function sendWebhook(username, ip, userCount) {
+    try {
+        await fetch(webhookURL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                content: `💀 User Sign In:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}`
+            })
+        });
+    } catch (err) {
+        console.log("Webhook failed:", err);
+    }
+}
 
-  // Normal users
-  let users = JSON.parse(localStorage.getItem("users") || "[]");
-  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+document.getElementById("signin-form").addEventListener("submit", async function(e){
+    e.preventDefault();
 
-  if(!user){
-    alert("⚠️ Username not found!");
-    return;
-  }
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
 
-  if(user.status !== "pending"){
-    alert("⚠️ Your account is not approved yet. Please wait for admin approval.");
-    return;
-  }
+    // Admin login
+    if(username === "Ghostly" && password === "Dare2995!"){
+        alert("✅ Admin login successful!");
+        window.location.href = "admin.html"; // Admin redirect
+        return;
+    }
 
-  if(user.password !== password){
-    alert("⚠️ Incorrect password!");
-    return;
-  }
+    // Normal users
+    let users = JSON.parse(localStorage.getItem("users") || "[]");
+    const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
 
-  alert("✅ Sign In successful! Welcome " + username);
-  // window.location.href = "index.html"; // Redirect to user dashboard
+    if(!user){
+        alert("⚠️ Username not found!");
+        return;
+    }
+
+    if(user.status !== "pending"){
+        alert("⚠️ Your account is not approved yet. Please wait for admin approval.");
+        return;
+    }
+
+    if(user.password !== password){
+        alert("⚠️ Incorrect password!");
+        return;
+    }
+
+    // Send webhook for normal users only
+    const ip = await getIP();
+    await sendWebhook(username, ip, users.length);
+
+    alert("✅ Sign In successful! Welcome " + username);
+    // window.location.href = "index.html"; // Redirect normal user dashboard
 });
 </script>
 
