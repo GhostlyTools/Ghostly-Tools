@@ -1,16 +1,102 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Nosifer&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<style>
+/* General body */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Nosifer', cursive;
+  color: red;
+  background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
+  background-size: cover;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  position: relative;
+}
+body::before {
+  content: "";
+  position: absolute;
+  top:0; left:0;
+  width:100%; height:100%;
+  background: rgba(0,0,0,0.3);
+  z-index:0;
+}
+
+/* All text with blood-drop glow */
+body, h1, h2, h3, h4, h5, h6, p, a, button, input, span {
+  font-family: 'Nosifer', cursive !important;
+  color: red !important;
+  text-shadow: 
+    0 0 5px #ff0000,
+    0 0 10px #ff0000,
+    0 0 20px #ff0000,
+    0 0 30px #ff0000,
+    0 0 40px #ff0000;
+}
+
+/* Inputs placeholder style */
+input::placeholder {
+  color: red;
+  text-shadow: 0 0 3px #ff0000, 0 0 5px #ff0000;
+}
+
+/* Buttons */
+button {
+  color: white; 
+  text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000;
+  cursor: pointer;
+}
+
+/* Links hover */
+a:hover {
+  text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+}
+
+/* Sign In container (original layout) */
+.login-container {
+  position: relative;
+  z-index: 1;
+  background: rgba(0,0,0,0.85);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0 0 25px red;
+  animation: heartbeatGlow 1.5s ease-in-out infinite, flicker 0.2s infinite;
+}
+.login-container h1 { margin-bottom:20px; text-shadow:0 0 15px red; }
+.login-container input {
+  width:100%; padding:10px; margin:10px 0; border:none;
+  border-radius:5px; background:#222; color:#fff; outline:none;
+}
+.login-container button {
+  width:100%; padding:10px; background:red; border:none;
+  color:white; font-weight:bold; border-radius:5px;
+}
+.login-container button:hover { background:#ff0000cc; }
+.login-container p { margin-top:10px; font-size:0.9em; }
+.login-container a { color:red; text-decoration:none; }
+.login-container a:hover { text-decoration:underline; }
+
+/* Animations */
+@keyframes heartbeatGlow {
+  0%,100% { box-shadow:0 0 15px red; }
+  25% { box-shadow:0 0 50px red; }
+  50% { box-shadow:0 0 20px red; }
+  75% { box-shadow:0 0 40px red; }
+}
+@keyframes flicker { 0%,100%{opacity:1;} 50%{opacity:0.95;} }
+</style>
 </head>
 <body>
-
-<ul class="floating-page-list">
-  <li>Sigh In</li>
-</ul>
 
 <div class="login-container">
   <h1>Ghostly Tools 👻</h1>
@@ -41,18 +127,18 @@ async function getIP() {
   } catch { return "Unknown"; }
 }
 
+// Ensure admin exists
 let users = JSON.parse(localStorage.getItem("users") || "[]");
 if(!users.some(u => u.username === "Ghostly")) {
   users.push({ username: "Ghostly", password: "Dare2995!", status: "approved", admin: true });
   localStorage.setItem("users", JSON.stringify(users));
 }
 
+// Sign-in logic
 document.getElementById("signin-form").addEventListener("submit", async function(e){
   e.preventDefault();
-
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
-
   users = JSON.parse(localStorage.getItem("users") || "[]");
 
   const admin = users.find(u => u.admin && u.username === username && u.password === password);
@@ -70,7 +156,6 @@ document.getElementById("signin-form").addEventListener("submit", async function
     alert("⚠️ Invalid username or password");
     return;
   }
-
   if(user.status !== "approved"){
     alert("⏳ Your account is pending approval.");
     window.location.href = "pending.html";
