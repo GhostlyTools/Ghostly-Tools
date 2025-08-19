@@ -15,6 +15,7 @@ body {
     height: 100vh;
     overflow: hidden;
 }
+
 .floating-text {
     position: absolute;
     font-size: 2.2rem;
@@ -23,12 +24,14 @@ body {
     pointer-events: none;
     animation: float 12s linear infinite;
 }
+
 @keyframes float {
     0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity:0; }
     10% { opacity:0.2; }
     50% { transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.15; }
     100% { transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0; }
 }
+
 .login-container {
     background: rgba(0,0,0,0.75);
     border: 3px solid red;
@@ -42,6 +45,7 @@ body {
     position: relative;
     z-index: 10;
 }
+
 .login-container h1 { color: red; margin-bottom: 30px; font-size: 30px; text-shadow: 1px 1px 4px #000; }
 .login-container input { width: 90%; padding: 14px; margin: 12px 0; border: 2px solid red; border-radius: 10px; background: #111; color: #fff; font-size: 16px; outline: none; transition: 0.3s; }
 .login-container input:focus { border-color: #ff5555; box-shadow: 0 0 10px red; }
@@ -49,7 +53,9 @@ body {
 .login-container button:hover { background: #fff; color: red; box-shadow: 0 0 15px red; }
 .login-container p { margin-top: 22px; font-size: 15px; }
 .login-container p a { color: red; text-decoration: underline; cursor: pointer; }
+
 @keyframes heartbeat { 0%,100% { box-shadow: 0 0 10px red; } 50% { box-shadow: 0 0 25px red; } }
+
 @media (max-width: 480px) {
     .login-container { width: 90%; padding: 30px 20px; top:0; margin:auto; box-shadow:0 0 25px rgba(255,0,0,0.7); }
     .login-container h1 { font-size: 24px; margin-bottom: 20px; }
@@ -79,23 +85,21 @@ body {
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+const usersFile = "users.json";
 
 async function getIP() {
-    try { const res = await fetch("https://api.ipify.org?format=json"); const data = await res.json(); return data.ip || "Unknown IP"; } catch { return "Unknown IP"; }
+    try { const res = await fetch("https://api.ipify.org?format=json"); const data = await res.json(); return data.ip || "Unknown IP"; }
+    catch { return "Unknown IP"; }
 }
 
 async function fetchUsers() {
-    try { const res = await fetch('users.json'); return await res.json(); } catch { return []; }
+    try { const res = await fetch(usersFile); return await res.json(); } catch { return []; }
 }
 
-async function sendWebhook(username, ip, userCount) {
+async function sendWebhook(username, ip, userCount){
     try {
-        await fetch(webhookURL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: `💀 User Sign In:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}` })
-        });
-    } catch {}
+        await fetch(webhookURL, { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ content: `💀 User Sign In:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}`}) });
+    } catch(err){ console.error("Webhook failed:", err); }
 }
 
 document.getElementById("signin-form").addEventListener("submit", async function(e){
@@ -110,21 +114,31 @@ document.getElementById("signin-form").addEventListener("submit", async function
         return;
     }
 
+    // Normal users
     let users = await fetchUsers();
     const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
-    if(!user){ alert("⚠️ Username not found!"); return; }
-    if(user.password !== password){ alert("⚠️ Incorrect password!"); return; }
+
+    if(!user){
+        alert("⚠️ Username not found!");
+        return;
+    }
+    if(user.password !== password){
+        alert("⚠️ Incorrect password!");
+        return;
+    }
 
     const ip = await getIP();
     await sendWebhook(username, ip, users.length);
 
-    if(user.status === "pending"){ 
-        alert("⏳ Account pending approval!"); 
+    if(user.status === "pending"){
+        alert("⏳ Account pending approval!");
         window.location.href = "pending.html";
     } else if(user.status === "approved"){
-        alert("✅ Sign In successful!"); 
+        alert("✅ Sign In successful!");
         window.location.href = "index.html";
-    } else { alert("⚠️ Unknown account status."); }
+    } else {
+        alert("⚠️ Account status unknown. Contact admin.");
+    }
 });
 </script>
 
