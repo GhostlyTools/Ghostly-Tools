@@ -8,64 +8,62 @@
 </head>
 <body>
 
-<div class="floating-page-name">Sign Up</div>
+<ul class="floating-page-list">
+  <li>Sign Up</li>
+</ul>
 
 <div class="login-container">
-<h1>Ghostly Tools 👻</h1>
-<form id="signup-form">
-  <input type="text" id="username" placeholder="Username" required>
-  <input type="password" id="password" placeholder="Password" required>
-  <button type="submit">Sign Up</button>
-</form>
-<p>Already have an account? <a href="auth.html">Sign In</a></p>
+  <h1>Ghostly Tools 👻</h1>
+  <form id="signup-form">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Sign Up</button>
+  </form>
+  <p>Already have an account? <a href="auth.html">Sign In</a></p>
 </div>
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-// Async webhook sender
-function sendWebhook(message){
-  return fetch(webhookURL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({content: message})
-  }).catch(()=>{});
+function sendWebhook(message) {
+  fetch(webhookURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content: message })
+  }).catch(function(err){ console.log("Webhook failed:", err); });
 }
 
-// Get IP
-async function getIP(){
-  try{
-    const res = await fetch("https://api.ipify.org?format=json");
-    const data = await res.json();
+async function getIP() {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
     return data.ip;
-  } catch {
-    return "Unknown";
-  }
+  } catch { return "Unknown"; }
 }
 
-document.getElementById("signup-form").addEventListener("submit", async function(e){
+document.getElementById("signup-form").addEventListener("submit", async function(e) {
   e.preventDefault();
+
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
 
   let users = JSON.parse(localStorage.getItem("users") || "[]");
-
-  if(users.some(u => u.username.toLowerCase() === username.toLowerCase())){
-    alert(`Username "${username}" already exists!`);
+  if(users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+    alert("⚠️ Username \"" + username + "\" already exists!");
     return;
   }
 
-  const newUser = {username, password, status:"pending"};
+  const newUser = { username: username, password: password, status: "pending" };
   users.push(newUser);
   localStorage.setItem("users", JSON.stringify(users));
 
   const ip = await getIP();
-  await sendWebhook(`💀 New user: ${username}\nIP: ${ip}`);
+  await sendWebhook("💀 New user: " + username + "\nIP: " + ip);
 
-  setTimeout(()=>{
+  setTimeout(function(){
     alert("✅ Account created! Waiting for admin approval.");
-    window.location.href="pending.html";
-  },1000);
+    window.location.href = "pending.html";
+  }, 1000);
 });
 </script>
 
