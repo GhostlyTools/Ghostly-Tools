@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Ghostly Tools Downloads 👻</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghostly Tools 👻 - Downloads</title>
 <style>
 body {
     margin: 0;
@@ -36,20 +37,6 @@ body {
     text-shadow: 0 0 20px red;
 }
 
-/* Subtle YouTube video */
-#downloads-container iframe {
-    width: 90%;
-    max-width: 550px;
-    height: 315px;
-    border-radius: 15px;
-    border: none;
-    box-shadow: 0 0 25px rgba(255,0,0,0.5);
-    opacity: 0.15;
-    background: transparent;
-    margin-bottom: 25px;
-}
-
-/* Links styling */
 #downloads-content a {
     display: block;
     padding: 18px 25px;
@@ -102,11 +89,12 @@ body {
 
   <!-- Hardly visible YouTube Video -->
   <iframe 
-    src="https://www.youtube.com/embed/-BV8bVATMhQ?autoplay=1&loop=1&playlist=-BV8bVATMhQ&controls=0&modestbranding=1&rel=0" 
-    title="Ghostly Tools Video" 
-    frameborder="0" 
-    allow="autoplay; encrypted-media; clipboard-write; accelerometer; gyroscope; picture-in-picture" 
-    allowfullscreen>
+      src="https://www.youtube.com/embed/-BV8bVATMhQ?autoplay=1&loop=1&playlist=-BV8bVATMhQ&controls=0&modestbranding=1&rel=0&mute=0" 
+      title="Ghostly Tools Video" 
+      frameborder="0" 
+      allow="autoplay; encrypted-media; clipboard-write; accelerometer; gyroscope; picture-in-picture" 
+      allowfullscreen
+      style="width: 90%; max-width: 550px; height: 315px; border-radius: 15px; border: none; box-shadow: 0 0 25px rgba(255,0,0,0.5); opacity: 0.35; margin-bottom: 25px;">
   </iframe>
 
   <div id="downloads-content"></div>
@@ -126,7 +114,6 @@ body {
 <div class="waiting" style="left:85%; animation-delay:4s;">Downloads…</div>
 
 <script>
-// Get signed in user from localStorage
 const signedInUser = localStorage.getItem("signedInUser");
 let users = JSON.parse(localStorage.getItem("users") || "[]");
 let currentUser = users.find(u => u.username === signedInUser);
@@ -134,7 +121,8 @@ let currentUser = users.find(u => u.username === signedInUser);
 const downloadsContent = document.getElementById("downloads-content");
 
 if (!currentUser || currentUser.status !== "approved") {
-  downloadsContent.innerHTML = "<p>Downloads 👻 (Pending admin approval)</p>";
+  // Optional: redirect pending users
+  window.location.href = "pending.html";
 } else {
   downloadsContent.innerHTML = `
       <a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank" rel="noopener noreferrer">Ghostly Toolkit</a>
