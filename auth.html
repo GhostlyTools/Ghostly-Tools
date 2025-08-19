@@ -5,143 +5,83 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
 <link rel="stylesheet" href="style.css">
-<style>
-/* Body and overlay */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Creepster", cursive;
-  color: #fff;
-  background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  position: relative;
-}
-body::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.3);
-  z-index: 0;
-}
-
-/* Sign In container */
-.login-container {
-  position: relative;
-  z-index: 1;
-  background: rgba(0,0,0,0.85);
-  padding: 30px;
-  border-radius: 15px;
-  text-align: center;
-  width: 300px;
-  box-shadow: 0 0 25px red;
-  animation: heartbeatGlow 1.5s ease-in-out infinite, flicker 0.2s infinite;
-}
-.login-container h1 { margin-bottom: 20px; text-shadow: 0 0 15px red; }
-.login-container input {
-  width: 100%; padding: 10px; margin: 10px 0; border: none;
-  border-radius: 5px; background: #222; color: #fff; outline: none;
-}
-.login-container button {
-  width: 100%; padding: 10px; background: red; border: none;
-  color: white; font-weight: bold; border-radius: 5px; cursor: pointer;
-}
-.login-container button:hover { background: #ff0000cc; }
-.login-container p { margin-top: 10px; font-size: 0.9em; }
-.login-container a { color: red; text-decoration: none; }
-.login-container a:hover { text-decoration: underline; }
-
-/* Animations */
-@keyframes heartbeatGlow {
-  0%,100% { box-shadow: 0 0 15px red; }
-  25%     { box-shadow: 0 0 50px red; }
-  50%     { box-shadow: 0 0 20px red; }
-  75%     { box-shadow: 0 0 40px red; }
-}
-@keyframes flicker { 0%,100% { opacity: 1; } 50% { opacity: 0.95; } }
-</style>
 </head>
 <body>
 
+<ul class="floating-page-list">
+  <li>Auth</li>
+</ul>
+
 <div class="login-container">
-<h1>Ghostly Tools 👻</h1>
-<form id="signin-form">
-  <input type="text" id="username" placeholder="Username" required>
-  <input type="password" id="password" placeholder="Password" required>
-  <button type="submit">Sign In</button>
-</form>
-<p>Don't have an account? <a href="signup.html">Sign Up</a></p>
+  <h1>Ghostly Tools 👻</h1>
+  <form id="signin-form">
+    <input type="text" id="username" placeholder="Username" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Sign In</button>
+  </form>
+  <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
 </div>
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-// Ensure admin exists
-let users = JSON.parse(localStorage.getItem("users") || "[]");
-if(!users.find(u=>u.username==="Ghostly")){
-  users.push({username:"Ghostly", password:"Dare2995!", status:"approved", admin:true});
-  localStorage.setItem("users", JSON.stringify(users));
+function sendWebhook(message) {
+  fetch(webhookURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content: message })
+  }).catch(err => console.log("Webhook failed:", err));
 }
 
-// Async webhook sender
-function sendWebhook(message){
-  fetch(webhookURL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({content: message})
-  }).catch(()=>{});
-}
-
-// Get user IP
-async function getIP(){
-  try{
+async function getIP() {
+  try {
     const res = await fetch("https://api.ipify.org?format=json");
     const data = await res.json();
     return data.ip;
-  } catch {
-    return "Unknown";
-  }
+  } catch { return "Unknown"; }
+}
+
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+if(!users.some(u => u.username === "Ghostly")) {
+  users.push({ username: "Ghostly", password: "Dare2995!", status: "approved", admin: true });
+  localStorage.setItem("users", JSON.stringify(users));
 }
 
 document.getElementById("signin-form").addEventListener("submit", async function(e){
   e.preventDefault();
+
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
 
   users = JSON.parse(localStorage.getItem("users") || "[]");
 
-  // Admin login
-  const admin = users.find(u=>u.admin && u.username===username && u.password===password);
+  const admin = users.find(u => u.admin && u.username === username && u.password === password);
   if(admin){
     localStorage.setItem("signedInUser", username);
     const ip = await getIP();
-    sendWebhook(`💀 Admin ${username} signed in\nIP: ${ip}`);
+    sendWebhook("💀 Admin " + username + " signed in\nIP: " + ip);
     alert("✅ Admin signed in!");
-    window.location.href="admin.html";
+    window.location.href = "admin.html";
     return;
   }
 
-  // Normal user login
-  const user = users.find(u=>u.username.toLowerCase()===username.toLowerCase() && u.password===password);
+  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
   if(!user){
     alert("⚠️ Invalid username or password");
     return;
   }
+
   if(user.status !== "approved"){
     alert("⏳ Your account is pending approval.");
-    window.location.href="pending.html";
+    window.location.href = "pending.html";
     return;
   }
 
   localStorage.setItem("signedInUser", user.username);
   const ip = await getIP();
-  sendWebhook(`💀 User ${username} signed in\nIP: ${ip}`);
+  sendWebhook("💀 User " + user.username + " signed in\nIP: " + ip);
   alert("✅ Signed in successfully!");
-  window.location.href="index.html";
+  window.location.href = "index.html";
 });
 </script>
 
