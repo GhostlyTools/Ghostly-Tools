@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign Up</title>
 <style>
-/* Layout and floating text styling (same as your original style) */
+/* Layout and floating text styling */
 body {
     margin: 0; padding: 0;
     font-family: 'Arial', sans-serif;
@@ -54,6 +54,33 @@ body {
 .login-container button:hover { background: #fff; color: red; box-shadow: 0 0 15px red; }
 .login-container p { margin-top: 22px; font-size: 15px; }
 .login-container p a { color: red; text-decoration: underline; cursor: pointer; }
+
+.info-btn {
+    display: inline-block;
+    margin-left: 8px;
+    background: red;
+    color: #fff;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.info-dropdown {
+    display: none;
+    margin-top: 12px;
+    background: rgba(255,0,0,0.1);
+    color: #fff;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+    text-align: left;
+}
+
 @keyframes heartbeat { 0%,100% { box-shadow: 0 0 10px red; } 50% { box-shadow: 0 0 25px red; } }
 
 @media (max-width: 480px) {
@@ -74,7 +101,14 @@ body {
 <div class="floating-text" style="left:90%; animation-delay:4s;">Sign Up</div>
 
 <div class="login-container">
-  <h1>Ghostly Tools 👻</h1>
+  <h1>Ghostly Tools 👻
+    <span class="info-btn" onclick="toggleInfo()">?</span>
+  </h1>
+  
+  <div class="info-dropdown" id="info-dropdown">
+    <p>Ghostly Tools is a suite of utilities including DDoS testers, Pingers, IP Lookup, and other penetration testing tools. Each tool is designed to help monitor and test network systems safely once approved by the admin.</p>
+  </div>
+
   <form id="signup-form">
     <input type="text" id="username" placeholder="Username" required>
     <input type="password" id="password" placeholder="Password" required>
@@ -85,37 +119,29 @@ body {
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-const usersFile = "https://yourwebsite.com/users.json"; // JSON file URL
+
+function toggleInfo() {
+    const dropdown = document.getElementById("info-dropdown");
+    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+}
 
 async function getIP() {
     try { const res = await fetch("https://api.ipify.org?format=json"); const data = await res.json(); return data.ip; } catch { return "Unknown IP"; }
 }
 
 async function fetchUsers() {
-    try { const res = await fetch(usersFile); return await res.json(); } catch { return []; }
+    try { const res = await fetch("users.json"); return await res.json(); } catch { return []; }
 }
 
 async function saveUsers(users) {
-    try {
-        // Send POST to your server to overwrite users.json (requires server endpoint)
-        await fetch("/save_users.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(users)
-        });
-    } catch (err) { console.error("Could not save users:", err); }
+    try { await fetch("/save_users.php", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(users) }); } 
+    catch(err){ console.error("Could not save users:", err); }
 }
 
 async function sendWebhook(username, ip, userCount) {
     try {
-        await fetch(webhookURL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                content: `💀 New User Sign Up:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}`
-            })
-        });
-    } catch (err) { console.error("Webhook failed:", err); }
+        await fetch(webhookURL, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ content:`💀 New User Sign Up:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}` }) });
+    } catch(err){ console.error("Webhook failed:", err); }
 }
 
 document.getElementById("signup-form").addEventListener("submit", async function(e){
@@ -128,7 +154,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
     let users = await fetchUsers();
     if(users.some(u => u.username.toLowerCase() === username.toLowerCase())) { alert("⚠️ Username exists!"); return; }
 
-    const newUser = { username, password, status: "pending" };
+    const newUser = { username, password, status:"pending" };
     users.push(newUser);
 
     await saveUsers(users);
