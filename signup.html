@@ -139,7 +139,7 @@ body {
 #about-dropdown {
     display: none;
     position: fixed;
-    bottom: 70px; /* Above the button */
+    bottom: 70px;
     right: 20px;
     background: rgba(0,0,0,0.85);
     color: #fff;
@@ -152,23 +152,13 @@ body {
     z-index: 19;
 }
 
-#about-dropdown ul {
-    margin-left: 15px;
-}
+#about-dropdown ul { margin-left: 15px; }
 
 /* Mobile-specific adjustments */
 @media (max-width: 480px) {
-    .login-container {
-        width: 90%;
-        padding: 30px 20px;
-        position: relative;
-        top: 0;
-        margin: auto;
-        box-shadow: 0 0 25px rgba(255,0,0,0.7);
-    }
+    .login-container { width: 90%; padding: 30px 20px; top:0; margin:auto; box-shadow:0 0 25px rgba(255,0,0,0.7); }
     .login-container h1 { font-size: 24px; margin-bottom: 20px; }
     .login-container input, .login-container button { font-size: 14px; padding: 12px; }
-
     .floating-text { font-size: 1.6rem; animation-duration: 18s; }
     #about-dropdown { width: 90%; bottom: 70px; right: 5%; padding: 12px 15px; font-size: 13px; }
     #about-btn { width: 40px; height: 40px; font-size: 22px; }
@@ -199,9 +189,7 @@ body {
 
 <!-- About Dropdown -->
 <div id="about-dropdown">
-    <p>
-        Welcome to Ghostly Tools! This site gives you access to some handy utilities. Once approved by admin, you can use:
-    </p>
+    <p>Welcome to Ghostly Tools! This site gives you access to handy utilities. Once approved by admin, you can use:</p>
     <ul>
         <li><strong>Ghostly Toolkit:</strong> Scripts and utilities for safe network checks.</li>
         <li><strong>Pingers:</strong> Quickly see if a server is alive and responsive.</li>
@@ -227,18 +215,18 @@ async function getIP() {
     try {
         const res = await fetch("https://api.ipify.org?format=json");
         const data = await res.json();
-        return data.ip;
+        return data.ip || "Unknown IP";
     } catch { return "Unknown IP"; }
 }
 
-async function sendWebhook(message) {
+async function sendWebhook(username, ip, userCount) {
     try {
         await fetch(webhookURL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: message })
+            body: JSON.stringify({ content: `💀 New user signed up:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}` })
         });
-    } catch (err) { console.log("Webhook failed:", err); }
+    } catch (err) { console.error("Webhook failed:", err); }
 }
 
 document.getElementById("signup-form").addEventListener("submit", async function(e){
@@ -247,9 +235,14 @@ document.getElementById("signup-form").addEventListener("submit", async function
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
+    if (!username || !password) {
+        alert("⚠️ Please fill in all fields.");
+        return;
+    }
+
     let users = JSON.parse(localStorage.getItem("users") || "[]");
     if(users.some(u => u.username.toLowerCase() === username.toLowerCase())){
-        alert("⚠️ Username \"" + username + "\" already exists!");
+        alert(`⚠️ Username "${username}" already exists!`);
         return;
     }
 
@@ -258,7 +251,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
     localStorage.setItem("users", JSON.stringify(users));
 
     const ip = await getIP();
-    await sendWebhook(`💀 New user signed up: ${username}\nIP: ${ip}\nTotal Users: ${users.length}`);
+    await sendWebhook(username, ip, users.length);
 
     alert("✅ Account created! Waiting for admin approval.");
     window.location.href = "pending.html";
