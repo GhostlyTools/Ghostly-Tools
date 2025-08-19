@@ -16,23 +16,22 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    overflow: hidden; /* ensure floating text doesn’t scroll */
+    overflow: hidden;
 }
 
-/* Floating "Sign In" text */
 .floating-text {
     position: absolute;
-    font-size: 3rem;
+    font-size: 2.2rem;
     font-weight: bold;
-    color: rgba(255,0,0,0.3);
+    color: rgba(255,0,0,0.15);
     pointer-events: none;
     animation: float 12s linear infinite;
 }
 
 @keyframes float {
     0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity:0; }
-    10% { opacity:1; }
-    50% { transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.7; }
+    10% { opacity:0.2; }
+    50% { transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.15; }
     100% { transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0; }
 }
 
@@ -47,7 +46,7 @@ body {
     animation: heartbeat 1.5s infinite;
     box-shadow: 0 0 20px rgba(255,0,0,0.7);
     position: relative;
-    z-index: 10; /* ensure container is above floating text */
+    z-index: 10;
 }
 
 .login-container h1 {
@@ -111,17 +110,11 @@ body {
     50% { box-shadow: 0 0 25px red; }
 }
 
-@media (max-width: 400px) {
-    .login-container {
-        width: 90%;
-        padding: 30px 20px;
-    }
-    .login-container h1 {
-        font-size: 24px;
-    }
-    .login-container button, .login-container input {
-        font-size: 15px;
-    }
+@media (max-width: 480px) {
+    .login-container { width: 90%; padding: 30px 20px; top:0; margin:auto; box-shadow:0 0 25px rgba(255,0,0,0.7); }
+    .login-container h1 { font-size: 24px; margin-bottom: 20px; }
+    .login-container input, .login-container button { font-size: 14px; padding: 12px; }
+    .floating-text { font-size: 1.6rem; animation-duration: 18s; }
 }
 </style>
 </head>
@@ -151,24 +144,20 @@ async function getIP() {
     try {
         const res = await fetch("https://api.ipify.org?format=json");
         const data = await res.json();
-        return data.ip;
-    } catch {
-        return "Unknown IP";
-    }
+        return data.ip || "Unknown IP";
+    } catch { return "Unknown IP"; }
 }
 
-async function sendWebhook(username, ip, liveCount) {
+async function sendWebhook(username, ip, userCount) {
     try {
         await fetch(webhookURL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                content: `💀 User Sign In:\nUsername: ${username}\nIP: ${ip}\nLive Users: ${liveCount}`
+            body: JSON.stringify({ 
+                content: `💀 User Sign In:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}` 
             })
         });
-    } catch (err) {
-        console.log("Webhook failed:", err);
-    }
+    } catch (err) { console.error("Webhook failed:", err); }
 }
 
 document.getElementById("signin-form").addEventListener("submit", async function(e){
@@ -177,7 +166,7 @@ document.getElementById("signin-form").addEventListener("submit", async function
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
-    // Admin login (manual)
+    // Admin login
     if(username === "Ghostly" && password === "Dare2995!"){
         alert("✅ Admin login successful!");
         window.location.href = "admin.html";
@@ -193,41 +182,24 @@ document.getElementById("signin-form").addEventListener("submit", async function
         return;
     }
 
-    if(user.status === "pending"){
-        alert("⏳ Your account is pending approval.");
-        window.location.href = "pending.html";
-        return;
-    }
-
-    if(user.status !== "approved"){
-        alert("⚠️ Your account cannot sign in yet.");
-        return;
-    }
-
     if(user.password !== password){
         alert("⚠️ Incorrect password!");
         return;
     }
 
-    // Track live users
-    let activeUsers = JSON.parse(localStorage.getItem("activeUsers") || "[]");
-    if(!activeUsers.includes(username)) activeUsers.push(username);
-    localStorage.setItem("activeUsers", JSON.stringify(activeUsers));
-
+    // Send webhook only for normal users
     const ip = await getIP();
-    await sendWebhook(username, ip, activeUsers.length); // Live users count
+    await sendWebhook(username, ip, users.length);
 
-    alert("✅ Sign In successful! Welcome " + username);
-    localStorage.setItem("signedInUser", username);
-    window.location.href = "index.html"; // Redirect normal user dashboard
-});
-
-// Remove user from activeUsers on page unload
-window.addEventListener('beforeunload', () => {
-    let activeUsers = JSON.parse(localStorage.getItem("activeUsers") || "[]");
-    const signedInUser = localStorage.getItem("signedInUser");
-    activeUsers = activeUsers.filter(u => u !== signedInUser);
-    localStorage.setItem("activeUsers", JSON.stringify(activeUsers));
+    if(user.status === "pending"){
+        alert("⏳ Account pending approval!");
+        window.location.href = "pending.html";
+    } else if(user.status === "approved"){
+        alert("✅ Sign In successful!");
+        window.location.href = "index.html";
+    } else {
+        alert("⚠️ Account status unknown. Contact admin.");
+    }
 });
 </script>
 
