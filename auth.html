@@ -152,8 +152,8 @@ document.getElementById("signin-form").addEventListener("submit", async function
 
     // Admin login
     if(username === "Ghostly" && password === "Dare2995!"){
-        alert("✅ Admin login successful!");
-        window.location.href = "admin.html"; // Admin redirect
+        localStorage.setItem("signedInUser", username);
+        window.location.href = "admin.html";
         return;
     }
 
@@ -166,22 +166,23 @@ document.getElementById("signin-form").addEventListener("submit", async function
         return;
     }
 
-    if(user.status !== "pending"){
-        alert("⚠️ Your account is not approved yet. Please wait for admin approval.");
-        return;
-    }
-
     if(user.password !== password){
         alert("⚠️ Incorrect password!");
         return;
     }
 
-    // Send webhook for normal users only
-    const ip = await getIP();
-    await sendWebhook(username, ip, users.length);
+    localStorage.setItem("signedInUser", username);
 
-    alert("✅ Sign In successful! Welcome " + username);
-    // window.location.href = "index.html"; // Redirect normal user dashboard
+    // Redirect based on status
+    if(user.status === "approved"){
+        const ip = await getIP();
+        await sendWebhook(username, ip, users.length);
+        window.location.href = "index.html";
+    } else if(user.status === "pending"){
+        window.location.href = "pending.html";
+    } else {
+        alert("⚠️ Your account status is unknown. Contact admin.");
+    }
 });
 </script>
 
