@@ -5,16 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign Up</title>
 <style>
+/* Layout and floating text styling (same as your original style) */
 body {
-    margin: 0;
-    padding: 0;
+    margin: 0; padding: 0;
     font-family: 'Arial', sans-serif;
     background: url('https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg') no-repeat center center fixed;
     background-size: cover;
     color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: flex; justify-content: center; align-items: center;
     height: 100vh;
     overflow: hidden;
 }
@@ -49,66 +47,14 @@ body {
     z-index: 10;
 }
 
-.login-container h1 {
-    color: red;
-    margin-bottom: 30px;
-    font-size: 30px;
-    text-shadow: 1px 1px 4px #000;
-}
-
-.login-container input {
-    width: 90%;
-    padding: 14px;
-    margin: 12px 0;
-    border: 2px solid red;
-    border-radius: 10px;
-    background: #111;
-    color: #fff;
-    font-size: 16px;
-    outline: none;
-    transition: 0.3s;
-}
-
-.login-container input:focus {
-    border-color: #ff5555;
-    box-shadow: 0 0 10px red;
-}
-
-.login-container button {
-    width: 95%;
-    padding: 14px;
-    margin-top: 18px;
-    border: none;
-    border-radius: 10px;
-    background: red;
-    color: #fff;
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.login-container button:hover {
-    background: #fff;
-    color: red;
-    box-shadow: 0 0 15px red;
-}
-
-.login-container p {
-    margin-top: 22px;
-    font-size: 15px;
-}
-
-.login-container p a {
-    color: red;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-@keyframes heartbeat {
-    0%, 100% { box-shadow: 0 0 10px red; }
-    50% { box-shadow: 0 0 25px red; }
-}
+.login-container h1 { color: red; margin-bottom: 30px; font-size: 30px; text-shadow: 1px 1px 4px #000; }
+.login-container input { width: 90%; padding: 14px; margin: 12px 0; border: 2px solid red; border-radius: 10px; background: #111; color: #fff; font-size: 16px; outline: none; transition: 0.3s; }
+.login-container input:focus { border-color: #ff5555; box-shadow: 0 0 10px red; }
+.login-container button { width: 95%; padding: 14px; margin-top: 18px; border: none; border-radius: 10px; background: red; color: #fff; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+.login-container button:hover { background: #fff; color: red; box-shadow: 0 0 15px red; }
+.login-container p { margin-top: 22px; font-size: 15px; }
+.login-container p a { color: red; text-decoration: underline; cursor: pointer; }
+@keyframes heartbeat { 0%,100% { box-shadow: 0 0 10px red; } 50% { box-shadow: 0 0 25px red; } }
 
 @media (max-width: 480px) {
     .login-container { width: 90%; padding: 30px 20px; top:0; margin:auto; box-shadow:0 0 25px rgba(255,0,0,0.7); }
@@ -139,13 +85,25 @@ body {
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
+const usersFile = "https://yourwebsite.com/users.json"; // JSON file URL
 
 async function getIP() {
+    try { const res = await fetch("https://api.ipify.org?format=json"); const data = await res.json(); return data.ip; } catch { return "Unknown IP"; }
+}
+
+async function fetchUsers() {
+    try { const res = await fetch(usersFile); return await res.json(); } catch { return []; }
+}
+
+async function saveUsers(users) {
     try {
-        const res = await fetch("https://api.ipify.org?format=json");
-        const data = await res.json();
-        return data.ip || "Unknown IP";
-    } catch { return "Unknown IP"; }
+        // Send POST to your server to overwrite users.json (requires server endpoint)
+        await fetch("/save_users.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(users)
+        });
+    } catch (err) { console.error("Could not save users:", err); }
 }
 
 async function sendWebhook(username, ip, userCount) {
@@ -162,29 +120,19 @@ async function sendWebhook(username, ip, userCount) {
 
 document.getElementById("signup-form").addEventListener("submit", async function(e){
     e.preventDefault();
-
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
-    // Prevent admin signup
-    if(username === "Ghostly" && password === "Dare2995!") {
-        alert("⚠️ Cannot create admin account!");
-        return;
-    }
+    if(username === "Ghostly" && password === "Dare2995!") { alert("⚠️ Cannot create admin account!"); return; }
 
-    let users = JSON.parse(localStorage.getItem("users") || "[]");
-    if(users.some(u => u.username.toLowerCase() === username.toLowerCase())){
-        alert("⚠️ Username already exists!");
-        return;
-    }
+    let users = await fetchUsers();
+    if(users.some(u => u.username.toLowerCase() === username.toLowerCase())) { alert("⚠️ Username exists!"); return; }
 
     const newUser = { username, password, status: "pending" };
     users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
 
+    await saveUsers(users);
     const ip = await getIP();
-
-    // Send webhook immediately for admin to detect
     await sendWebhook(username, ip, users.length);
 
     alert("✅ Account created! Waiting for admin approval.");
