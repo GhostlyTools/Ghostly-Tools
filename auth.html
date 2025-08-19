@@ -16,6 +16,24 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow: hidden; /* ensure floating text doesn’t scroll */
+}
+
+/* Floating "Sign In" text */
+.floating-text {
+    position: absolute;
+    font-size: 3rem;
+    font-weight: bold;
+    color: rgba(255,0,0,0.3);
+    pointer-events: none;
+    animation: float 12s linear infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity:0; }
+    10% { opacity:1; }
+    50% { transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.7; }
+    100% { transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0; }
 }
 
 .login-container {
@@ -28,6 +46,8 @@ body {
     max-width: 90%;
     animation: heartbeat 1.5s infinite;
     box-shadow: 0 0 20px rgba(255,0,0,0.7);
+    position: relative;
+    z-index: 10; /* ensure container is above floating text */
 }
 
 .login-container h1 {
@@ -107,6 +127,13 @@ body {
 </head>
 <body>
 
+<!-- Floating Sign In texts -->
+<div class="floating-text" style="left:10%; animation-delay:0s;">Sign In</div>
+<div class="floating-text" style="left:30%; animation-delay:3s;">Sign In</div>
+<div class="floating-text" style="left:50%; animation-delay:6s;">Sign In</div>
+<div class="floating-text" style="left:70%; animation-delay:1s;">Sign In</div>
+<div class="floating-text" style="left:90%; animation-delay:4s;">Sign In</div>
+
 <div class="login-container">
   <h1>Ghostly Tools 👻</h1>
   <form id="signin-form">
@@ -130,13 +157,13 @@ async function getIP() {
     }
 }
 
-async function sendWebhook(username, ip, userCount) {
+async function sendWebhook(username, ip, liveCount) {
     try {
         await fetch(webhookURL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                content: `💀 User Sign In:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}`
+                content: `💀 User Sign In:\nUsername: ${username}\nIP: ${ip}\nLive Users: ${liveCount}`
             })
         });
     } catch (err) {
@@ -150,10 +177,10 @@ document.getElementById("signin-form").addEventListener("submit", async function
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
 
-    // Admin login (no autofill)
+    // Admin login (manual)
     if(username === "Ghostly" && password === "Dare2995!"){
         alert("✅ Admin login successful!");
-        window.location.href = "admin.html"; // Admin redirect
+        window.location.href = "admin.html";
         return;
     }
 
@@ -182,12 +209,25 @@ document.getElementById("signin-form").addEventListener("submit", async function
         return;
     }
 
-    // Send webhook for normal users only
+    // Track live users
+    let activeUsers = JSON.parse(localStorage.getItem("activeUsers") || "[]");
+    if(!activeUsers.includes(username)) activeUsers.push(username);
+    localStorage.setItem("activeUsers", JSON.stringify(activeUsers));
+
     const ip = await getIP();
-    await sendWebhook(username, ip, users.length);
+    await sendWebhook(username, ip, activeUsers.length); // Live users count
 
     alert("✅ Sign In successful! Welcome " + username);
+    localStorage.setItem("signedInUser", username);
     window.location.href = "index.html"; // Redirect normal user dashboard
+});
+
+// Remove user from activeUsers on page unload
+window.addEventListener('beforeunload', () => {
+    let activeUsers = JSON.parse(localStorage.getItem("activeUsers") || "[]");
+    const signedInUser = localStorage.getItem("signedInUser");
+    activeUsers = activeUsers.filter(u => u !== signedInUser);
+    localStorage.setItem("activeUsers", JSON.stringify(activeUsers));
 });
 </script>
 
