@@ -1,55 +1,10 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
-<link href="https://fonts.googleapis.com/css2?family=Nosifer&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<style>
-/* Change all text to scary font */
-body, h1, h2, h3, h4, h5, h6, p, a, button, input, span, li {
-  font-family: 'Nosifer', cursive !important; /* scary blood-drip font */
-  color: red !important;
-  text-shadow: 
-    0 0 5px #ff0000,
-    0 0 10px #ff0000,
-    0 0 20px #ff0000,
-    0 0 30px #ff0000,
-    0 0 40px #ff0000;
-}
-
-/* Floating page text */
-.floating-page-list li {
-  position: absolute;
-  font-size: 2em;
-  color: red;
-  text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000, 0 0 20px #ff0000;
-}
-
-/* Inputs placeholder style */
-input::placeholder {
-  color: red;
-  text-shadow:
-    0 0 3px #ff0000,
-    0 0 5px #ff0000;
-}
-
-/* Buttons */
-button {
-  color: white; 
-  text-shadow:
-    0 0 5px #ff0000,
-    0 0 10px #ff0000;
-}
-
-/* Links hover effect */
-a:hover {
-  text-shadow:
-    0 0 10px #ff0000,
-    0 0 20px #ff0000;
-}
-</style>
 </head>
 <body>
 
@@ -68,24 +23,65 @@ a:hover {
 </div>
 
 <script>
-// Floating animation script (same as before)
-const floatingItems = document.querySelectorAll(".floating-page-list li");
-floatingItems.forEach(item => {
-  let posX = Math.random() * (window.innerWidth - 100);
-  let posY = Math.random() * (window.innerHeight - 50);
-  item.style.left = posX + "px";
-  item.style.top = posY + "px";
+const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
 
-  function move() {
-    posX += (Math.random() - 0.5) * 2;
-    posY += (Math.random() - 0.5) * 2;
-    posX = Math.max(0, Math.min(window.innerWidth - 100, posX));
-    posY = Math.max(0, Math.min(window.innerHeight - 50, posY));
-    item.style.left = posX + "px";
-    item.style.top = posY + "px";
-    requestAnimationFrame(move);
+function sendWebhook(message) {
+  fetch(webhookURL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content: message })
+  }).catch(err => console.log("Webhook failed:", err));
+}
+
+async function getIP() {
+  try {
+    const res = await fetch("https://api.ipify.org?format=json");
+    const data = await res.json();
+    return data.ip;
+  } catch { return "Unknown"; }
+}
+
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+if(!users.some(u => u.username === "Ghostly")) {
+  users.push({ username: "Ghostly", password: "Dare2995!", status: "approved", admin: true });
+  localStorage.setItem("users", JSON.stringify(users));
+}
+
+document.getElementById("signin-form").addEventListener("submit", async function(e){
+  e.preventDefault();
+
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
+
+  users = JSON.parse(localStorage.getItem("users") || "[]");
+
+  const admin = users.find(u => u.admin && u.username === username && u.password === password);
+  if(admin){
+    localStorage.setItem("signedInUser", username);
+    const ip = await getIP();
+    sendWebhook("💀 Admin " + username + " signed in\nIP: " + ip);
+    alert("✅ Admin signed in!");
+    window.location.href = "admin.html";
+    return;
   }
-  move();
+
+  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
+  if(!user){
+    alert("⚠️ Invalid username or password");
+    return;
+  }
+
+  if(user.status !== "approved"){
+    alert("⏳ Your account is pending approval.");
+    window.location.href = "pending.html";
+    return;
+  }
+
+  localStorage.setItem("signedInUser", user.username);
+  const ip = await getIP();
+  sendWebhook("💀 User " + user.username + " signed in\nIP: " + ip);
+  alert("✅ Signed in successfully!");
+  window.location.href = "index.html";
 });
 </script>
 
