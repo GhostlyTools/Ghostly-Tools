@@ -80,21 +80,32 @@ body {
     50% {transform: translateY(50vh) translateX(100px) rotate(180deg); opacity:0.7;}
     100% {transform: translateY(-20vh) translateX(200px) rotate(360deg); opacity:0;}
 }
+
+/* Subtle video styling */
+#bg-video {
+    width: 90%;
+    max-width: 550px;
+    height: 315px;
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 0 25px rgba(255,0,0,0.5);
+    opacity: 0.35;
+    margin-bottom: 25px;
+}
 </style>
 </head>
 <body>
 
 <div id="downloads-container">
+
   <h2>Downloads</h2>
 
-  <!-- Hardly visible YouTube Video -->
-  <iframe 
-      src="https://www.youtube.com/embed/-BV8bVATMhQ?autoplay=1&loop=1&playlist=-BV8bVATMhQ&controls=0&modestbranding=1&rel=0&mute=0" 
-      title="Ghostly Tools Video" 
-      frameborder="0" 
-      allow="autoplay; encrypted-media; clipboard-write; accelerometer; gyroscope; picture-in-picture" 
-      allowfullscreen
-      style="width: 90%; max-width: 550px; height: 315px; border-radius: 15px; border: none; box-shadow: 0 0 25px rgba(255,0,0,0.5); opacity: 0.35; margin-bottom: 25px;">
+  <!-- YouTube video (subtle, above links) -->
+  <iframe id="bg-video"
+      src="https://www.youtube.com/embed/-BV8bVATMhQ?autoplay=1&loop=1&playlist=-BV8bVATMhQ&controls=0&modestbranding=1&rel=0&mute=0"
+      frameborder="0"
+      allow="autoplay; encrypted-media; clipboard-write; accelerometer; gyroscope; picture-in-picture"
+      allowfullscreen>
   </iframe>
 
   <div id="downloads-content"></div>
@@ -121,16 +132,16 @@ let currentUser = users.find(u => u.username === signedInUser);
 const downloadsContent = document.getElementById("downloads-content");
 
 if (!currentUser || currentUser.status !== "approved") {
-  // Optional: redirect pending users
-  window.location.href = "pending.html";
+    // Redirect pending users
+    window.location.href = "pending.html";
 } else {
-  downloadsContent.innerHTML = `
-      <a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank" rel="noopener noreferrer">Ghostly Toolkit</a>
-      <a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank" rel="noopener noreferrer">Pingers</a>
-      <a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank" rel="noopener noreferrer">Savage Multitool</a>
-      <a href="https://www.mediafire.com/folder/133z6qltkuybu/Iplookup" target="_blank" rel="noopener noreferrer">IP Lookup</a>
-      <a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank" rel="noopener noreferrer">DDoS v3</a>
-  `;
+    downloadsContent.innerHTML = `
+        <a href="https://www.mediafire.com/folder/ywxqi9zw78mnf/ghostly_toolkit" target="_blank" rel="noopener noreferrer">Ghostly Toolkit</a>
+        <a href="https://www.mediafire.com/folder/42ybdsm9ye5zm/Pinger" target="_blank" rel="noopener noreferrer">Pingers</a>
+        <a href="https://www.mediafire.com/file/i19nvh86lnflpfy/savages_Multi_Tool_v2.bat/file" target="_blank" rel="noopener noreferrer">Savage Multitool</a>
+        <a href="https://www.mediafire.com/folder/133z6qltkuybu/Iplookup" target="_blank" rel="noopener noreferrer">IP Lookup</a>
+        <a href="https://www.mediafire.com/folder/esdp7v36ghng1/v3" target="_blank" rel="noopener noreferrer">DDoS v3</a>
+    `;
 }
 </script>
 
