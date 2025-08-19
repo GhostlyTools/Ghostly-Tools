@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign Up</title>
 <style>
-/* Layout and floating text styling */
 body {
     margin: 0; padding: 0;
     font-family: 'Arial', sans-serif;
@@ -55,39 +54,26 @@ body {
 .login-container p { margin-top: 22px; font-size: 15px; }
 .login-container p a { color: red; text-decoration: underline; cursor: pointer; }
 
-.info-btn {
-    display: inline-block;
-    margin-left: 8px;
-    background: red;
-    color: #fff;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    line-height: 22px;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-.info-dropdown {
-    display: none;
-    margin-top: 12px;
-    background: rgba(255,0,0,0.1);
-    color: #fff;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 14px;
-    text-align: left;
-}
-
 @keyframes heartbeat { 0%,100% { box-shadow: 0 0 10px red; } 50% { box-shadow: 0 0 25px red; } }
+
+#about-button {
+    position: absolute; top: 10px; right: 10px;
+    background: rgba(255,0,0,0.7); border: none; color: #fff;
+    padding: 8px 12px; border-radius: 8px; cursor: pointer;
+    font-size: 16px; z-index: 20;
+}
+#about-dropdown {
+    display: none; position: absolute; top: 50px; right: 10px;
+    background: rgba(0,0,0,0.85); border: 2px solid red; border-radius: 10px;
+    padding: 15px; color: #fff; width: 300px; font-size: 14px; z-index: 20;
+}
 
 @media (max-width: 480px) {
     .login-container { width: 90%; padding: 30px 20px; top:0; margin:auto; box-shadow:0 0 25px rgba(255,0,0,0.7); }
     .login-container h1 { font-size: 24px; margin-bottom: 20px; }
     .login-container input, .login-container button { font-size: 14px; padding: 12px; }
     .floating-text { font-size: 1.6rem; animation-duration: 18s; }
+    #about-dropdown { width: 90%; right: 5%; top: 60px; }
 }
 </style>
 </head>
@@ -100,47 +86,53 @@ body {
 <div class="floating-text" style="left:70%; animation-delay:1s;">Sign Up</div>
 <div class="floating-text" style="left:90%; animation-delay:4s;">Sign Up</div>
 
-<div class="login-container">
-  <h1>Ghostly Tools 👻
-    <span class="info-btn" onclick="toggleInfo()">?</span>
-  </h1>
-  
-  <div class="info-dropdown" id="info-dropdown">
-    <p>Ghostly Tools is a suite of utilities including DDoS testers, Pingers, IP Lookup, and other penetration testing tools. Each tool is designed to help monitor and test network systems safely once approved by the admin.</p>
-  </div>
+<!-- About dropdown -->
+<button id="about-button">?</button>
+<div id="about-dropdown">
+  <h3>About Ghostly Tools 👻</h3>
+  <p>Ghostly Tools is a professional suite for online exploration and dark web utilities. Here's a breakdown:</p>
+  <ul>
+    <li><strong>IP Pinger:</strong> Verifies online servers and device status.</li>
+    <li><strong>IP Lookup:</strong> Provides detailed info on IPs, location, and ISP.</li>
+    <li><strong>Savage Multitool:</strong> A dark web multi-tool connecting through Pinger, PuTTY, and Onion Tour Browser for safe access to markets.</li>
+    <li><strong>Pingers:</strong> Monitor servers and websites efficiently.</li>
+    <li><strong>DDoS v3:</strong> Controlled network testing for learning and analysis.</li>
+  </ul>
+  <p>All operations prioritize privacy, safety, and ethical usage.</p>
+</div>
 
+<div class="login-container">
+  <h1>Ghostly Tools 👻</h1>
   <form id="signup-form">
     <input type="text" id="username" placeholder="Username" required>
     <input type="password" id="password" placeholder="Password" required>
     <button type="submit">Sign Up</button>
   </form>
-  <p>Already have an account? <a href="signin.html">Sign In</a></p>
+  <p>Already have an account? <a href="auth.html">Sign In</a></p>
 </div>
 
 <script>
 const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-
-function toggleInfo() {
-    const dropdown = document.getElementById("info-dropdown");
-    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-}
+const usersFile = "users.json"; // Your JSON file URL
 
 async function getIP() {
-    try { const res = await fetch("https://api.ipify.org?format=json"); const data = await res.json(); return data.ip; } catch { return "Unknown IP"; }
+    try { const res = await fetch("https://api.ipify.org?format=json"); const data = await res.json(); return data.ip || "Unknown IP"; }
+    catch { return "Unknown IP"; }
 }
 
 async function fetchUsers() {
-    try { const res = await fetch("users.json"); return await res.json(); } catch { return []; }
+    try { const res = await fetch(usersFile); return await res.json(); } catch { return []; }
 }
 
 async function saveUsers(users) {
-    try { await fetch("/save_users.php", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(users) }); } 
-    catch(err){ console.error("Could not save users:", err); }
+    try {
+        await fetch("save_users.php", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(users) });
+    } catch(err){ console.error("Could not save users:", err); }
 }
 
-async function sendWebhook(username, ip, userCount) {
+async function sendWebhook(username, ip, userCount){
     try {
-        await fetch(webhookURL, { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ content:`💀 New User Sign Up:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}` }) });
+        await fetch(webhookURL, { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({ content: `💀 New User Sign Up:\nUsername: ${username}\nIP: ${ip}\nTotal Users: ${userCount}`}) });
     } catch(err){ console.error("Webhook failed:", err); }
 }
 
@@ -154,7 +146,7 @@ document.getElementById("signup-form").addEventListener("submit", async function
     let users = await fetchUsers();
     if(users.some(u => u.username.toLowerCase() === username.toLowerCase())) { alert("⚠️ Username exists!"); return; }
 
-    const newUser = { username, password, status:"pending" };
+    const newUser = { username, password, status: "pending" };
     users.push(newUser);
 
     await saveUsers(users);
@@ -163,6 +155,12 @@ document.getElementById("signup-form").addEventListener("submit", async function
 
     alert("✅ Account created! Waiting for admin approval.");
     window.location.href = "pending.html";
+});
+
+// About dropdown toggle
+document.getElementById("about-button").addEventListener("click", () => {
+    const dd = document.getElementById("about-dropdown");
+    dd.style.display = dd.style.display === "block" ? "none" : "block";
 });
 </script>
 
