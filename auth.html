@@ -4,96 +4,74 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghostly Tools 👻 - Sign In</title>
-<link href="https://fonts.googleapis.com/css2?family=Nosifer&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <style>
-/* General body */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Nosifer', cursive;
-  color: red;
-  background: url("https://wallpapers.com/images/hd/cool-3d-ghost-crawling-in-dark-agupg3ry9e4innyi.jpg") no-repeat center center fixed;
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  position: relative;
-}
-body::before {
-  content: "";
-  position: absolute;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.3);
-  z-index:0;
-}
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
 
-/* All text with blood-drop glow */
-body, h1, h2, h3, h4, h5, h6, p, a, button, input, span {
-  font-family: 'Nosifer', cursive !important;
-  color: red !important;
-  text-shadow: 
-    0 0 5px #ff0000,
-    0 0 10px #ff0000,
-    0 0 20px #ff0000,
-    0 0 30px #ff0000,
-    0 0 40px #ff0000;
-}
+  .login-container {
+    background: #111;
+    border: 3px solid red;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    width: 320px;
+    animation: heartbeat 1.5s infinite;
+  }
 
-/* Inputs placeholder style */
-input::placeholder {
-  color: red;
-  text-shadow: 0 0 3px #ff0000, 0 0 5px #ff0000;
-}
+  .login-container h1 {
+    color: red;
+    margin-bottom: 25px;
+  }
 
-/* Buttons */
-button {
-  color: white; 
-  text-shadow: 0 0 5px #ff0000, 0 0 10px #ff0000;
-  cursor: pointer;
-}
+  .login-container input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid red;
+    border-radius: 5px;
+    background: #111;
+    color: #fff;
+    font-size: 16px;
+  }
 
-/* Links hover */
-a:hover {
-  text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
-}
+  .login-container button {
+    width: 95%;
+    padding: 10px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    background: red;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
 
-/* Sign In container (original layout) */
-.login-container {
-  position: relative;
-  z-index: 1;
-  background: rgba(0,0,0,0.85);
-  padding: 30px;
-  border-radius: 15px;
-  text-align: center;
-  width: 300px;
-  box-shadow: 0 0 25px red;
-  animation: heartbeatGlow 1.5s ease-in-out infinite, flicker 0.2s infinite;
-}
-.login-container h1 { margin-bottom:20px; text-shadow:0 0 15px red; }
-.login-container input {
-  width:100%; padding:10px; margin:10px 0; border:none;
-  border-radius:5px; background:#222; color:#fff; outline:none;
-}
-.login-container button {
-  width:100%; padding:10px; background:red; border:none;
-  color:white; font-weight:bold; border-radius:5px;
-}
-.login-container button:hover { background:#ff0000cc; }
-.login-container p { margin-top:10px; font-size:0.9em; }
-.login-container a { color:red; text-decoration:none; }
-.login-container a:hover { text-decoration:underline; }
+  .login-container button:hover {
+    background: #fff;
+    color: red;
+  }
 
-/* Animations */
-@keyframes heartbeatGlow {
-  0%,100% { box-shadow:0 0 15px red; }
-  25% { box-shadow:0 0 50px red; }
-  50% { box-shadow:0 0 20px red; }
-  75% { box-shadow:0 0 40px red; }
-}
-@keyframes flicker { 0%,100%{opacity:1;} 50%{opacity:0.95;} }
+  .login-container p a {
+    color: red;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  @keyframes heartbeat {
+    0%, 100% { box-shadow: 0 0 5px red; }
+    50% { box-shadow: 0 0 20px red; }
+  }
 </style>
 </head>
 <body>
@@ -109,64 +87,33 @@ a:hover {
 </div>
 
 <script>
-const webhookURL = "https://discord.com/api/webhooks/1405861054017179708/rYLQuKpFZCXOHT1nPhBPvq4hDeWiyohO46jMVjL6bWVSATni6QLX1umoxDeAoUQwBTXP";
-
-function sendWebhook(message) {
-  fetch(webhookURL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content: message })
-  }).catch(err => console.log("Webhook failed:", err));
-}
-
-async function getIP() {
-  try {
-    const res = await fetch("https://api.ipify.org?format=json");
-    const data = await res.json();
-    return data.ip;
-  } catch { return "Unknown"; }
-}
-
-// Ensure admin exists
-let users = JSON.parse(localStorage.getItem("users") || "[]");
-if(!users.some(u => u.username === "Ghostly")) {
-  users.push({ username: "Ghostly", password: "Dare2995!", status: "approved", admin: true });
-  localStorage.setItem("users", JSON.stringify(users));
-}
-
-// Sign-in logic
-document.getElementById("signin-form").addEventListener("submit", async function(e){
+document.getElementById("signin-form").addEventListener("submit", function(e){
   e.preventDefault();
+
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
-  users = JSON.parse(localStorage.getItem("users") || "[]");
 
-  const admin = users.find(u => u.admin && u.username === username && u.password === password);
-  if(admin){
-    localStorage.setItem("signedInUser", username);
-    const ip = await getIP();
-    sendWebhook("💀 Admin " + username + " signed in\nIP: " + ip);
-    alert("✅ Admin signed in!");
-    window.location.href = "admin.html";
-    return;
-  }
+  let users = JSON.parse(localStorage.getItem("users") || "[]");
+  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
 
-  const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
   if(!user){
-    alert("⚠️ Invalid username or password");
-    return;
-  }
-  if(user.status !== "approved"){
-    alert("⏳ Your account is pending approval.");
-    window.location.href = "pending.html";
+    alert("⚠️ Username not found!");
     return;
   }
 
-  localStorage.setItem("signedInUser", user.username);
-  const ip = await getIP();
-  sendWebhook("💀 User " + user.username + " signed in\nIP: " + ip);
-  alert("✅ Signed in successfully!");
-  window.location.href = "index.html";
+  if(user.status !== "pending"){
+    alert("⚠️ Your account is not approved yet. Please wait for admin approval.");
+    return;
+  }
+
+  if(user.password !== password){
+    alert("⚠️ Incorrect password!");
+    return;
+  }
+
+  alert("✅ Sign In successful! Welcome " + username);
+  // Redirect to your dashboard page
+  // window.location.href = "index.html";
 });
 </script>
 
