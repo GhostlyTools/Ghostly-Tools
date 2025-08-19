@@ -6,7 +6,7 @@
 <title>Ghostly Tools 👻 - Sign In</title>
 <link rel="stylesheet" href="style.css">
 <style>
-  body {
+body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
@@ -16,9 +16,9 @@
     justify-content: center;
     align-items: center;
     height: 100vh;
-  }
+}
 
-  .login-container {
+.login-container {
     background: #111;
     border: 3px solid red;
     padding: 40px;
@@ -26,14 +26,14 @@
     text-align: center;
     width: 320px;
     animation: heartbeat 1.5s infinite;
-  }
+}
 
-  .login-container h1 {
+.login-container h1 {
     color: red;
     margin-bottom: 25px;
-  }
+}
 
-  .login-container input {
+.login-container input {
     width: 90%;
     padding: 10px;
     margin: 10px 0;
@@ -42,9 +42,9 @@
     background: #111;
     color: #fff;
     font-size: 16px;
-  }
+}
 
-  .login-container button {
+.login-container button {
     width: 95%;
     padding: 10px;
     margin-top: 10px;
@@ -55,23 +55,23 @@
     font-size: 18px;
     cursor: pointer;
     transition: 0.3s;
-  }
+}
 
-  .login-container button:hover {
+.login-container button:hover {
     background: #fff;
     color: red;
-  }
+}
 
-  .login-container p a {
+.login-container p a {
     color: red;
     text-decoration: underline;
     cursor: pointer;
-  }
+}
 
-  @keyframes heartbeat {
+@keyframes heartbeat {
     0%, 100% { box-shadow: 0 0 5px red; }
     50% { box-shadow: 0 0 20px red; }
-  }
+}
 </style>
 </head>
 <body>
@@ -112,8 +112,7 @@ document.getElementById("signin-form").addEventListener("submit", function(e){
   }
 
   alert("✅ Sign In successful! Welcome " + username);
-  // Redirect to your dashboard page
-  // window.location.href = "index.html";
+  // window.location.href = "index.html"; // redirect to dashboard
 });
 </script>
 
