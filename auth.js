@@ -1,5 +1,5 @@
 // Admin credentials
-const adminUser = "admin";
+const adminUser = "Ghostly";
 const adminPass = "Dare2995!";
 
 document.getElementById("login-form").addEventListener("submit", function(e){
